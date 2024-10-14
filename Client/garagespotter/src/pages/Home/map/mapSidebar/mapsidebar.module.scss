@@ -1,0 +1,82 @@
+.sidebar {
+    position: absolute;
+    top: 20px;
+    left: -370px; // Off-screen by default
+    width: 350px;
+    min-height: 600px;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); // Adjust shadow for left side
+    transition: left 0.3s ease-in-out;
+    z-index: 1000;
+
+    &.open {
+        left: 0; // Move sidebar into view
+    }
+
+    .closeButton {
+        background: none;
+        border: none;
+        top: 50%;
+        position: absolute;
+        transform: translate(50%, -100%);
+        font-size: 24px;
+        right: -3px; // Place close button outside the sidebar
+        height: 55px;
+        border-radius: 5px;
+        box-shadow: 1px 2px 1px rgb(132, 131, 131);
+        background-color: rgba(255, 255, 255, 0.9);
+        cursor: pointer;
+    }
+
+    .sidebarContent {
+        padding: 20px;
+        overflow-y: auto;
+
+        .imageSlider {
+            display: flex;
+            position: relative;
+            gap: 10px; // Space between images
+            overflow-x: hidden;
+
+            .imageContainer {
+                display: flex;
+                scroll-snap-type: x mandatory;
+                overflow-x: auto; // Horizontal scrolling for the images
+                gap: 10px;
+                scroll-behavior: smooth;
+
+                img {
+                    flex: 0 0 100%;
+                    max-width: 100%;
+                    height: auto;
+                    border-radius: 5px;
+                    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); // Shadow effect
+                    scroll-snap-align: center;
+                }
+            }
+
+            .arrow {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 30px;
+                background: none;
+                border: none;
+                cursor: pointer;
+                z-index: 1;
+                padding: 10px;
+                border-radius: 50%;
+                background-color: rgba(255, 255, 255, 0.8); // Arrow background
+                box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+            }
+
+            .arrowLeft {
+                left: 5px;
+            }
+
+            .arrowRight {
+                right: 5px;
+            }
+        }
+    }
+}

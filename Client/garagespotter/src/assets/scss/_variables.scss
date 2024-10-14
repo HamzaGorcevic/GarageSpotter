@@ -1,0 +1,34 @@
+// Color palette
+$primary-color: #1a73e8; // Bright blue for buttons, highlights
+$secondary-color: #34a853; // Green for success, availability
+$accent-color: #ffcc00; // Yellow for highlights or warnings
+$error-color: #ea4335; // Red for errors
+$background-color: #f4f7fa; // Light background
+$map-background: #e5e5e5; // Map container background (light gray)
+$text-color: #202124; // Dark text color
+$muted-text-color: #5f6368; // Muted text (gray)
+$border-color: #dadce0; // Light border
+
+// Typography
+$font-family: "Afacad Flux", sans-serif; // Clean and modern font
+$font-size-base: 16px;
+$font-size-large: 18px;
+$font-size-small: 14px;
+
+// Spacing
+$spacing-small: 8px;
+$spacing-medium: 16px;
+$spacing-large: 24px;
+
+// Borders and Shadows
+$border-radius: 8px; // Rounded corners
+$box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); // Light shadow for depth
+$hover-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); // Slightly stronger hover shadow
+
+// Z-index
+$z-index-modal: 1000;
+$z-index-tooltip: 900;
+$z-index-navbar: 9999;
+
+// Transition
+$transition-default: 0.3s ease; // Smooth transitions for hover and active states
