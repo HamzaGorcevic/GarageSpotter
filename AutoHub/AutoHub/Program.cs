@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -109,9 +110,10 @@ namespace AutoHub
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(key),
-                        ValidateIssuer = false, // You can set this to true if you want to validate the issuer
-                        ValidateAudience = false, // You can set this to true if you want to validate the audience
-                        ValidateLifetime = true
+                        ValidateIssuer = false, 
+                        ValidateAudience = false, 
+                        ValidateLifetime = true,
+                        RoleClaimType = ClaimTypes.Role
                     };
                 });
             //

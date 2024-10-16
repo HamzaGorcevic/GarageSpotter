@@ -1,0 +1,88 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5); // Semi-transparent background
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: $z-index-modal;
+}
+
+.modalContent {
+    background-color: white;
+    border-radius: $border-radius;
+    box-shadow: $hover-shadow;
+    padding: $spacing-large;
+    width: 400px;
+    max-width: 90%;
+    position: relative;
+    text-align: center;
+
+    h2 {
+        font-size: $font-size-large;
+        color: $text-color;
+        margin-bottom: $spacing-medium;
+    }
+
+    .inputGroup {
+        margin-bottom: $spacing-medium;
+
+        label {
+            font-size: $font-size-base;
+            color: $text-color;
+            display: block;
+            margin-bottom: $spacing-small;
+        }
+
+        input {
+            width: 100%;
+            padding: $spacing-small;
+            font-size: $font-size-base;
+            border: 1px solid $border-color;
+            border-radius: $border-radius;
+            color: $text-color;
+            transition: border-color $transition-default;
+
+            &:focus {
+                border-color: $primary-color;
+                outline: none;
+            }
+        }
+    }
+
+    .buttonGroup {
+        display: flex;
+        justify-content: space-between;
+        gap: $spacing-medium;
+
+        button {
+            padding: $spacing-small $spacing-medium;
+            font-size: $font-size-base;
+            border-radius: $border-radius;
+            border: none;
+            cursor: pointer;
+            transition: background-color $transition-default;
+
+            &:first-child {
+                background-color: $primary-color;
+                color: white;
+
+                &:hover {
+                    background-color: darken($primary-color, 10%);
+                }
+            }
+
+            &:last-child {
+                background-color: $error-color;
+                color: white;
+
+                &:hover {
+                    background-color: darken($error-color, 10%);
+                }
+            }
+        }
+    }
+}

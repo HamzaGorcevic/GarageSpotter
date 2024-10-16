@@ -1,4 +1,5 @@
-﻿using AutoHub.Models;
+﻿using AutoHub.Dtos;
+using AutoHub.Models;
 using AutoHub.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,9 +29,16 @@ namespace AutoHub.Controllers
             return await _garageSpotService.GetOwnerGarageSpots();
         }
 
+        [HttpGet("getGarageSpot")]
+        [Authorize(Roles="User,Owner")]
+
+        public async Task<ServiceResponse<GarageSpotDto>> GetGarageSpot(int garageSpotId)
+        {
+            return await _garageSpotService.GetGarageSpot(garageSpotId);
+        }
         [HttpPost("creategaragespot")]
         [Authorize(Roles = "Owner")]
-        public async Task<ServiceResponse<string>> CreateGarageSpot([FromBody] GarageSpotDto garageSpotDto)
+        public async Task<ServiceResponse<int>> CreateGarageSpot([FromBody] CreateGarageSpotDto garageSpotDto)
         {
             return await _garageSpotService.CreateGarageSpot(garageSpotDto);
         }

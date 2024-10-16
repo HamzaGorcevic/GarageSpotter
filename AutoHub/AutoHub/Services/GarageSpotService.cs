@@ -1,4 +1,5 @@
 ﻿using AutoHub.Data;
+using AutoHub.Dtos;
 using AutoHub.Models;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,7 @@ namespace AutoHub.Services
         public async Task<ServiceResponse<List<GarageSpotDto>>> GetGarageSpots()
         {
 
-            var garagaSpots = await _context.GarageSpots.ToListAsync();
+            var garagaSpots = await _context.GarageSpots.Include(g=>g.TotalSpots).ToListAsync();
 
             var response = new ServiceResponse<List<GarageSpotDto>>
             {
@@ -27,33 +28,63 @@ namespace AutoHub.Services
 
             return response;
         }
-
-        public async Task<ServiceResponse<string>> CreateGarageSpot(GarageSpotDto newSpot)
+        public async Task<ServiceResponse<GarageSpotDto>> GetGarageSpot(int garageSpotId)
         {
-            var response = new ServiceResponse<string>();
+            var response = new ServiceResponse<GarageSpotDto>();
+            var garapgeSpot = await _context.GarageSpots.Include(g => g.TotalSpots).FirstOrDefaultAsync(g=>g.Id==garageSpotId);
 
-            var garageSpot = _mapper.Map<GarageSpot>(newSpot);
-            var ownerId = GetUserId();
-
-            // Fetch the existing user if needed
-            var existingUser = await _context.Users.FindAsync(ownerId);
-            if (existingUser == null)
+            if (garapgeSpot is not null)
             {
-                response.Success = false;
-                response.Message = "User does not exist.";
+
+                var garageSpotDto = _mapper.Map<GarageSpotDto>(garapgeSpot);
+                response.Value = garageSpotDto;
+                response.Success = true;
+                response.Message = "Succesfully found garage";
                 return response;
             }
+            response.Success = false;
+            response.Message = "Garage not found";
+            response.Value = null;
+            return response;
+            
+        }
+        public async Task<ServiceResponse<int>> CreateGarageSpot(CreateGarageSpotDto newSpot)
+        {
+            var response = new ServiceResponse<int>();
 
-            garageSpot.Owner = existingUser; // Set the Owner directly
-            garageSpot.OwnerId = ownerId; // Ensure OwnerId is set correctly
+            var garageSpot = new GarageSpot
+            {
+                OwnerId = GetUserId(),
+                LocationName = newSpot.LocationName,
+                IsAvailable = newSpot.IsAvailable,
+                Latitude = newSpot.Latitude,
+                Longitude = newSpot.Longitude,
+                VerificationDocument = newSpot.VerificationDocument,
+                Price = newSpot.Price,
+                GarageImages = newSpot.GarageImages
+            };
 
+            // Save garage spot first to generate GarageSpotId
             _context.GarageSpots.Add(garageSpot);
             await _context.SaveChangesAsync();
 
-            response.Success = true;
-            response.Message = "Garage spot created successfully.";
-            response.Value = garageSpot.Id.ToString();
+            // Automatically create the specified number of SingleSpots
+            for (int i = 0; i < newSpot.NumberOfSpots; i++)
+            {
+                var singleSpot = new SingleSpot
+                {
+                    IsAvailable = true, // By default, each SingleSpot is available
+                    GarageSpotId = garageSpot.Id
+                };
 
+                _context.SingleSpots.Add(singleSpot);
+            }
+
+            await _context.SaveChangesAsync();
+
+            response.Success = true;
+            response.Message = $"Garage spot with {newSpot.NumberOfSpots} spots created successfully.";
+            response.Value = garageSpot.Id;
             return response;
         }
 

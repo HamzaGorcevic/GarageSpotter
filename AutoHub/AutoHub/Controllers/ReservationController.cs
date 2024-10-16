@@ -18,22 +18,22 @@ namespace AutoHub.Controllers
             _reservationService = reservationService;
         }
 
-        [HttpPost("userreserve")]
-        [Authorize(Roles = "User")]
+        [HttpPost("reserveSingleSpot")]
+        [Authorize(Roles = "User,Owner")]
         public async Task<ServiceResponse<int>> UserReserveGarageSpot([FromBody] ReserveDto reserveDto)
         {
-            return await _reservationService.ReserveGarageSpot(reserveDto);
+            return await _reservationService.ReserveSingleSpot(reserveDto);
         }
 
-        [HttpPost("travelerreserve")]
-        [Authorize(Roles = "Traveler")]
-        public async Task<ServiceResponse<int>> TravelerReserveGarageSpot([FromBody] ReserveDto reserveDto)
-        {
-            return await _reservationService.TravelerReserveGarageSpot(reserveDto);
-        }
+        //[HttpPost("travelerreserve")]
+        //[Authorize(Roles = "Traveler")]
+        //public async Task<ServiceResponse<int>> TravelerReserveGarageSpot([FromBody] ReserveDto reserveDto)
+        //{
+        //    return await _reservationService.TravelerReserveGarageSpot(reserveDto);
+        //}
 
         [HttpPost("usercancelledgaragespot")]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User,Owner")]
         public async Task<ServiceResponse<int>> UserCancelledGaragaSpot([FromBody] CancelReservationDto cancelDto)
         {
             return await _reservationService.CancelReservation(cancelDto);

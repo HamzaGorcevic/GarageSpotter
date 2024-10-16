@@ -9,8 +9,35 @@
     transition: left 0.3s ease-in-out;
     z-index: 1000;
 
+    .containerForSpots {
+        width: 100%;
+        height: 90px;
+        margin-top: 5px;
+        margin-bottom: 5px;
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        flex-wrap: wrap;
+    }
     &.open {
         left: 0; // Move sidebar into view
+    }
+
+    .reserveButton {
+        background-color: $secondary-color;
+        color: rgb(241, 236, 236);
+        padding: $spacing-small;
+        font-size: $font-size-large;
+        border-radius: $border-radius;
+        border: 0;
+        margin-top: $spacing-small;
+        width: 100%;
+
+        cursor: pointer;
+        transition: $transition-default;
+        &:hover {
+            background-color: #119e37;
+        }
     }
 
     .closeButton {

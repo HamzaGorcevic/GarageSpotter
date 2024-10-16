@@ -4,6 +4,7 @@ using AutoHub.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AutoHub.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241014195503_RemovedGarageSpotFromSingleSpot")]
+    partial class RemovedGarageSpotFromSingleSpot
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -74,14 +77,14 @@ namespace AutoHub.Migrations
                     b.Property<int>("GarageSpotId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Hours")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("ReservationEnd")
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("ReservationStart")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<int>("ReservationType")
+                        .HasColumnType("int");
 
                     b.Property<int>("SingleSpotId")
                         .HasColumnType("int");

@@ -31,7 +31,7 @@ const MapComponent = ({ garageSpots }) => {
     const [userPosition, setUserPosition] = useState(null);
     const [clickedMarkerPosition, setClickedMarkerPosition] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [selectedGarageSpot, setSelectedGarageSpot] = useState(null);
+    const [selectedGarageSpotId, setSelectedGarageSpotId] = useState(0);
     const [distanceToSpot, setDistanceToSpot] = useState(0);
 
     useEffect(() => {
@@ -59,14 +59,13 @@ const MapComponent = ({ garageSpots }) => {
         );
         let convertedDistance = convertDistance(distance, "km").toFixed(2);
         setDistanceToSpot(convertedDistance);
-        setSelectedGarageSpot(spot);
+        setSelectedGarageSpotId(spot.id);
         setClickedMarkerPosition({
             lat: spot.latitude,
             lng: spot.longitude,
         });
 
         setSidebarOpen(true);
-        console.log(convertedDistance, spot);
     };
 
     // Function to close the sidebar
@@ -117,7 +116,7 @@ const MapComponent = ({ garageSpots }) => {
             <Sidebar
                 isOpen={sidebarOpen}
                 onClose={closeSidebar}
-                garageSpot={selectedGarageSpot}
+                garageSpotId={selectedGarageSpotId}
                 distance={distanceToSpot}
             />
         </div>

@@ -22,7 +22,6 @@ const Home = () => {
                 console.error("Error fetching garage spots:", error);
             }
         };
-
         fetchGarageSpots();
     }, []);
 

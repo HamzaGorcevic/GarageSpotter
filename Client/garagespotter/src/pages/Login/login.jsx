@@ -26,7 +26,6 @@ const Login = () => {
         const res = await response.json();
 
         login(res.value, form);
-        console.log("Login data:", form, res);
     };
 
     return (

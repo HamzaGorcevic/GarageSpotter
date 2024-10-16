@@ -238,3 +238,4 @@ C:\Users\gorce\GarageSpotter\AutoHub\AutoHub\obj\Debug\net8.0\refint\AutoHub.dll
 C:\Users\gorce\GarageSpotter\AutoHub\AutoHub\obj\Debug\net8.0\AutoHub.pdb
 C:\Users\gorce\GarageSpotter\AutoHub\AutoHub\obj\Debug\net8.0\AutoHub.genruntimeconfig.cache
 C:\Users\gorce\GarageSpotter\AutoHub\AutoHub\obj\Debug\net8.0\ref\AutoHub.dll
+C:\Users\gorce\GarageSpotter\AutoHub\AutoHub\obj\Debug\net8.0\AutoHub.sourcelink.json

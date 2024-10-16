@@ -4,6 +4,7 @@ using AutoHub.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AutoHub.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241014193316_SingleSpot")]
+    partial class SingleSpot
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,6 +32,9 @@ namespace AutoHub.Migrations
                         .HasColumnType("int");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("FreeSpots")
+                        .HasColumnType("int");
 
                     b.Property<string>("GarageImages")
                         .HasColumnType("longtext");
@@ -50,6 +56,9 @@ namespace AutoHub.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("Price")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalSpots")
                         .HasColumnType("int");
 
                     b.Property<string>("VerificationDocument")
@@ -74,16 +83,13 @@ namespace AutoHub.Migrations
                     b.Property<int>("GarageSpotId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Hours")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("ReservationEnd")
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("ReservationStart")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("SingleSpotId")
+                    b.Property<int>("ReservationType")
                         .HasColumnType("int");
 
                     b.Property<int>("UserId")
@@ -92,8 +98,6 @@ namespace AutoHub.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("GarageSpotId");
-
-                    b.HasIndex("SingleSpotId");
 
                     b.HasIndex("UserId");
 
@@ -111,7 +115,7 @@ namespace AutoHub.Migrations
                     b.Property<int>("GarageSpotId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsAvailable")
+                    b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
 
                     b.HasKey("Id");
@@ -170,12 +174,6 @@ namespace AutoHub.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AutoHub.Models.SingleSpot", "SingleSpot")
-                        .WithMany()
-                        .HasForeignKey("SingleSpotId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("AutoHub.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -184,23 +182,18 @@ namespace AutoHub.Migrations
 
                     b.Navigation("GarageSpot");
 
-                    b.Navigation("SingleSpot");
-
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("AutoHub.Models.SingleSpot", b =>
                 {
-                    b.HasOne("AutoHub.Models.GarageSpot", null)
-                        .WithMany("TotalSpots")
+                    b.HasOne("AutoHub.Models.GarageSpot", "GarageSpot")
+                        .WithMany()
                         .HasForeignKey("GarageSpotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
 
-            modelBuilder.Entity("AutoHub.Models.GarageSpot", b =>
-                {
-                    b.Navigation("TotalSpots");
+                    b.Navigation("GarageSpot");
                 });
 
             modelBuilder.Entity("AutoHub.Models.User", b =>

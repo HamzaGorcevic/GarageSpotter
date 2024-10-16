@@ -7,8 +7,8 @@ namespace AutoHub.Models.Enums
     public enum UserRole
     {
         Owner,      // Vlasnik garaže
-        Driver,     // Vozač
-        Traveler    // Putnik
+        User,     // Vozač
+        Admin
     }
 
 }

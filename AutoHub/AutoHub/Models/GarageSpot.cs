@@ -16,8 +16,8 @@ namespace AutoHub.Models
         public User Owner { get; set; } = new User();
 
         public string VerificationDocument { get; set; } = string.Empty;
-        public int TotalSpots { get; set; }
-        public int FreeSpots { get; set; }
+        public List<SingleSpot> TotalSpots { get; set; } = new List<SingleSpot>();
+
         public int Price {  get; set; } 
         public List<string> ?GarageImages { get; set; } = new List<string>();
     }
