@@ -5,6 +5,7 @@
     padding: $spacing-medium;
     background-color: $primary-color;
     color: #fff;
+    z-index: $z-index-navbar !important;
 
     .logo {
         font-size: $font-size-large;

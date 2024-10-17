@@ -4,7 +4,7 @@ import RoutingMachine from "./RoutineMachine";
 import L from "leaflet";
 import getDistance from "geolib/es/getDistance";
 import convertDistance from "geolib/es/convertDistance";
-
+import DefaultSidebar from "./defaultSidebar/DefaultSidebar";
 import BluePin from "../../../assets/images/blue.svg";
 import RedPin from "../../../assets/images/red.svg";
 import Sidebar from "./mapSidebar/MapSidebar";
@@ -52,7 +52,7 @@ const MapComponent = ({ garageSpots }) => {
         }
     }, []);
 
-    const handleMarkerClick = (spot) => {
+    const countDistanceToSpot = (spot) => {
         const distance = getDistance(
             { latitude: userPosition.lat, longitude: userPosition.lng },
             { latitude: spot.latitude, longitude: spot.longitude }
@@ -64,7 +64,10 @@ const MapComponent = ({ garageSpots }) => {
             lat: spot.latitude,
             lng: spot.longitude,
         });
+    };
 
+    const handleMarkerClick = (spot) => {
+        countDistanceToSpot(spot);
         setSidebarOpen(true);
     };
 
@@ -73,9 +76,25 @@ const MapComponent = ({ garageSpots }) => {
         setSidebarOpen(false);
     };
 
+    // Function to log latitude and longitude of the clicked point
+    const MapClickHandler = () => {
+        alert("called");
+        useMapEvents({
+            click(e) {
+                const { lat, lng } = e.latlng;
+                console.log(
+                    `Clicked coordinates: Latitude: ${lat}, Longitude: ${lng}`
+                );
+                alert(`Clicked at Latitude: ${lat}, Longitude: ${lng}`);
+            },
+        });
+        return null;
+    };
+
     return (
         <div className={style.mapContainer}>
             <MapContainer
+                onClick={MapClickHandler}
                 center={
                     userPosition
                         ? [userPosition.lat, userPosition.lng]
@@ -118,6 +137,12 @@ const MapComponent = ({ garageSpots }) => {
                 onClose={closeSidebar}
                 garageSpotId={selectedGarageSpotId}
                 distance={distanceToSpot}
+            />
+            <DefaultSidebar
+                garageSpots={garageSpots}
+                setSidebarOpen={setSidebarOpen}
+                setSelectedGarageSpotId={setSelectedGarageSpotId}
+                countDistanceToSpot={countDistanceToSpot}
             />
         </div>
     );

@@ -57,7 +57,9 @@ const Sidebar = ({ isOpen, onClose, garageSpotId, distance }) => {
         setGarageSpot(res.value);
     };
     useEffect(() => {
-        fetchGarageSpot();
+        if (garageSpotId >= 0) {
+            fetchGarageSpot();
+        }
     }, [garageSpotId]);
 
     const handleReserveClick = () => {
@@ -72,7 +74,38 @@ const Sidebar = ({ isOpen, onClose, garageSpotId, distance }) => {
                 </button>
             </div>
             <div className={style.sidebarContent}>
+                {garageSpot?.garageImages?.length > 0 && (
+                    <div className={style.imageSlider}>
+                        <button
+                            className={`${style.arrow} ${style.arrowLeft}`}
+                            onClick={() => handleSliderMovement("left")}
+                        >
+                            &lt;
+                        </button>
+                        <div className={style.imageContainer} ref={sliderRef}>
+                            {garageSpot.garageImages.map((image, index) => (
+                                <img
+                                    key={index}
+                                    src={image}
+                                    alt={`Garage Image ${index + 1}`}
+                                />
+                            ))}
+                        </div>
+                        <button
+                            className={`${style.arrow} ${style.arrowRight}`}
+                            onClick={() => handleSliderMovement("right")}
+                        >
+                            &gt;
+                        </button>
+                    </div>
+                )}
                 <h2>{garageSpot?.locationName}</h2>
+                <button
+                    className={style.reserveButton}
+                    onClick={handleReserveClick}
+                >
+                    Reserve spot
+                </button>
                 <p>
                     <strong>Address:</strong> {garageSpot?.address}
                 </p>
@@ -100,40 +133,6 @@ const Sidebar = ({ isOpen, onClose, garageSpotId, distance }) => {
                         )
                     )}
                 </div>
-
-                {/* Display garage images if available */}
-                {garageSpot?.garageImages?.length > 0 && (
-                    <div className={style.imageSlider}>
-                        <button
-                            className={`${style.arrow} ${style.arrowLeft}`}
-                            onClick={() => handleSliderMovement("left")}
-                        >
-                            &lt;
-                        </button>
-                        <div className={style.imageContainer} ref={sliderRef}>
-                            {garageSpot.garageImages.map((image, index) => (
-                                <img
-                                    key={index}
-                                    src={image}
-                                    alt={`Garage Image ${index + 1}`}
-                                />
-                            ))}
-                        </div>
-                        <button
-                            className={`${style.arrow} ${style.arrowRight}`}
-                            onClick={() => handleSliderMovement("right")}
-                        >
-                            &gt;
-                        </button>
-                    </div>
-                )}
-
-                <button
-                    className={style.reserveButton}
-                    onClick={handleReserveClick}
-                >
-                    Reserve spot
-                </button>
             </div>
 
             {isModalOpen && (

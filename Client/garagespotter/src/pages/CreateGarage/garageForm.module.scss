@@ -2,17 +2,16 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    height: 100vh;
+    min-height: 100vh;
     background-color: $background-color;
     padding: 2rem;
 
-    // Mobile responsiveness
     @media (max-width: 600px) {
         padding: 1rem;
     }
 }
 
+// Form Title Styling
 .title {
     font-size: 2.5rem;
     margin-bottom: 2rem;
@@ -20,31 +19,42 @@
     text-align: center;
 }
 
+// Form Styling
 .form {
     display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 400px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-width: 50%;
+    align-items: center;
+    gap: 10px;
+    justify-content: space-between;
     background-color: #fff;
     padding: 2.5rem;
     border-radius: $border-radius;
     box-shadow: $box-shadow;
+    transition: box-shadow $transition-default;
 
-    // Slight elevation effect
     &:hover {
-        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        box-shadow: $hover-shadow;
+    }
+
+    @media (max-width: 768px) {
+        padding: 1.5rem;
+        min-width: 100% !important;
+        justify-content: center;
     }
 }
 
+// Form Group for Labels and Inputs
 .formGroup {
     margin-bottom: 1.5rem;
-
+    min-width: 250px;
     label {
-        display: block;
         font-size: 1rem;
         font-weight: 600;
         margin-bottom: 0.75rem;
         color: $text-color;
+        display: block;
     }
 
     input {
@@ -64,6 +74,7 @@
     }
 }
 
+// Button Styling
 .submitButton {
     padding: 1rem;
     font-size: 1.25rem;
@@ -90,9 +101,21 @@
         background-color: lighten($primary-color, 20%);
         cursor: not-allowed;
     }
+
+    @media (max-width: 768px) {
+        font-size: 1rem;
+        padding: 0.75rem;
+    }
 }
 
-// Add subtle animations for loading states
+// Error Message Styling
+.error {
+    color: $error-color;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+// Loading Spinner Styling
 .loadingSpinner {
     border: 4px solid #f3f3f3;
     border-radius: 50%;
@@ -102,23 +125,12 @@
     animation: spin 1s linear infinite;
 }
 
+// Animation for Spinner
 @keyframes spin {
     0% {
         transform: rotate(0deg);
     }
     100% {
         transform: rotate(360deg);
-    }
-}
-
-// Additional touch for mobile
-@media (max-width: 768px) {
-    .form {
-        padding: 1.5rem;
-    }
-
-    .submitButton {
-        font-size: 1rem;
-        padding: 0.75rem;
     }
 }

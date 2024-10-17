@@ -1,13 +1,15 @@
 .sidebar {
     position: absolute;
-    top: 20px;
-    left: -370px; // Off-screen by default
-    width: 350px;
-    min-height: 600px;
-    background-color: rgba(255, 255, 255, 0.9);
+    top: 0;
+    left: -430px; // Off-screen by default
+    width: 430px;
+    height: 95%;
+    background-color: $background-color;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); // Adjust shadow for left side
     transition: left 0.3s ease-in-out;
-    z-index: 1000;
+    z-index: 999;
+    overflow-y: auto;
+    overflow-x: hidden;
 
     .containerForSpots {
         width: 100%;
@@ -20,7 +22,7 @@
         flex-wrap: wrap;
     }
     &.open {
-        left: 0; // Move sidebar into view
+        left: 460px; // Move sidebar into view
     }
 
     .reserveButton {
@@ -53,6 +55,7 @@
         box-shadow: 1px 2px 1px rgb(132, 131, 131);
         background-color: rgba(255, 255, 255, 0.9);
         cursor: pointer;
+        z-index: 1000;
     }
 
     .sidebarContent {

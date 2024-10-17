@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import styles from "./Home.module.scss";
-import MapComponent from "./map/Map";
+import MapComponent from "./map/map";
 import { BASE_URL } from "../../config/config";
 const Home = () => {
     const [garageSpots, setGarageSpots] = useState([]);
@@ -27,7 +27,6 @@ const Home = () => {
 
     return (
         <div className={styles.homeContainer}>
-            <h1>Free Parking Spots</h1>
             <MapComponent garageSpots={garageSpots} />
         </div>
     );
