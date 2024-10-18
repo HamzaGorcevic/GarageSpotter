@@ -22,6 +22,12 @@ const Navbar = () => {
                     <Link to="/about">About</Link>
                 </li>
                 <li>
+                    <Link to="/about">My reservations</Link>
+                </li>
+                <li>
+                    <Link to="/about">My garages</Link>
+                </li>
+                <li>
                     <Link to="/create">Create Garage</Link>
                 </li>
                 {!authData.token ? (

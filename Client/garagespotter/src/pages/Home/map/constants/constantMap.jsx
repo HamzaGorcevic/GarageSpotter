@@ -13,7 +13,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-geosearch/dist/geosearch.css";
 import icon from "./constantMarker.js";
 
-const MapConstant = () => {
+const MapConstant = ({ setLatlng }) => {
     const [userPosition, setUserPosition] = useState(null);
     const [clickedMarkerPosition, setClickedMarkerPosition] = useState(null);
 
@@ -62,10 +62,7 @@ const MapConstant = () => {
         useMapEvents({
             click(e) {
                 const { lat, lng } = e.latlng;
-                console.log(
-                    `Clicked coordinates: Latitude: ${lat}, Longitude: ${lng}`
-                );
-                alert(`Clicked at Latitude: ${lat}, Longitude: ${lng}`);
+                setLatlng([lat, lng]);
             },
         });
         return null;

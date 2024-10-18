@@ -13,7 +13,7 @@ const Home = () => {
         const fetchGarageSpots = async () => {
             try {
                 const response = await fetch(
-                    `${BASE_URL}/GarageSpot/getgaragespots`
+                    `${BASE_URL}/GarageSpot/getGaragSspotsByCountry?country=Serbia`
                 );
                 const data = await response.json();
                 setGarageSpots(data.value);

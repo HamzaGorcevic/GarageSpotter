@@ -107,20 +107,6 @@ const MapComponent = ({ garageSpots }) => {
         setSidebarOpen(false);
     };
 
-    // Function to log latitude and longitude of the clicked point
-    const MapClickHandler = () => {
-        useMapEvents({
-            click(e) {
-                const { lat, lng } = e.latlng;
-                console.log(
-                    `Clicked coordinates: Latitude: ${lat}, Longitude: ${lng}`
-                );
-                alert(`Clicked at Latitude: ${lat}, Longitude: ${lng}`);
-            },
-        });
-        return null;
-    };
-
     return (
         <div className={style.mapContainer}>
             <MapContainer
@@ -132,9 +118,6 @@ const MapComponent = ({ garageSpots }) => {
                 zoom={14}
                 style={{ height: "100vh", width: "100%" }}
             >
-                <MapClickHandler />
-                <LeafletgeoSearch />
-
                 <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

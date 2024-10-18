@@ -1,14 +1,17 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import style from "./garageForm.module.scss"; // Import the SCSS module
 import { AuthContext } from "../../context/AuthContext";
 import { BASE_URL } from "../../config/config";
 import MapConstant from "../Home/map/constants/constantMap";
 const GarageForm = () => {
+    const [latlng, setLatlng] = useState([43.23132, 21.21321]);
+
     const { authData } = useContext(AuthContext);
     const [formData, setFormData] = useState({
         locationName: "",
-        latitude: "",
-        longitude: "",
+        latitude: latlng[0],
+        longitude: latlng[1],
+        country: "",
         verificationDocument: null,
         numberOfSpots: "",
         price: "",
@@ -16,15 +19,35 @@ const GarageForm = () => {
     });
 
     const [error, setError] = useState("");
-
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
+    useEffect(() => {
         setFormData((prevState) => ({
             ...prevState,
-            [name]: type === "checkbox" ? checked : value,
+            latitude: latlng[0],
+            longitude: latlng[1],
         }));
-    };
 
+        getcountryFromCoordinates(latlng[0], latlng[1]);
+    }, [latlng]);
+
+    const getcountryFromCoordinates = async (latitude, longitude) => {
+        try {
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+            );
+            const res = await response.json();
+            console.log(res);
+            const country = res.address.country;
+            ("Unknown country");
+
+            setFormData((prevState) => ({
+                ...prevState,
+                country,
+            }));
+        } catch (error) {
+            console.error("Error fetching country:", error);
+            setError("Failed to retrieve country name");
+        }
+    };
     const handleFileChange = (e) => {
         const { name, files } = e.target;
         setFormData((prevState) => ({
@@ -47,6 +70,7 @@ const GarageForm = () => {
             formDataToSend.append("locationName", formData.locationName);
             formDataToSend.append("latitude", formData.latitude);
             formDataToSend.append("longitude", formData.longitude);
+            formDataToSend.append("country", formData.country);
             formDataToSend.append(
                 "verificationDocument",
                 formData.verificationDocument
@@ -92,18 +116,24 @@ const GarageForm = () => {
                         type="text"
                         name="locationName"
                         value={formData.locationName}
-                        onChange={handleChange}
                         required
                     />
                 </div>
-
+                <div className={style.formGroup}>
+                    <label>Country:</label>
+                    <input
+                        type="text"
+                        name="country"
+                        value={formData.country}
+                        required
+                    />
+                </div>
                 <div className={style.formGroup}>
                     <label>Latitude:</label>
                     <input
                         type="number"
                         name="latitude"
                         value={formData.latitude}
-                        onChange={handleChange}
                         required
                     />
                 </div>
@@ -114,7 +144,6 @@ const GarageForm = () => {
                         type="number"
                         name="longitude"
                         value={formData.longitude}
-                        onChange={handleChange}
                         required
                     />
                 </div>
@@ -125,7 +154,6 @@ const GarageForm = () => {
                         type="number"
                         name="numberOfSpots"
                         value={formData.numberOfSpots}
-                        onChange={handleChange}
                         required
                     />
                 </div>
@@ -136,7 +164,6 @@ const GarageForm = () => {
                         type="number"
                         name="price"
                         value={formData.price}
-                        onChange={handleChange}
                         required
                     />
                 </div>
@@ -168,7 +195,7 @@ const GarageForm = () => {
                     Submit
                 </button>
             </form>
-            <MapConstant />
+            <MapConstant setLatlng={setLatlng} />
         </div>
     );
 };

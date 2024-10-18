@@ -31,6 +31,7 @@
     border-radius: $border-radius;
     box-shadow: $box-shadow;
     transition: box-shadow $transition-default;
+    margin-bottom: 50px;
 
     &:hover {
         box-shadow: $hover-shadow;
