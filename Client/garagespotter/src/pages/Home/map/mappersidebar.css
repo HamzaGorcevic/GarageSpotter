@@ -45,3 +45,8 @@
 .leaflet-control-zoom {
     display: none !important;
 }
+
+.leaflet-geosearch-button {
+    right: 0;
+    background-color: red;
+}

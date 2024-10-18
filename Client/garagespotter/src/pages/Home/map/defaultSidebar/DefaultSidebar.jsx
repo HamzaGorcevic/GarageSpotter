@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import style from "./defaultSidebar.module.scss";
-import ReservationModal from "../../../../components/Modals/Reservation/ReservationModal";
 
 const DefaultSidebar = ({
     garageSpots,
     setSidebarOpen,
     setSelectedGarageSpotId,
     countDistanceToSpot,
+    selectedGarageSpotId,
 }) => {
     const [isModalOpen, setModalOpen] = useState(false);
 
@@ -31,7 +31,14 @@ const DefaultSidebar = ({
     return (
         <div className={style.sidebarContainer}>
             {garageSpots.map((garage) => (
-                <div key={garage.id} className={style.garageItem}>
+                <div
+                    key={garage.id}
+                    className={`${style.garageItem} ${
+                        selectedGarageSpotId == garage.id
+                            ? style.selectedGarageItem
+                            : ""
+                    }`}
+                >
                     <img
                         src={garage.garageImages[0] || "/placeholder.png"}
                         alt={garage.locationName}

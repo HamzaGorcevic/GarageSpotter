@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import style from "./garageForm.module.scss"; // Import the SCSS module
 import { AuthContext } from "../../context/AuthContext";
 import { BASE_URL } from "../../config/config";
+import MapConstant from "../Home/map/constants/constantMap";
 const GarageForm = () => {
     const { authData } = useContext(AuthContext);
     const [formData, setFormData] = useState({
@@ -167,6 +168,7 @@ const GarageForm = () => {
                     Submit
                 </button>
             </form>
+            <MapConstant />
         </div>
     );
 };

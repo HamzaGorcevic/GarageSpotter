@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import {
+    MapContainer,
+    TileLayer,
+    Marker,
+    Popup,
+    useMapEvents,
+    useMap,
+} from "react-leaflet";
 import RoutingMachine from "./RoutineMachine";
 import L from "leaflet";
 import getDistance from "geolib/es/getDistance";
@@ -9,7 +16,10 @@ import BluePin from "../../../assets/images/blue.svg";
 import RedPin from "../../../assets/images/red.svg";
 import Sidebar from "./mapSidebar/MapSidebar";
 import style from "./map.module.scss";
-
+import { GeoSearchControl, OpenStreetMapProvider } from "leaflet-geosearch";
+import "leaflet/dist/leaflet.css";
+import "leaflet-geosearch/dist/geosearch.css";
+import icon from "./constants/constantMarker.js";
 const redIcon = L.icon({
     iconUrl: RedPin,
     iconSize: [45, 71],
@@ -38,6 +48,7 @@ const MapComponent = ({ garageSpots }) => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
+                    console.log("position", position);
                     if (position.coords) {
                         setUserPosition({
                             lat: position.coords.latitude,
@@ -52,6 +63,26 @@ const MapComponent = ({ garageSpots }) => {
         }
     }, []);
 
+    function LeafletgeoSearch() {
+        const map = useMap();
+        useEffect(() => {
+            const provider = new OpenStreetMapProvider();
+
+            const searchControl = new GeoSearchControl({
+                provider,
+                marker: {
+                    icon,
+                },
+                style: "bar",
+            });
+
+            map.addControl(searchControl);
+
+            return () => map.removeControl(searchControl);
+        }, []);
+
+        return null;
+    }
     const countDistanceToSpot = (spot) => {
         const distance = getDistance(
             { latitude: userPosition.lat, longitude: userPosition.lng },
@@ -78,7 +109,6 @@ const MapComponent = ({ garageSpots }) => {
 
     // Function to log latitude and longitude of the clicked point
     const MapClickHandler = () => {
-        alert("called");
         useMapEvents({
             click(e) {
                 const { lat, lng } = e.latlng;
@@ -94,7 +124,6 @@ const MapComponent = ({ garageSpots }) => {
     return (
         <div className={style.mapContainer}>
             <MapContainer
-                onClick={MapClickHandler}
                 center={
                     userPosition
                         ? [userPosition.lat, userPosition.lng]
@@ -103,6 +132,9 @@ const MapComponent = ({ garageSpots }) => {
                 zoom={14}
                 style={{ height: "100vh", width: "100%" }}
             >
+                <MapClickHandler />
+                <LeafletgeoSearch />
+
                 <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -139,10 +171,12 @@ const MapComponent = ({ garageSpots }) => {
                 distance={distanceToSpot}
             />
             <DefaultSidebar
+                isOpen={sidebarOpen}
                 garageSpots={garageSpots}
                 setSidebarOpen={setSidebarOpen}
                 setSelectedGarageSpotId={setSelectedGarageSpotId}
                 countDistanceToSpot={countDistanceToSpot}
+                selectedGarageSpotId={selectedGarageSpotId}
             />
         </div>
     );
