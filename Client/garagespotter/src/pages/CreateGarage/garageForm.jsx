@@ -11,7 +11,7 @@ const GarageForm = () => {
         locationName: "",
         latitude: latlng[0],
         longitude: latlng[1],
-        country: "",
+        countryName: "",
         verificationDocument: null,
         numberOfSpots: "",
         price: "",
@@ -26,26 +26,26 @@ const GarageForm = () => {
             longitude: latlng[1],
         }));
 
-        getcountryFromCoordinates(latlng[0], latlng[1]);
+        getcountryNameFromCoordinates(latlng[0], latlng[1]);
     }, [latlng]);
 
-    const getcountryFromCoordinates = async (latitude, longitude) => {
+    const getcountryNameFromCoordinates = async (latitude, longitude) => {
         try {
             const response = await fetch(
                 `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
             );
             const res = await response.json();
             console.log(res);
-            const country = res.address.country;
-            ("Unknown country");
+            const countryName = res.address.country;
+            ("Unknown countryName");
 
             setFormData((prevState) => ({
                 ...prevState,
-                country,
+                countryName,
             }));
         } catch (error) {
-            console.error("Error fetching country:", error);
-            setError("Failed to retrieve country name");
+            console.error("Error fetching countryName:", error);
+            setError("Failed to retrieve countryName name");
         }
     };
     const handleFileChange = (e) => {
@@ -70,7 +70,7 @@ const GarageForm = () => {
             formDataToSend.append("locationName", formData.locationName);
             formDataToSend.append("latitude", formData.latitude);
             formDataToSend.append("longitude", formData.longitude);
-            formDataToSend.append("country", formData.country);
+            formDataToSend.append("countryName", formData.countryName);
             formDataToSend.append(
                 "verificationDocument",
                 formData.verificationDocument
@@ -79,11 +79,9 @@ const GarageForm = () => {
             formDataToSend.append("price", formData.price);
 
             formData.garageImages.forEach((image) => {
-                console.log("Hello world", image);
                 formDataToSend.append(`garageImages`, image);
             });
 
-            console.log("sd:+>", formDataToSend);
             const response = await fetch(
                 `${BASE_URL}/GarageSpot/creategaragespot`,
                 {
@@ -105,6 +103,12 @@ const GarageForm = () => {
             setError("Error: " + error.message);
         }
     };
+    const handleChange = (e) => {
+        console.log(e.target);
+        const targetKey = e.target.name;
+        console.log({ ...formData, key: `${e.target.value}` });
+        setFormData({ ...formData, [targetKey]: `${e.target.value}` });
+    };
 
     return (
         <div className={style.registerContainer}>
@@ -116,15 +120,17 @@ const GarageForm = () => {
                         type="text"
                         name="locationName"
                         value={formData.locationName}
+                        onChange={handleChange}
                         required
                     />
                 </div>
                 <div className={style.formGroup}>
-                    <label>Country:</label>
+                    <label>Country Name:</label>
                     <input
                         type="text"
-                        name="country"
-                        value={formData.country}
+                        name="countryName"
+                        value={formData.countryName}
+                        onChange={handleChange}
                         required
                     />
                 </div>
@@ -134,6 +140,7 @@ const GarageForm = () => {
                         type="number"
                         name="latitude"
                         value={formData.latitude}
+                        onChange={handleChange}
                         required
                     />
                 </div>
@@ -144,6 +151,7 @@ const GarageForm = () => {
                         type="number"
                         name="longitude"
                         value={formData.longitude}
+                        onChange={handleChange}
                         required
                     />
                 </div>
@@ -154,6 +162,7 @@ const GarageForm = () => {
                         type="number"
                         name="numberOfSpots"
                         value={formData.numberOfSpots}
+                        onChange={handleChange}
                         required
                     />
                 </div>
@@ -163,6 +172,7 @@ const GarageForm = () => {
                     <input
                         type="number"
                         name="price"
+                        onChange={handleChange}
                         value={formData.price}
                         required
                     />

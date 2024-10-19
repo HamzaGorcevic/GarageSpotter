@@ -2,35 +2,54 @@ import React, { useState } from "react";
 import style from "./defaultSidebar.module.scss";
 
 const DefaultSidebar = ({
-    garageSpots,
+    filteredGarages,
     setSidebarOpen,
     setSelectedGarageSpotId,
     countDistanceToSpot,
     selectedGarageSpotId,
+    searchTerm,
+    setSearchTerm,
+    distanceFilter,
+    setDistanceFilter,
+    setPriceFilter,
+    priceFilter,
 }) => {
-    const [isModalOpen, setModalOpen] = useState(false);
-
-    const reserveGarageSpot = async (reservationData) => {
-        const response = await fetch(
-            `${BASE_URL}/Reservation/reserveSingleSpot`,
-            {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${authData.token}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    garageSpotId: garageSpotId,
-                    ...reservationData,
-                }),
-            }
-        );
-        const res = await response.json();
-        fetchGarageSpot();
-    };
     return (
         <div className={style.sidebarContainer}>
-            {garageSpots.map((garage) => (
+            <input
+                type="text"
+                placeholder="Search Garage by Name"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className={style.searchGarageName}
+            />
+
+            <div className={style.filtersContainer}>
+                {/* Distance Filter */}
+                <select
+                    value={distanceFilter}
+                    onChange={(e) => setDistanceFilter(e.target.value)}
+                    className={style.filterSelect}
+                >
+                    <option value="">All Distances</option>
+                    <option value="50">Within 50 miles</option>
+                    <option value="100">Within 100 miles</option>
+                    <option value="200">Within 200 miles</option>
+                </select>
+
+                {/* Price Filter */}
+                <select
+                    value={priceFilter}
+                    onChange={(e) => setPriceFilter(e.target.value)}
+                    className={style.filterSelect}
+                >
+                    <option value="">All Prices</option>
+                    <option value="10">Under $10</option>
+                    <option value="20">Under $20</option>
+                    <option value="50">Under $50</option>
+                </select>
+            </div>
+            {filteredGarages.map((garage) => (
                 <div
                     key={garage.id}
                     className={`${style.garageItem} ${

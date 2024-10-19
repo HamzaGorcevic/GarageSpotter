@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "./Navbar.module.scss";
-import { AuthContext } from "../../../context/AuthContext";
+import { AuthContext } from "../../context/AuthContext";
 
 const Navbar = () => {
     const { authData, logout } = useContext(AuthContext);
@@ -16,20 +16,21 @@ const Navbar = () => {
             <div className={styles.logo}>MyApp</div>
             <ul className={`${styles.navLinks} ${isOpen ? styles.active : ""}`}>
                 <li>
-                    <Link to="/">Home</Link>
+                    <Link to="/home">Home</Link>
                 </li>
                 <li>
                     <Link to="/about">About</Link>
                 </li>
                 <li>
-                    <Link to="/about">My reservations</Link>
+                    <Link to="/reservations">My reservations</Link>
                 </li>
                 <li>
-                    <Link to="/about">My garages</Link>
+                    <Link to="/garages">My garages</Link>
                 </li>
                 <li>
                     <Link to="/create">Create Garage</Link>
                 </li>
+
                 {!authData.token ? (
                     <>
                         <li>

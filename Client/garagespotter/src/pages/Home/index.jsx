@@ -3,7 +3,10 @@ import React, { useEffect, useState } from "react";
 import styles from "./Home.module.scss";
 import MapComponent from "./map/map";
 import { BASE_URL } from "../../config/config";
+import { useLocation } from "react-router-dom";
 const Home = () => {
+    const location = useLocation();
+
     const [garageSpots, setGarageSpots] = useState([]);
     const [map, setMap] = useState(null);
     const [userMarker, setUserMarker] = useState(null);
@@ -12,8 +15,13 @@ const Home = () => {
     useEffect(() => {
         const fetchGarageSpots = async () => {
             try {
+                const query = new URLSearchParams(location.search);
+                const country = query.get("country");
+
                 const response = await fetch(
-                    `${BASE_URL}/GarageSpot/getGaragSspotsByCountry?country=Serbia`
+                    `${BASE_URL}/GarageSpot/getGaragSspotsByCountry?country=${
+                        country ? country : "Serbia"
+                    }`
                 );
                 const data = await response.json();
                 setGarageSpots(data.value);

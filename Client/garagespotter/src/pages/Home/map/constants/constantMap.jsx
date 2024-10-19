@@ -43,9 +43,7 @@ const MapConstant = ({ setLatlng }) => {
 
             const searchControl = new GeoSearchControl({
                 provider,
-                marker: {
-                    icon,
-                },
+
                 style: "bar",
             });
 

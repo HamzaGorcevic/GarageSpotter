@@ -9,17 +9,16 @@ import {
 } from "react-leaflet";
 import RoutingMachine from "./RoutineMachine";
 import L from "leaflet";
-import getDistance from "geolib/es/getDistance";
-import convertDistance from "geolib/es/convertDistance";
 import DefaultSidebar from "./defaultSidebar/DefaultSidebar";
 import BluePin from "../../../assets/images/blue.svg";
 import RedPin from "../../../assets/images/red.svg";
 import Sidebar from "./mapSidebar/MapSidebar";
 import style from "./map.module.scss";
-import { GeoSearchControl, OpenStreetMapProvider } from "leaflet-geosearch";
 import "leaflet/dist/leaflet.css";
 import "leaflet-geosearch/dist/geosearch.css";
 import icon from "./constants/constantMarker.js";
+import { getDistanceToSpot } from "../../../utils/distanceUtils.js";
+
 const redIcon = L.icon({
     iconUrl: RedPin,
     iconSize: [45, 71],
@@ -43,12 +42,14 @@ const MapComponent = ({ garageSpots }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [selectedGarageSpotId, setSelectedGarageSpotId] = useState(0);
     const [distanceToSpot, setDistanceToSpot] = useState(0);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [distanceFilter, setDistanceFilter] = useState("");
+    const [priceFilter, setPriceFilter] = useState("");
 
     useEffect(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    console.log("position", position);
                     if (position.coords) {
                         setUserPosition({
                             lat: position.coords.latitude,
@@ -63,32 +64,8 @@ const MapComponent = ({ garageSpots }) => {
         }
     }, []);
 
-    function LeafletgeoSearch() {
-        const map = useMap();
-        useEffect(() => {
-            const provider = new OpenStreetMapProvider();
-
-            const searchControl = new GeoSearchControl({
-                provider,
-                marker: {
-                    icon,
-                },
-                style: "bar",
-            });
-
-            map.addControl(searchControl);
-
-            return () => map.removeControl(searchControl);
-        }, []);
-
-        return null;
-    }
     const countDistanceToSpot = (spot) => {
-        const distance = getDistance(
-            { latitude: userPosition.lat, longitude: userPosition.lng },
-            { latitude: spot.latitude, longitude: spot.longitude }
-        );
-        let convertedDistance = convertDistance(distance, "km").toFixed(2);
+        const convertedDistance = getDistanceToSpot(userPosition, spot);
         setDistanceToSpot(convertedDistance);
         setSelectedGarageSpotId(spot.id);
         setClickedMarkerPosition({
@@ -101,6 +78,23 @@ const MapComponent = ({ garageSpots }) => {
         countDistanceToSpot(spot);
         setSidebarOpen(true);
     };
+
+    const filteredGarages = garageSpots.filter((garage) => {
+        console.log(getDistanceToSpot(userPosition, garage), distanceFilter);
+        const matchesSearchTerm = garage.locationName
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase());
+
+        const matchesDistance =
+            !distanceFilter ||
+            getDistanceToSpot(userPosition, garage) <= parseInt(distanceFilter);
+        console.log(matchesDistance);
+
+        const matchesPrice =
+            !priceFilter || garage.price <= parseInt(priceFilter);
+
+        return matchesSearchTerm && matchesDistance && matchesPrice;
+    });
 
     // Function to close the sidebar
     const closeSidebar = () => {
@@ -123,7 +117,7 @@ const MapComponent = ({ garageSpots }) => {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
 
-                {garageSpots.map((spot, index) => (
+                {filteredGarages.map((spot, index) => (
                     <Marker
                         key={index}
                         position={[spot.latitude, spot.longitude]}
@@ -155,11 +149,18 @@ const MapComponent = ({ garageSpots }) => {
             />
             <DefaultSidebar
                 isOpen={sidebarOpen}
-                garageSpots={garageSpots}
+                filteredGarages={filteredGarages}
                 setSidebarOpen={setSidebarOpen}
                 setSelectedGarageSpotId={setSelectedGarageSpotId}
                 countDistanceToSpot={countDistanceToSpot}
                 selectedGarageSpotId={selectedGarageSpotId}
+                userPosition={userPosition}
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                distanceFilter={distanceFilter}
+                setDistanceFilter={setDistanceFilter}
+                setPriceFilter={setPriceFilter}
+                priceFilter={priceFilter}
             />
         </div>
     );
