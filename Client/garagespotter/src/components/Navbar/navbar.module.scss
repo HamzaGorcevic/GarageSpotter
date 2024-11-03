@@ -1,0 +1,84 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-medium;
+    background-color: $primary-color;
+    color: #fff;
+    z-index: $z-index-navbar !important;
+
+    .logo {
+        font-size: $font-size-large;
+        font-weight: bold;
+    }
+
+    .navLinks {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        li {
+            margin: 0 $spacing-medium;
+
+            a,
+            button {
+                color: #fff;
+                text-decoration: none;
+                font-size: $font-size-base;
+                transition: color $transition-default;
+                background-color: transparent;
+                border: none;
+                padding: 0;
+                font-family: $font-family;
+
+                &:hover {
+                    color: $accent-color;
+                }
+            }
+        }
+    }
+
+    .hamburger {
+        display: none; // Hide hamburger icon by default
+        flex-direction: column;
+        cursor: pointer;
+
+        .line {
+            width: 25px;
+            height: 3px;
+            background-color: #fff;
+            margin: 4px 0;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .navLinks {
+            display: none; // Hide links on mobile by default
+            flex-direction: column;
+            width: 100%;
+            background-color: $primary-color;
+            position: absolute;
+            top: 60px; // Adjust based on navbar height
+            left: 0;
+            z-index: $z-index-navbar;
+
+            li {
+                margin: $spacing-small 0;
+
+                a,
+                button {
+                    padding: $spacing-small;
+                    display: block;
+                }
+            }
+        }
+
+        .hamburger {
+            display: flex; // Show hamburger icon on mobile
+        }
+    }
+}
+.active {
+    display: flex !important; // Override display: none on mobile when active
+}

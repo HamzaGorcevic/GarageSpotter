@@ -1,0 +1,6 @@
+@AutoHub_HostAddress = http://localhost:5243
+
+GET {{AutoHub_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

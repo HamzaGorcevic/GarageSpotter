@@ -1,0 +1,174 @@
+.landingPage {
+    text-align: center;
+    color: white;
+    min-height: 90vh;
+    background: linear-gradient(135deg, $primary-color 0%, #5a9ff0 100%);
+
+    .mainWindow {
+        padding: 100px 0 30px 0;
+        height: 80vh;
+        .header {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+
+            button {
+                background-color: transparent;
+                color: white;
+                border: none;
+                font-size: 16px;
+                margin: 0 10px;
+                cursor: pointer;
+                padding-bottom: 5px;
+                transition: border-bottom 0.3s ease;
+
+                &.active {
+                    border-bottom: 2px solid white;
+                }
+            }
+        }
+
+        .searchContainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            width: 100%;
+
+            .searchBar {
+                width: 50%;
+                padding: $spacing-medium;
+                border: none;
+                border-radius: $border-radius;
+                font-size: 17px;
+                box-shadow: $hover-shadow;
+            }
+
+            .searchButton {
+                background-color: $accent-color;
+                border: none;
+                padding: $spacing-medium;
+                margin-left: 10px;
+                color: white;
+                border-radius: $border-radius;
+                cursor: pointer;
+                font-size: 16px;
+                box-shadow: $hover-shadow;
+                transition: background-color 0.3s ease;
+
+                &:hover {
+                    background-color: darken($accent-color, 10%);
+                }
+            }
+        }
+
+        .nearbyButton {
+            background-color: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: $spacing-medium;
+            border-radius: $border-radius;
+            display: flex;
+            margin: auto;
+            gap: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+            .loader {
+                border: 3px solid rgba(255, 255, 255, 0.2);
+                border-top: 3px solid white;
+                border-radius: 50%;
+                width: 15px;
+                height: 15px;
+                animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+        }
+    }
+    .howItWorks {
+        background-color: $background-color;
+        text-align: center;
+        margin-top: 40px;
+        width: 100%;
+        min-height: 80vh;
+        padding-top: 50px;
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 50px;
+            color: black;
+        }
+
+        .steps {
+            display: flex;
+            justify-content: space-evenly;
+            color: black;
+
+            .step {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 25%;
+                text-align: center;
+                img {
+                    width: 80px;
+                    height: auto;
+                    margin-bottom: 15px;
+                }
+
+                h3 {
+                    font-size: 1.5rem;
+                    margin-bottom: 10px;
+                }
+
+                p {
+                    font-size: 1.2rem;
+                    color: #555;
+                }
+            }
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .mainWindow {
+            .searchButton {
+                display: none;
+            }
+            .searchBar {
+                width: 80% !important;
+            }
+        }
+        .howItWorks .steps {
+            flex-direction: column;
+            align-items: center;
+
+            .step {
+                width: 100%;
+                margin-bottom: 20px;
+                display: flex;
+                flex-direction: row;
+                gap: 20px;
+                .content {
+                    text-align: start;
+                }
+            }
+        }
+    }
+}

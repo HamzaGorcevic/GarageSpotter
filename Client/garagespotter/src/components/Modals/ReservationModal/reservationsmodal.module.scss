@@ -1,0 +1,127 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(
+        0,
+        0,
+        0,
+        0.6
+    ); // Darker semi-transparent background for focus effect
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: $z-index-modal;
+    backdrop-filter: blur(5px); // Softens background with blur
+    animation: fadeIn 0.3s ease-in-out; // Smooth fade-in animation
+}
+
+.modalContent {
+    background-color: white;
+    border-radius: 10px; // Slightly larger rounded corners
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); // Subtle shadow for depth
+    padding: 2rem; // Ample padding for better content spacing
+    width: 400px;
+    max-width: 90%;
+    position: relative;
+    text-align: center;
+    animation: slideUp 0.3s ease-in-out; // Subtle slide-up effect when opening
+
+    h2 {
+        font-size: 1.75rem; // Larger heading
+        color: $primary-color;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+    }
+
+    .inputGroup {
+        margin-bottom: 1rem;
+
+        label {
+            font-size: 1rem;
+            color: $text-color;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 1px solid $border-color;
+            border-radius: 6px;
+            color: $text-color;
+            background-color: #f9f9f9; // Slight background tint for input fields
+            transition: all 0.3s ease-in-out;
+
+            &:focus {
+                border-color: $primary-color;
+                outline: none;
+                box-shadow: 0 0 5px rgba($primary-color, 0.3); // Soft glow on focus
+                background-color: white;
+            }
+        }
+    }
+
+    .buttonGroup {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+
+        button {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out,
+                transform 0.2s ease-in-out;
+
+            &:first-child {
+                background-color: $primary-color;
+                color: white;
+                font-weight: 600;
+
+                &:hover {
+                    background-color: darken($primary-color, 10%);
+                    transform: translateY(-2px); // Subtle hover effect
+                }
+            }
+
+            &:last-child {
+                background-color: $error-color;
+                color: white;
+                font-weight: 600;
+
+                &:hover {
+                    background-color: darken($error-color, 10%);
+                    transform: translateY(-2px); // Subtle hover effect
+                }
+            }
+        }
+    }
+}
+
+/* Keyframe Animations for fade-in and slide-up effects */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

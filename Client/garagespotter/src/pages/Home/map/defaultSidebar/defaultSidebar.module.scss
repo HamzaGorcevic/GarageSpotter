@@ -1,0 +1,158 @@
+.sidebarContainer {
+    background-color: transparent;
+    width: 100%;
+    max-width: 450px;
+    max-height: 97%;
+    overflow-y: scroll;
+    position: absolute;
+    z-index: $z-index-modal !important;
+    top: 0;
+    margin: 0;
+    .toggleButton {
+        border-radius: $border-radius;
+        padding: $spacing-small;
+        border: none;
+        box-shadow: $box-shadow;
+        margin-left: auto;
+        display: none;
+        cursor: pointer;
+        @media (max-width: 768px) {
+            display: block;
+        }
+    }
+    .alwaysVisible {
+        background-color: $background-color;
+        padding: $spacing-small;
+        z-index: $z-index-modal;
+        padding-top: 20px;
+        @media (max-width: 768px) {
+            padding: $spacing-large;
+        }
+    }
+    .toggledSidebar {
+        background-color: $background-color;
+        padding: $spacing-small $spacing-small 0 $spacing-small;
+
+        @media (max-width: 768px) {
+            padding: $spacing-large;
+        }
+    }
+    .searchGarageName {
+        width: 96%;
+        padding: $spacing-small;
+        margin-bottom: $spacing-medium;
+        font-size: $font-size-base;
+        border: 1px solid $border-color;
+        border-radius: $border-radius;
+        box-shadow: $box-shadow;
+
+        &:focus {
+            border-color: $primary-color;
+            background-color: #f9f9f9;
+            outline: none;
+        }
+
+        &::placeholder {
+            color: $muted-text-color;
+            opacity: 0.8;
+        }
+    }
+
+    .filtersContainer {
+        display: flex;
+        justify-content: space-between;
+        gap: $spacing-small;
+        margin-bottom: $spacing-medium;
+
+        .filterSelect {
+            flex: 1;
+            padding: $spacing-small;
+            font-size: $font-size-small;
+            color: $text-color;
+            border: 1px solid $border-color;
+            border-radius: $border-radius;
+            box-shadow: $box-shadow;
+            transition: $transition-default;
+
+            &:focus {
+                border-color: $primary-color;
+                outline: none;
+            }
+        }
+    }
+    @media (max-width: 768px) {
+        width: 100%;
+        max-width: none;
+    }
+    .selectedGarageItem {
+        background-color: #007bff;
+        color: #fff;
+        border: 2px solid #0056b3;
+        padding: $spacing-medium;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        transform: scale(1.05);
+        transition: all 0.3s ease-in-out;
+    }
+    .garageItem {
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        background-color: #fff;
+        border: 1px solid $border-color;
+        border-radius: $border-radius;
+        margin-bottom: $spacing-medium;
+        padding: $spacing-medium;
+        box-shadow: $box-shadow;
+        transition: box-shadow $transition-default;
+
+        .reserveButton {
+            background-color: $secondary-color;
+            color: rgb(241, 236, 236);
+            padding: $spacing-small;
+            font-size: $font-size-large;
+            border-radius: $border-radius;
+            border: 0;
+            margin-top: $spacing-small;
+            width: 100%;
+
+            cursor: pointer;
+            transition: $transition-default;
+            &:hover {
+                background-color: #119e37;
+            }
+        }
+
+        &:hover {
+            box-shadow: $hover-shadow;
+        }
+        .garageImage {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: $border-radius;
+        }
+
+        .garageInfo {
+            margin-top: $spacing-small;
+        }
+
+        .garageTitle {
+            font-family: $font-family;
+            font-size: $font-size-large;
+            color: $text-color;
+            margin-bottom: $spacing-small;
+        }
+
+        .price {
+            font-family: $font-family;
+            font-size: $font-size-base;
+            color: $primary-color;
+        }
+
+        .availableSpots {
+            font-family: $font-family;
+            font-size: $font-size-small;
+            color: $muted-text-color;
+        }
+    }
+}
