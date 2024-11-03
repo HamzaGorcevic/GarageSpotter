@@ -1,0 +1,52 @@
+/* this css is for builded leaflet sidebar when must be css ! */
+
+.leaflet-routing-container.leaflet-bar {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 8px !important;
+    padding: 10px !important;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15) !important;
+    max-width: 350px !important;
+    max-height: 400px !important;
+    overflow-y: auto !important;
+    display: none !important;
+}
+
+.leaflet-routing-alt h2 {
+    font-size: 18px !important;
+    font-weight: bold !important;
+    color: #2c3e50 !important;
+}
+
+.leaflet-routing-alt h3 {
+    font-size: 16px !important;
+    color: #16a085 !important;
+}
+
+.leaflet-routing-instruction-text {
+    font-size: 14px !important;
+    color: #34495e !important;
+}
+
+.leaflet-routing-instruction-distance {
+    font-size: 13px !important;
+    color: #7f8c8d !important;
+    text-align: right !important;
+}
+
+.leaflet-routing-instruction-icon {
+    width: 20px !important;
+    vertical-align: middle !important;
+}
+
+.leaflet-control-attribution {
+    display: none !important;
+}
+
+.leaflet-control-zoom {
+    display: none !important;
+}
+
+.leaflet-geosearch-button {
+    right: 0;
+    background-color: red;
+}
