@@ -1,3 +1,3 @@
-const BASE_URL = "http://localhost:7134";
+const BASE_URL = "https://garagespotter.onrender.com";
 
 export { BASE_URL };
