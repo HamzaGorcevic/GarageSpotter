@@ -24,4 +24,4 @@ dist-ssr
 *.sln
 *.sw?
 appsettings.json
-/AutoHub/AutoHub/.env
+/AutoHub/.env

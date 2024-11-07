@@ -42,8 +42,14 @@ const MapSidebar = ({ isOpen, onClose, garageSpotId, distance }) => {
             }
         );
         setLoading(false);
-        toast.success("Succesfully reserved garage spot !");
-        fetchGarageSpot();
+        const res = await response.json();
+        console.log(res);
+        if (res.success) {
+            toast.success(res.message);
+            fetchGarageSpot();
+        } else {
+            toast.error(res.message);
+        }
     };
 
     const fetchGarageSpot = async () => {

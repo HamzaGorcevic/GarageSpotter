@@ -9,19 +9,20 @@ namespace AutoHub.Services
 {
     public class GarageSpotService : BaseService, IGarageSpotService
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext _dbContext;
         private readonly IMapper _mapper;
         private readonly IAzureBlobService _azureBlobService;
-        public GarageSpotService(AppDbContext context,IMapper mapper,IAzureBlobService azureBlobService,IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+        public GarageSpotService(AppDbContext dbContext,IMapper mapper,IAzureBlobService azureBlobService,IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor,dbContext)
         {
-            _context = context;
+            _dbContext = dbContext;
             _mapper = mapper;
             _azureBlobService = azureBlobService;
         }
         public async Task<ServiceResponse<List<GarageSpotDto>>> GetGarageSpotsByCountry(string country)
         {
+            await ClearReservations();
 
-            var garagaSpots = await _context.GarageSpots.Include(g => g.TotalSpots).Where(g=>g.CountryName==country).ToListAsync();
+            var garagaSpots = await _dbContext.GarageSpots.Include(g => g.TotalSpots).Where(g=>g.CountryName==country).ToListAsync();
 
             var response = new ServiceResponse<List<GarageSpotDto>>
             {
@@ -34,7 +35,7 @@ namespace AutoHub.Services
         public async Task<ServiceResponse<List<GarageSpotDto>>> GetGarageSpots()
         {
 
-            var garagaSpots = await _context.GarageSpots.Include(g=>g.TotalSpots).ToListAsync();
+            var garagaSpots = await _dbContext.GarageSpots.Include(g=>g.TotalSpots).ToListAsync();
 
             var response = new ServiceResponse<List<GarageSpotDto>>
             {
@@ -46,7 +47,7 @@ namespace AutoHub.Services
         public async Task<ServiceResponse<GarageSpotDto>> GetGarageSpot(int garageSpotId)
         {
             var response = new ServiceResponse<GarageSpotDto>();
-            var garapgeSpot = await _context.GarageSpots.Include(g => g.TotalSpots).FirstOrDefaultAsync(g=>g.Id==garageSpotId);
+            var garapgeSpot = await _dbContext.GarageSpots.Include(g => g.TotalSpots).FirstOrDefaultAsync(g=>g.Id==garageSpotId);
 
             if (garapgeSpot is not null)
             {
@@ -79,13 +80,13 @@ namespace AutoHub.Services
             }
 
             // when user create garage i should make him owner instead of user 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
             user!.Role = Models.Enums.UserRole.Owner;
             var garageSpot = _mapper.Map<GarageSpot>(newSpot);
             garageSpot.OwnerId = userId;
             garageSpot.Owner = user;
-            _context.GarageSpots.Add(garageSpot);
-            await _context.SaveChangesAsync();
+            _dbContext.GarageSpots.Add(garageSpot);
+            await _dbContext.SaveChangesAsync();
 
             for (int i = 0; i < newSpot.NumberOfSpots; i++)
             {
@@ -95,10 +96,10 @@ namespace AutoHub.Services
                     GarageSpotId = garageSpot.Id
                 };
 
-                _context.SingleSpots.Add(singleSpot);
+                _dbContext.SingleSpots.Add(singleSpot);
             }
 
-            await _context.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
 
             response.Success = true;
             response.Message = $"Garage spot with {newSpot.NumberOfSpots} spots created successfully.";
@@ -112,7 +113,7 @@ namespace AutoHub.Services
             var response = new ServiceResponse<List<GarageSpotDto>>();
             var ownerId = GetUserId();
 
-            var garagespots = await _context.GarageSpots
+            var garagespots = await _dbContext.GarageSpots
                     .Where(g => g.OwnerId == ownerId)
                     .ToListAsync();
             
@@ -137,7 +138,7 @@ namespace AutoHub.Services
         {
             var response = new ServiceResponse<int>();
 
-            var garagespot = await _context.GarageSpots.FirstOrDefaultAsync(g => g.Id == garageSpotId);
+            var garagespot = await _dbContext.GarageSpots.FirstOrDefaultAsync(g => g.Id == garageSpotId);
 
 
             if (garagespot == null)
@@ -163,7 +164,7 @@ namespace AutoHub.Services
             garagespot.VerificationDocument = updatedSpot.CountryName;
             garagespot.CountryName = updatedSpot.CountryName;
 
-            await _context.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
             response.Success = true;
             response.Message = "Succesfully updated garage";
             response.Value = garagespot.Id;
@@ -172,7 +173,7 @@ namespace AutoHub.Services
         public async Task<ServiceResponse<bool>> DeleteGarageSpot(int spotId)
         {
             var response = new ServiceResponse<bool>();
-            var garageSpot = await _context.GarageSpots.FindAsync(spotId);
+            var garageSpot = await _dbContext.GarageSpots.FindAsync(spotId);
 
             if (garageSpot == null)
             {
@@ -188,8 +189,8 @@ namespace AutoHub.Services
                 return response;
             }
 
-            _context.GarageSpots.Remove(garageSpot);
-            await _context.SaveChangesAsync();
+            _dbContext.GarageSpots.Remove(garageSpot);
+            await _dbContext.SaveChangesAsync();
 
             response.Success = true;
             response.Message = "Garage spot deleted successfully.";

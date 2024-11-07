@@ -11,7 +11,7 @@ namespace AutoHub.Services
     {
         private readonly AppDbContext _dbContext;
         private readonly IMapper _mapper;
-        public ReservationService(AppDbContext dbContext, IMapper mapper,IHttpContextAccessor httpContextAccessor):base(httpContextAccessor)
+        public ReservationService(AppDbContext dbContext, IMapper mapper,IHttpContextAccessor httpContextAccessor):base(httpContextAccessor,dbContext)
         {
             _mapper = mapper;
             _dbContext = dbContext;
@@ -32,10 +32,36 @@ namespace AutoHub.Services
                 serviceResponse.Message = "Garage spot not found.";
                 return serviceResponse;
             }
+            if (reserveDto.ReservationStart.HasValue && reserveDto.ReservationEnd.HasValue)
+            {
+                var singleSpotCurrentlyBusy = garageSpot.TotalSpots.ToList();
+                foreach (var spot in singleSpotCurrentlyBusy)
+                {
+                    if (IsSpotAvailableForPeriod(spot.Id, reserveDto.ReservationStart.Value, reserveDto.ReservationEnd.Value))
+                    {
+                        if(reserveDto.ReservationStart <= reserveDto.ReservationStarted)
+                        {
+                            spot.IsAvailable = false;
+                            _dbContext.Entry(spot).State = EntityState.Modified;
+                        }
+                        var dateReservation = _mapper.Map<Reservation>(reserveDto);
+                        dateReservation.SingleSpotId = spot.Id;
+                        dateReservation.UserId = userId;
+                        await _dbContext.Reservations.AddAsync(dateReservation);
+                        await _dbContext.SaveChangesAsync();
+                        serviceResponse.Success = true;
+                        serviceResponse.Message = $"Garage reserved in period from {reserveDto.ReservationStart.Value.ToShortDateString()} to {reserveDto.ReservationEnd.Value.ToShortDateString()}.";
+                        return serviceResponse;
+                    }
+
+                }
+
+            }
 
             var singleSpot = garageSpot.TotalSpots.FirstOrDefault(s => s.IsAvailable);
             if (singleSpot == null)
             {
+                
                 serviceResponse.Success = false;
                 serviceResponse.Message = "No available spots in this garage.";
                 return serviceResponse;
@@ -44,6 +70,8 @@ namespace AutoHub.Services
             var reservation = _mapper.Map<Reservation>(reserveDto);
             reservation.SingleSpotId = singleSpot.Id;
             reservation.UserId = userId;
+            reservation.ReservationStart = null;
+            reservation.ReservationEnd = null;
 
             singleSpot.IsAvailable = false;
 
@@ -104,7 +132,6 @@ namespace AutoHub.Services
             var reservationsDto = _mapper.Map<List<ReserveDto>>(reservations);
 
             // remove expired reservations
-        
 
             if(reservations.Count == 0)
             {
@@ -149,46 +176,22 @@ namespace AutoHub.Services
         
         }
 
-        public async Task ClearReservations()
+
+
+
+        private bool IsSpotAvailableForPeriod(int spotId, DateTime start, DateTime end)
         {
-            var allReservations = await _dbContext.Reservations
-                .Include(r => r.SingleSpot) 
-                .ToListAsync(); 
+            var overlappingReservations = _dbContext.Reservations
+                .Where(r => r.SingleSpotId == spotId &&
+                            (
+                                (r.ReservationStart <= start && r.ReservationEnd >= start) ||
+                                (r.ReservationStart <= end && r.ReservationEnd >= end) ||
+                                (r.ReservationStart >= start && r.ReservationEnd <= end) ||
+                                (r.Hours.HasValue  && r.ReservationStarted.AddHours(r.Hours.Value) < start)
+                            ))
+                .ToList();
 
-            var expiredReservations = allReservations.Where(r => IsExpired(r)).ToList();
-
-            if (expiredReservations.Any())
-            {
-                foreach (var expiredReservation in expiredReservations)
-                {
-                    if (expiredReservation.SingleSpot != null)
-                    {
-                        expiredReservation.SingleSpot.IsAvailable = true;
-                        _dbContext.Entry(expiredReservation.SingleSpot).State = EntityState.Modified;
-                    }
-                }
-
-                await _dbContext.SaveChangesAsync();
-
-                _dbContext.Reservations.RemoveRange(expiredReservations);
-
-                await _dbContext.SaveChangesAsync();
-            }
-        }
-
-        public bool IsExpired(Reservation r)
-        {
-            if (r.Hours != 0)
-            {
-                var expirationTime = r.ReservationStarted.AddHours(r.Hours.Value);
-                return DateTime.UtcNow > expirationTime;
-            }
-            if (r.ReservationEnd.HasValue)
-            {
-                return DateTime.UtcNow > r.ReservationEnd.Value;
-            }
-
-            return false;
+            return overlappingReservations.Count == 0;
         }
     }
 }

@@ -15,7 +15,7 @@ namespace AutoHub.Data
         AppDbContext _appDbContext;
         IConfiguration _configuration;
         IMapper _mapper;
-        public AuthRepository(AppDbContext appDbContext,IConfiguration configuration,IMapper mapper,IHttpContextAccessor httpContextAccessor):base(httpContextAccessor)
+        public AuthRepository(AppDbContext appDbContext,IConfiguration configuration,IMapper mapper,IHttpContextAccessor httpContextAccessor):base(httpContextAccessor,appDbContext)
         {
             _appDbContext = appDbContext;
             _configuration = configuration; 

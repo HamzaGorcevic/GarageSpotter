@@ -3,7 +3,7 @@ import style from "./garageForm.module.scss"; // Import the SCSS module
 import { AuthContext } from "../../context/AuthContext";
 import { BASE_URL } from "../../config/config";
 import MapConstant from "../Home/map/constants/constantMap";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const GarageForm = () => {
@@ -13,6 +13,7 @@ const GarageForm = () => {
     const { id } = useParams();
     const [isUpdateMode, setIsUpdateMode] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [formErrors, setFormErrors] = useState({});
     const [formData, setFormData] = useState({
         locationName: "",
         latitude: latlng[0],
@@ -78,7 +79,7 @@ const GarageForm = () => {
             );
             const res = await response.json();
             const countryName = res.address.country || "Unknown country";
-
+            setError("");
             setFormData((prevState) => ({
                 ...prevState,
                 countryName,
@@ -104,8 +105,26 @@ const GarageForm = () => {
         }));
     };
 
+    const validateForm = () => {
+        const errors = {};
+        if (!formData.locationName) {
+            errors.locationName = "Location name is required";
+        }
+        if (formData.numberOfSpots < 1) {
+            errors.numberOfSpots = "Number of spots must be at least 1";
+        }
+        if (formData.price < 1) {
+            errors.price = "Price must be at least 1";
+        }
+        setFormErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!validateForm()) {
+            return;
+        }
         try {
             const formDataToSend = new FormData();
             formDataToSend.append("locationName", formData.locationName);
@@ -161,6 +180,12 @@ const GarageForm = () => {
     const handleChange = (e) => {
         const targetKey = e.target.name;
         setFormData({ ...formData, [targetKey]: e.target.value });
+        if (formErrors[targetKey]) {
+            setFormErrors((prevErrors) => ({
+                ...prevErrors,
+                [targetKey]: null,
+            }));
+        }
     };
 
     return (
@@ -176,8 +201,14 @@ const GarageForm = () => {
                         name="locationName"
                         value={formData.locationName}
                         onChange={handleChange}
+                        className={
+                            formErrors.locationName ? style.errorInput : ""
+                        }
                         required
                     />
+                    {formErrors.locationName && (
+                        <p className={style.error}>{formErrors.locationName}</p>
+                    )}
                 </div>
                 <div className={style.formGroup}>
                     <label>Country Name:</label>
@@ -218,8 +249,17 @@ const GarageForm = () => {
                         name="numberOfSpots"
                         value={formData.numberOfSpots}
                         onChange={handleChange}
+                        min={1}
+                        className={
+                            formErrors.numberOfSpots ? style.errorInput : ""
+                        }
                         required
                     />
+                    {formErrors.numberOfSpots && (
+                        <p className={style.error}>
+                            {formErrors.numberOfSpots}
+                        </p>
+                    )}
                 </div>
 
                 <div className={style.formGroup}>
@@ -229,8 +269,13 @@ const GarageForm = () => {
                         name="price"
                         onChange={handleChange}
                         value={formData.price}
+                        min={1}
+                        className={formErrors.price ? style.errorInput : ""}
                         required
                     />
+                    {formErrors.price && (
+                        <p className={style.error}>{formErrors.price}</p>
+                    )}
                 </div>
 
                 <div className={style.formGroup}>
@@ -240,37 +285,34 @@ const GarageForm = () => {
                         name="garageImages"
                         onChange={handleMultipleFileChange}
                         multiple
-                        accept="image/*"
+                        required
                     />
                 </div>
+
                 <div className={style.formGroup}>
                     <label>Verification Document:</label>
                     <input
                         type="file"
                         name="verificationDocument"
                         onChange={handleFileChange}
-                        accept=".pdf,.doc,.docx,.jpg,.png"
                         required
                     />
                 </div>
 
-                {error && <p className={style.error}>{error}</p>}
-
-                {!loading ? (
-                    <button className={style.submitButton} type="submit">
-                        Submit
-                    </button>
+                {loading ? (
+                    <div>Loading...</div>
                 ) : (
-                    <button
-                        disabled
-                        className={`${style.submitButton} ${style.loadingButton}`}
-                    >
-                        Loading ...
+                    <button type="submit" className={style.submitButton}>
+                        {isUpdateMode
+                            ? "Update Garage Spot"
+                            : "Create Garage Spot"}
                     </button>
                 )}
+                {error && <p className={style.error}>{error}</p>}
             </form>
             <MapConstant setLatlng={setLatlng} />
         </div>
     );
 };
+
 export default GarageForm;

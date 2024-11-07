@@ -38,18 +38,29 @@ const ReservationModal = ({
                 hours: parseInt(hours),
                 reservationStarted: localISOString,
             });
-        } else if (
-            reservationType === "date" &&
-            reservationStart &&
-            reservationEnd
-        ) {
-            onSubmit({
-                reservationStart,
-                reservationEnd,
-                reservationStarted: localISOString,
-            });
+        } else if (reservationType === "date") {
+            if (reservationStart && reservationEnd) {
+                if (new Date(reservationStart) > new Date(reservationEnd)) {
+                    alert("Start date cannot be later than end date.");
+                    return;
+                }
+                onSubmit({
+                    reservationStart,
+                    reservationEnd,
+                    reservationStarted: localISOString,
+                });
+            }
         }
     };
+
+    const today = new Date().toISOString().split("T")[0];
+
+    let minReservationEnd = reservationStart
+        ? new Date(reservationStart)
+        : new Date(today);
+
+    minReservationEnd.setDate(minReservationEnd.getDate() + 1);
+    const minReservationEndStr = minReservationEnd.toISOString().split("T")[0];
 
     return (
         <div className={style.modalOverlay}>
@@ -97,6 +108,7 @@ const ReservationModal = ({
                             <label>Reservation Start</label>
                             <input
                                 type="date"
+                                min={today}
                                 value={reservationStart}
                                 onChange={(e) =>
                                     setReservationStart(e.target.value)
@@ -108,6 +120,7 @@ const ReservationModal = ({
                             <label>Reservation End</label>
                             <input
                                 type="date"
+                                min={minReservationEndStr}
                                 value={reservationEnd}
                                 onChange={(e) =>
                                     setReservationEnd(e.target.value)

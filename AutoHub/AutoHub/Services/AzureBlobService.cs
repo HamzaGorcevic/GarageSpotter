@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-public class AzureBlobService:IAzureBlobService
+public class AzureBlobService : IAzureBlobService
 {
     private readonly BlobServiceClient _blobServiceClient;
     private readonly string _blobConnectionString;
