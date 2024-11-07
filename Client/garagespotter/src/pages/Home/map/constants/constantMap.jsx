@@ -41,10 +41,10 @@ const MapConstant = ({ setLatlng }) => {
             const searchControl = new GeoSearchControl({
                 provider,
                 style: "bar",
+                showMarker: false,
             });
 
             map.addControl(searchControl);
-
             return () => map.removeControl(searchControl);
         }, []);
 
@@ -62,6 +62,10 @@ const MapConstant = ({ setLatlng }) => {
                 });
                 const { lat, lng } = e.latlng;
                 setLatlng([lat, lng]);
+                const markers = document.querySelectorAll(
+                    ".leaflet-marker-icon"
+                );
+                markers.forEach((marker) => (marker.style.display = "none"));
             },
         });
         return null;

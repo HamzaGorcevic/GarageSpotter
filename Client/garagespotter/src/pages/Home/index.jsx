@@ -9,9 +9,6 @@ const Home = () => {
     const location = useLocation();
     const { authData } = useContext(AuthContext);
     const [garageSpots, setGarageSpots] = useState([]);
-    const [map, setMap] = useState(null);
-    const [userMarker, setUserMarker] = useState(null);
-    const [routeControl, setRouteControl] = useState(null);
 
     useEffect(() => {
         const fetchGarageSpots = async () => {

@@ -9,7 +9,7 @@ const GarageReservationTimer = ({
     const [timeRemaining, setTimeRemaining] = useState("");
 
     useEffect(() => {
-        const isDefaultStart = reservationStart === "0001-01-01T00:00:00";
+        const isDefaultStart = !reservationStart;
         const startTime = Date.parse(reservationStarted);
         const durationInMillis = hours * 60 * 60 * 1000;
         const reservationEndTime = startTime + durationInMillis;

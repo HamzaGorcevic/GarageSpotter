@@ -2,8 +2,9 @@
     background-color: transparent;
     width: 100%;
     max-width: 450px;
-    max-height: 97%;
+    max-height: 100%;
     overflow-y: scroll;
+    overflow-x: hidden;
     position: absolute;
     z-index: $z-index-modal !important;
     top: 0;

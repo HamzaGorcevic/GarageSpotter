@@ -13,7 +13,7 @@ const Reservations = () => {
     const [selectedReservation, setSelectedReservation] = useState(null);
     const [filter, setFilter] = useState("all");
 
-    const getReservatons = async () => {
+    const getReservations = async () => {
         const response = await fetch(
             `${BASE_URL}/Reservation/getUserReservations`,
             {
@@ -25,13 +25,15 @@ const Reservations = () => {
         );
         const res = await response.json();
         setReservations(res?.value || []);
+        console.log(res.value);
     };
 
     useEffect(() => {
         if (authData?.token) {
-            getReservatons();
+            getReservations();
         }
     }, [authData]);
+
     const extendReservation = async (reservation) => {
         try {
             await toast.promise(
@@ -52,9 +54,8 @@ const Reservations = () => {
                     error: "Failed to extend reservation.",
                 }
             );
-
             setIsModalOpen(false);
-            getReservatons();
+            getReservations();
         } catch (error) {
             console.error("Error extending reservation:", error);
         }
@@ -63,17 +64,15 @@ const Reservations = () => {
     const onClose = () => {
         setIsModalOpen(false);
     };
+
+    // Adjusted filter logic for reservations
     const filteredReservations = reservations.filter((reservation) => {
-        if (filter === "hours")
-            return (
-                reservation.hours != 0 &&
-                reservation.reservationStart == "0001-01-01T00:00:00"
-            );
-        if (filter === "date")
-            return (
-                reservation.reservationStart != "0001-01-01T00:00:00" &&
-                reservation.hours == 0
-            );
+        if (filter === "hours") {
+            return reservation.hours !== 0 && !reservation.reservationStart;
+        }
+        if (filter === "date") {
+            return reservation.reservationStart && !reservation.hours;
+        }
         return true;
     });
 
@@ -119,40 +118,32 @@ const Reservations = () => {
                     filteredReservations.map((reservation) => (
                         <div
                             className={styles.reservationCard}
-                            key={reservation.garageSpotId}
+                            key={reservation.id} // Use `id` instead of `garageSpotId` as the key
                         >
                             <h2 className={styles.spotId}>
                                 Spot #{reservation.garageSpotId}
                             </h2>
-                            {reservation.reservationStart !=
-                            "0001-01-01T00:00:00" ? (
+                            {reservation.reservationStart && (
                                 <p>
                                     <strong>Start:</strong>{" "}
                                     {new Date(
                                         reservation.reservationStart
                                     ).toLocaleString()}
                                 </p>
-                            ) : (
-                                ""
                             )}
-                            {reservation.reservationEnd !=
-                            "0001-01-01T00:00:00" ? (
+                            {reservation.reservationEnd && (
                                 <p>
                                     <strong>End:</strong>{" "}
                                     {new Date(
                                         reservation.reservationEnd
                                     ).toLocaleString()}
                                 </p>
-                            ) : (
-                                ""
                             )}
-                            {reservation.hours != 0 ? (
+                            {reservation.hours && reservation.hours !== 0 && (
                                 <p>
                                     <strong>Duration:</strong>{" "}
                                     {reservation.hours} hour(s)
                                 </p>
-                            ) : (
-                                ""
                             )}
                             <GarageReservationTimer
                                 reservationStarted={

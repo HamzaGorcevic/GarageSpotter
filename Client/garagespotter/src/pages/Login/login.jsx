@@ -7,14 +7,14 @@ import { AuthContext } from "../../context/AuthContext";
 const Login = () => {
     const { login } = useContext(AuthContext);
     const [form, setForm] = useState({ email: "", password: "" });
-
+    const [loading, setLoading] = useState(false);
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        setLoading(true);
         const response = await fetch(`${BASE_URL}/Auth/Login`, {
             method: "POST",
             headers: {
@@ -24,6 +24,7 @@ const Login = () => {
         });
 
         const res = await response.json();
+        setLoading(false);
         login(res.value, { email: form.email });
     };
 
@@ -63,10 +64,16 @@ const Login = () => {
                     />
                 </div>
                 <p>Forgot password ?</p>
-                <button type="submit" className={styles.submitButton}>
-                    {" "}
-                    {/* Use styles for submit button */}
-                    Login
+                <button
+                    type="submit"
+                    className={styles.submitButton}
+                    disabled={loading}
+                >
+                    {loading ? (
+                        <div className={styles.loadingSpinner}></div>
+                    ) : (
+                        "Login"
+                    )}
                 </button>
             </form>
         </div>

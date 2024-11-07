@@ -57,6 +57,14 @@
         color: $text-color;
         display: block;
     }
+    .error {
+        color: red;
+        font-size: 0.9rem;
+    }
+
+    .errorInput {
+        border: 1px solid red;
+    }
 
     input {
         width: 90%;
