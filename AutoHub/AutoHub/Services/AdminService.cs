@@ -40,6 +40,7 @@ namespace AutoHub.Services
         public async Task<ServiceResponse<int>> VerifyGarage(VerifyGarageDto verifyGarageDto)
         {
             var response = new ServiceResponse<int>();
+            Console.WriteLine($"ovdeje {verifyGarageDto.Id.ToString()}");
             var garageSpot = await _dbContext.GarageSpots.FindAsync(verifyGarageDto.Id);
 
             if (garageSpot == null)
