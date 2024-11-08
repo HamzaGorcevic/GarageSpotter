@@ -5,9 +5,12 @@ import { AuthContext } from "../../context/AuthContext";
 import GarageReservationTimer from "../../components/Garage/GarageTimer/garageTimer";
 import ReservationModal from "../../components/Modals/ReservationModal/ReservationModal";
 import toast from "react-hot-toast";
+import ViewGarageModal from "../../components/Modals/ViewGarageModal/viewGarageModal";
 
 const Reservations = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [garageSpot, setGarageSpot] = useState(null);
     const { authData } = useContext(AuthContext);
     const [reservations, setReservations] = useState([]);
     const [selectedReservation, setSelectedReservation] = useState(null);
@@ -25,7 +28,6 @@ const Reservations = () => {
         );
         const res = await response.json();
         setReservations(res?.value || []);
-        console.log(res.value);
     };
 
     useEffect(() => {
@@ -33,6 +35,26 @@ const Reservations = () => {
             getReservations();
         }
     }, [authData]);
+
+    const getGarageSpot = async (garagespotId) => {
+        try {
+            const response = await fetch(
+                `${BASE_URL}/garageSpot/getGarageSpot?garageSpotId=${garagespotId}`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${authData.token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+            const data = await response.json();
+            setGarageSpot(data.value);
+            setIsViewModalOpen(true);
+        } catch (error) {
+            console.error("Error fetching garage spot:", error);
+        }
+    };
 
     const extendReservation = async (reservation) => {
         try {
@@ -63,9 +85,9 @@ const Reservations = () => {
 
     const onClose = () => {
         setIsModalOpen(false);
+        setIsViewModalOpen(false);
     };
 
-    // Adjusted filter logic for reservations
     const filteredReservations = reservations.filter((reservation) => {
         if (filter === "hours") {
             return reservation.hours !== 0 && !reservation.reservationStart;
@@ -80,7 +102,6 @@ const Reservations = () => {
         <div className={styles.container}>
             <h1 className={styles.title}>Your Reservations</h1>
 
-            {/* Filter Options */}
             <div className={styles.filters}>
                 <button
                     className={`${styles.filterButton} ${
@@ -108,7 +129,6 @@ const Reservations = () => {
                 </button>
             </div>
 
-            {/* Reservation List */}
             <div className={styles.reservationList}>
                 {filteredReservations.length === 0 ? (
                     <p className={styles.noReservations}>
@@ -118,7 +138,7 @@ const Reservations = () => {
                     filteredReservations.map((reservation) => (
                         <div
                             className={styles.reservationCard}
-                            key={reservation.id} // Use `id` instead of `garageSpotId` as the key
+                            key={reservation.id}
                         >
                             <h2 className={styles.spotId}>
                                 Spot #{reservation.garageSpotId}
@@ -162,6 +182,14 @@ const Reservations = () => {
                             >
                                 Extend Reservation
                             </button>
+                            <button
+                                className={styles.extendButton} // Add appropriate styling
+                                onClick={() =>
+                                    getGarageSpot(reservation.garageSpotId)
+                                }
+                            >
+                                View
+                            </button>
                         </div>
                     ))
                 )}
@@ -173,6 +201,10 @@ const Reservations = () => {
                     onSubmit={extendReservation}
                     reservationData={selectedReservation}
                 />
+            )}
+
+            {isViewModalOpen && garageSpot && (
+                <ViewGarageModal garage={garageSpot} onClose={onClose} />
             )}
         </div>
     );

@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 
 const GarageForm = () => {
     const [latlng, setLatlng] = useState([43.23132, 21.21321]);
+    const [areFilesValid, setAreFilesValid] = useState(true);
     const [error, setError] = useState("");
     const { authData } = useContext(AuthContext);
     const { id } = useParams();
@@ -99,9 +100,24 @@ const GarageForm = () => {
     };
 
     const handleMultipleFileChange = (e) => {
+        const validImageTypes = ["image/jpeg", "image/png", "image/jpg"];
+        const selectedFiles = Array.from(e.target.files);
+
+        const filteredFiles = selectedFiles.filter((file) =>
+            validImageTypes.includes(file.type)
+        );
+
+        if (filteredFiles.length !== selectedFiles.length) {
+            toast.error("Only image files (PNG, JPEG) are allowed.");
+            setAreFilesValid(false);
+            e.target.value = "";
+        } else {
+            setAreFilesValid(true);
+        }
+
         setFormData((prevState) => ({
             ...prevState,
-            garageImages: Array.from(e.target.files),
+            garageImages: filteredFiles,
         }));
     };
 
@@ -116,12 +132,17 @@ const GarageForm = () => {
         if (formData.price < 1) {
             errors.price = "Price must be at least 1";
         }
+        if (!areFilesValid) {
+            errors.validFiles = "Files must be png or jpg format";
+        }
         setFormErrors(errors);
+        console.log(errors);
         return Object.keys(errors).length === 0;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log(areFilesValid, !validateForm());
         if (!validateForm()) {
             return;
         }
@@ -285,6 +306,7 @@ const GarageForm = () => {
                         name="garageImages"
                         onChange={handleMultipleFileChange}
                         multiple
+                        accept=".png, .jpg, .jpeg"
                         required
                     />
                 </div>
@@ -300,7 +322,9 @@ const GarageForm = () => {
                 </div>
 
                 {loading ? (
-                    <div>Loading...</div>
+                    <button disabled className={style.submitButton}>
+                        Loading ...
+                    </button>
                 ) : (
                     <button type="submit" className={style.submitButton}>
                         {isUpdateMode

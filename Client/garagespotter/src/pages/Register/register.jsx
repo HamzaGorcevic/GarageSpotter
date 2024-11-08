@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import styles from "./Register.module.scss";
 import { useNavigate } from "react-router-dom";
+import styles from "./Register.module.scss";
 import { BASE_URL } from "../../config/config";
+
 const Register = () => {
     const [form, setForm] = useState({
         name: "",
@@ -11,24 +12,50 @@ const Register = () => {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
+
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (form.password.length < 8) {
+            toast.error("Password must be at least 8 characters long.");
+            return;
+        }
+
         setIsSubmitting(true);
 
-        const response = await fetch(`${BASE_URL}/Auth/Register`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(form),
-        });
-        const res = await response.json();
-        setIsSubmitting(false);
-        navigate("/login");
+        try {
+            const response = await fetch(`${BASE_URL}/Auth/Register`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(form),
+            });
+
+            const res = await response.json();
+            setIsSubmitting(false);
+
+            if (response.ok) {
+                toast.success(
+                    "Registration successful! Redirecting to login..."
+                );
+                navigate("/login");
+            } else {
+                const errorMessage =
+                    res.message || "Registration failed. Please try again.";
+                toast.error(errorMessage);
+            }
+        } catch (error) {
+            setIsSubmitting(false);
+            toast.error(
+                "An error occurred during registration. Please try again."
+            );
+            console.error("Registration error:", error);
+        }
     };
 
     return (
