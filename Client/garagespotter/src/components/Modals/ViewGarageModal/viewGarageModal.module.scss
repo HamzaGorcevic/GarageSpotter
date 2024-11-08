@@ -1,0 +1,158 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(
+        0,
+        0,
+        0,
+        0.6
+    ); // Darker semi-transparent background for focus effect
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: $z-index-modal;
+    backdrop-filter: blur(5px); // Softens background with blur
+    animation: fadeIn 0.3s ease-in-out; // Smooth fade-in animation
+}
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 430px;
+    max-width: 90%;
+    height: auto;
+    background-color: $background-color;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    border-radius: 8px;
+    overflow-y: auto;
+    padding: 20px;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    animation: fadeIn 0.3s ease-in-out;
+
+    &.close {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+
+    @media (max-width: 768px) {
+        width: 100%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .closeButton {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 5px;
+        background-color: rgba(255, 255, 255, 0.8);
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+        transition: background-color 0.2s ease-in-out;
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 1);
+        }
+    }
+
+    .modalContent {
+        margin-top: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+
+        .imageSlider {
+            display: flex;
+            position: relative;
+            gap: 10px;
+            overflow-x: hidden;
+
+            .imageContainer {
+                display: flex;
+                scroll-snap-type: x mandatory;
+                overflow-x: auto;
+                gap: 10px;
+                scroll-behavior: smooth;
+
+                img {
+                    flex: 0 0 100%;
+                    max-width: 100%;
+                    height: auto;
+                    border-radius: 5px;
+                    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                    scroll-snap-align: center;
+                    transition: transform 0.3s ease-in-out;
+
+                    &:hover {
+                        transform: scale(1.05);
+                    }
+                }
+            }
+
+            .arrow {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 30px;
+                background: none;
+                border: none;
+                cursor: pointer;
+                z-index: 1;
+                padding: 10px;
+                border-radius: 50%;
+                background-color: rgba(255, 255, 255, 0.8);
+                box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+                transition: background-color 0.2s ease-in-out;
+
+                &:hover {
+                    background-color: rgba(255, 255, 255, 1);
+                }
+            }
+
+            .arrowLeft {
+                left: 5px;
+            }
+
+            .arrowRight {
+                right: 5px;
+            }
+        }
+
+        .reserveButton {
+            background-color: $secondary-color;
+            color: #f1ecec;
+            padding: $spacing-small;
+            font-size: $font-size-large;
+            border-radius: $border-radius;
+            border: none;
+            margin-top: $spacing-small;
+            width: 100%;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out,
+                transform 0.2s ease-in-out;
+
+            &:hover {
+                background-color: #119e37;
+                transform: translateY(-2px);
+            }
+        }
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

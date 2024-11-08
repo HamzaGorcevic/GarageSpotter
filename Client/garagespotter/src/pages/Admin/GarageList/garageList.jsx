@@ -64,18 +64,15 @@ const GarageList = () => {
                     Authorization: `Bearer ${authData.token}`,
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ garageSpotId }),
+                body: JSON.stringify({ id: garageSpotId, verify: true }),
             });
             const result = await response.json();
 
             if (result.success) {
                 toast.success("Garage verified successfully.");
+                fetchGarages();
                 setGarages(
-                    garages.map((garage) =>
-                        garage.id === garageSpotId
-                            ? { ...garage, isVerified: true }
-                            : garage
-                    )
+                    garages.filter((garage) => garage.id !== garageSpotId)
                 );
             } else {
                 toast.error(result.message || "Failed to verify garage.");

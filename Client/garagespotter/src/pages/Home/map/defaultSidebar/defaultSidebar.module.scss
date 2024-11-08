@@ -156,4 +156,21 @@
             color: $muted-text-color;
         }
     }
+
+    // no garages
+
+    .noGaragesContainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 92vh;
+        background-color: $background-color;
+        overflow: hidden;
+    }
+
+    .noGaragesImage {
+        max-width: 100%;
+        max-height: 80%;
+        object-fit: contain;
+    }
 }

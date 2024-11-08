@@ -4,7 +4,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    height: 90vh;
     background-color: $background-color;
 }
 .editProfileContainer {
@@ -60,4 +60,9 @@
     &:hover {
         background-color: darken($primary-color, 10%);
     }
+}
+.errorMessage {
+    color: red;
+    margin-bottom: $spacing-small;
+    font-size: $font-size-small;
 }
