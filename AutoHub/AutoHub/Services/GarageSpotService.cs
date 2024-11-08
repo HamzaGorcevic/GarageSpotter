@@ -22,7 +22,7 @@ namespace AutoHub.Services
         {
             await ClearReservations();
 
-            var garagaSpots = await _dbContext.GarageSpots.Include(g => g.TotalSpots).Where(g=>g.CountryName==country).ToListAsync();
+            var garagaSpots = await _dbContext.GarageSpots.Include(g => g.TotalSpots).Where(g=>g.CountryName==country && g.IsVerified).ToListAsync();
 
             var response = new ServiceResponse<List<GarageSpotDto>>
             {
