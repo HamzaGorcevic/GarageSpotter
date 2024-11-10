@@ -51,10 +51,18 @@ const Navbar = () => {
                                     <Link to="/create">Create Garage</Link>
                                 </li>
                                 <li>
+                                    <Link to="/create/charger">
+                                        Create Electric Charger
+                                    </Link>
+                                </li>
+                                <li>
                                     <Link to="/reservations">Reservations</Link>
                                 </li>
                                 <li>
                                     <Link to="/garages">My Garages</Link>
+                                </li>
+                                <li>
+                                    <Link to="/chargers">My E Chargers</Link>
                                 </li>
                             </>
                         ) : (

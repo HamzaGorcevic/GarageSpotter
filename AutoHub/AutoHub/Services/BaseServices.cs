@@ -8,7 +8,7 @@ public class BaseService
 {
 
 	IHttpContextAccessor _httpContextAccessor;
-    private readonly AppDbContext _dbContext;
+    public readonly AppDbContext _dbContext;
 	public BaseService(IHttpContextAccessor httpContextAccessor,AppDbContext dbContext)
 	{
 		_httpContextAccessor = httpContextAccessor;
@@ -19,7 +19,7 @@ public class BaseService
 	public int GetUserId()
 	{
 
-		var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+		var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
 		return userId != null ? int.Parse(userId) : 0;
 	}

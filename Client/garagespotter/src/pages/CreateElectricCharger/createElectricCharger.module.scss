@@ -1,5 +1,4 @@
-// Container styling
-.registerContainer {
+.createElectricChargerContainer {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -12,16 +11,13 @@
     }
 }
 
-// Title styling
 .title {
     font-size: 2.5rem;
     margin-bottom: 2rem;
-    color: $text-color;
-    text-align: center;
     color: $primary-color;
+    text-align: center;
 }
 
-// Form styling
 .form {
     display: grid;
     grid-template-columns: repeat(2, 1fr); // Two columns on larger screens
@@ -35,17 +31,16 @@
     margin-bottom: 50px;
 
     &:hover {
-        box-shadow: $hover-shadow;
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
     }
 
     @media (max-width: 768px) {
-        grid-template-columns: 1fr; // Single column on smaller screens
-        max-width: 100%;
+        grid-template-columns: 1fr;
+        width: 100%;
         padding: 1.5rem;
     }
 }
 
-// Form group styling for labels and inputs
 .formGroup {
     display: flex;
     flex-direction: column;
@@ -55,26 +50,16 @@
         font-size: 1rem;
         font-weight: 600;
         margin-bottom: 0.75rem;
-        color: $text-color;
-        display: block;
-    }
-    .error {
-        color: red;
-        font-size: 0.9rem;
-    }
-
-    .errorInput {
-        border: 1px solid red;
+        color: #333;
     }
 
     input {
-        width: 90%;
+        width: 90%; // Full width for inputs
         padding: 0.75rem;
         font-size: 1rem;
-        border: 1px solid $border-color;
+        border: 1px solid #ccc;
         border-radius: $border-radius;
-        transition: border-color $transition-default,
-            box-shadow $transition-default;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
 
         &:focus {
             border-color: $primary-color;
@@ -85,7 +70,7 @@
 }
 
 .submitButton {
-    grid-column: span 2;
+    grid-column: span 2; // Button spans full width of the form
     padding: 1rem;
     font-size: 1.25rem;
     background-color: $primary-color;
@@ -119,7 +104,7 @@
 }
 
 .error {
-    color: $error-color;
+    color: red;
     font-size: 1rem;
     margin-top: 0.5rem;
     grid-column: span 2;
@@ -134,7 +119,6 @@
     animation: spin 1s linear infinite;
 }
 
-// Keyframes for spinner animation
 @keyframes spin {
     0% {
         transform: rotate(0deg);

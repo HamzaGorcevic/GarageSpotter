@@ -21,7 +21,7 @@ namespace AutoHub.Controllers
         }
 
         [HttpPut("changePassword")]
-        public async Task<ServiceResponse<string>> ChangePassword(ChangePa  sswordDto changePasswordDto)
+        public async Task<ServiceResponse<string>> ChangePassword(ChangePasswordDto  changePasswordDto)
         {
             var response = await _authRepository.ChangePassword(changePasswordDto);
             return response;

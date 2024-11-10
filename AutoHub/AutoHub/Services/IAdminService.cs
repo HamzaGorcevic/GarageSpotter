@@ -8,5 +8,8 @@ namespace AutoHub.Services
         Task<ServiceResponse<List<GarageSpotDto>>> GetGarages();
         Task<ServiceResponse<int>> VerifyGarage(VerifyGarageDto verifyGarageDto);
         Task<ServiceResponse<int>> DeleteGarage(int garageSpotId);
+        Task<ServiceResponse<int>> DeleteElectricCharger(int chargerId);
+        Task<ServiceResponse<int>> VerifyElectricCharger(VerifyGarageDto verifyElectricCharger);
+        Task<ServiceResponse<List<ElectricCharger>>> GetElectricChargers();
     }
 }

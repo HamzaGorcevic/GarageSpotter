@@ -15,8 +15,9 @@ namespace AutoHub
             CreateMap<GarageSpot, CreateGarageSpotDto>();
             CreateMap<ReserveDto, Reservation>();
             CreateMap<Reservation,ReserveDto>();
-
-
+            CreateMap<CreateElectricCharagerDto, ElectricCharger>();
+            CreateMap<ElectricCharger, CreateElectricCharagerDto>();
+                
 
         }
 

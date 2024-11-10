@@ -12,6 +12,8 @@ namespace AutoHub.Data
         public DbSet<GarageSpot> GarageSpots => Set<GarageSpot>();  
         public DbSet<Reservation> Reservations => Set<Reservation>();
         public DbSet<SingleSpot> SingleSpots => Set<SingleSpot>();
-        
+        public DbSet<ElectricCharger> ElectricChargers => Set<ElectricCharger>();
+
+
     }
 }
