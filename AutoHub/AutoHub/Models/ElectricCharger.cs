@@ -13,7 +13,9 @@
         public int Price { get; set; }
         public string VerificationDocument {  get; set; }
         public string? Description { get; set; }
-        public bool[] AvailbleSpots;
+        public int AvailableSpots { get; set; }
+        public string ChargerType { get; set; }
+
         public int OwnerId { get; set; }
         public User Owner { get; set; } = new User();
     }

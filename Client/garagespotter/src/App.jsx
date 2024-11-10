@@ -16,7 +16,7 @@ import AccessDenied from "./pages/AccesDenied/accesDenied.jsx";
 import { NotFound } from "./pages/notFound/notFound.jsx";
 import EditProfile from "./pages/EditProfile/editProfile.jsx";
 import CreateElectricCharger from "./pages/CreateElectricCharger/createElectricCharger.jsx";
-import ElectricChargers from "./pages/ElectricChargers/electricChargers.jsx";
+import MyElectricChargers from "./pages/MyElectricChargers/myElectricChargers.jsx";
 
 function App() {
     return (
@@ -62,7 +62,7 @@ function App() {
 
                         <Route path="/update/:id" element={<GarageForm />} />
                         <Route
-                            path="/create/charger/:id"
+                            path="/update/charger/:id"
                             element={<CreateElectricCharger />}
                         />
                         <Route
@@ -78,7 +78,7 @@ function App() {
                         <Route path="/garages" element={<MyGarages />} />
                         <Route
                             path="/chargers"
-                            element={<ElectricChargers />}
+                            element={<MyElectricChargers />}
                         />
                     </Route>
 

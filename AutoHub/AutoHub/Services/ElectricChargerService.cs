@@ -31,19 +31,14 @@ using Microsoft.EntityFrameworkCore;
                 }
                 try
                 {
-                    var newCharger = new ElectricCharger
-                    {
-                        Name = electricChargerDto.Name,
-                        CountryName = electricChargerDto.CountryName,
-                        Latitude = electricChargerDto.Latitude,
-                        Longitude = electricChargerDto.Longitude,
-                        IsVerified = false,
-                        Price = electricChargerDto.Price,
-                        VerificationDocument = verificationDocumentPath,
-                        Description = electricChargerDto.Description,
-                        AvailbleSpots = electricChargerDto.AvailbleSpots
-                    };
+                    var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == GetUserId());
+                    user!.Role = Models.Enums.UserRole.Owner;
+    
+                   var newCharger = _mapper.Map<ElectricCharger>(electricChargerDto);
 
+                newCharger.Owner = user;
+                newCharger.OwnerId = user.Id;
+                newCharger.VerificationDocument = verificationDocumentPath;
                     _dbContext.ElectricChargers.Add(newCharger);
                     await _dbContext.SaveChangesAsync();
 
@@ -106,24 +101,12 @@ using Microsoft.EntityFrameworkCore;
                     var charger = await _dbContext.ElectricChargers.FindAsync(electricChargerId);
                     if (charger == null)
                     {
-                        response.Success = false;
+                        response.Success = false;   
                         response.Message = "Electric charger not found.";
                         return response;
                     }
-                     var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
-                    user!.Role = Models.Enums.UserRole.Owner;
-                    charger.Owner = user;
-                    charger.OwnerId = GetUserId();
-                    charger.IsVerified = false;
-                    charger.Name = electricChargerDto.Name;
-                    charger.CountryName = electricChargerDto.CountryName;
-                    charger.Latitude = electricChargerDto.Latitude;
-                    charger.Longitude = electricChargerDto.Longitude;
-                    charger.Price = electricChargerDto.Price;
-                    charger.Description = electricChargerDto.Description;
-                    charger.AvailbleSpots = electricChargerDto.AvailbleSpots;
-              
 
+                    charger = _mapper.Map<ElectricCharger>(electricChargerDto);
 
                     if (verificationDocument != null)
                     {
