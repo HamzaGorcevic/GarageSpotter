@@ -39,6 +39,7 @@ namespace AutoHub
             builder.Services.AddScoped<IReservationService, ReservationService>();
             builder.Services.AddScoped<IAzureBlobService, AzureBlobService>();
             builder.Services.AddScoped<IAdminService, AdminService>();
+            builder.Services.AddScoped<IElectricChargerService, ElectricChargerService>();
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowOrigins",

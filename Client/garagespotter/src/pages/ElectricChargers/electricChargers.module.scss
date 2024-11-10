@@ -1,0 +1,68 @@
+.container {
+    background-color: $background-color;
+    padding: $spacing-large;
+    font-family: $font-family;
+    color: $text-color;
+    min-height: 100vh;
+}
+
+.title {
+    font-size: $font-size-large;
+    margin-bottom: $spacing-large;
+    text-align: center;
+}
+
+.chargerList {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-medium;
+}
+
+.noChargers {
+    color: $muted-text-color;
+    text-align: center;
+    font-size: $font-size-base;
+}
+
+.chargerCard {
+    background-color: #fff;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    padding: $spacing-medium;
+    box-shadow: $box-shadow;
+    transition: box-shadow $transition-default;
+
+    &:hover {
+        box-shadow: $hover-shadow;
+    }
+
+    h2 {
+        font-size: $font-size-large;
+        margin-bottom: $spacing-small;
+        color: $primary-color;
+    }
+
+    p {
+        margin: $spacing-small 0;
+        font-size: $font-size-base;
+    }
+
+    .editButton {
+        background-color: $primary-color;
+        color: #fff;
+        padding: $spacing-small $spacing-medium;
+        border: none;
+        border-radius: $border-radius;
+        cursor: pointer;
+        transition: background-color $transition-default;
+
+        &:hover {
+            background-color: darken($primary-color, 10%);
+        }
+
+        &:focus {
+            outline: none;
+            box-shadow: $hover-shadow;
+        }
+    }
+}

@@ -39,6 +39,25 @@ namespace AutoHub.Controllers
             var response = await _adminService.DeleteGarage(garageSpotId);
             return response;
         }
-        
+        [HttpGet("getElectricChargers")]
+        public async Task<ServiceResponse<List<ElectricCharger>>> GetElectricGarages()
+        {
+            var response = await _adminService.GetElectricChargers();
+            return response;
+        }
+        [HttpPut("verifyElectricCharger")]
+        public async Task<ServiceResponse<int>> VerifyElectricCharger(VerifyGarageDto verifyChargerDto)
+        {
+            var response = await _adminService.VerifyElectricCharger(verifyChargerDto);
+            return response;
+        }
+        [HttpDelete("deleteElectricCharger")]
+        public async Task<ServiceResponse<int>> DeleteElectricCharger(int chargerId)
+        {
+            var response = await _adminService.DeleteElectricCharger(chargerId);
+            return response;
+        }
+
+
     }
 }

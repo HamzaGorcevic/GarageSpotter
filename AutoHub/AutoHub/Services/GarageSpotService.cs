@@ -64,7 +64,7 @@ namespace AutoHub.Services
             return response;
             
         }
-        public async Task<ServiceResponse<int>> CreateGarageSpot([FromForm] IFormFile verificationDocument, [FromForm] List<IFormFile> garageImages, [FromForm] CreateGarageSpotDto newSpot)
+        public async Task<ServiceResponse<int>> CreateGarageSpot( IFormFile verificationDocument, List<IFormFile> garageImages,  CreateGarageSpotDto newSpot)
         {
             var response = new ServiceResponse<int>();
             var userId = GetUserId(); 

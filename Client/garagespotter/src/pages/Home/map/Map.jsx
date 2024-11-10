@@ -1,17 +1,11 @@
 import React, { useState, useEffect } from "react";
-import {
-    MapContainer,
-    TileLayer,
-    Marker,
-    Popup,
-    useMapEvents,
-    useMap,
-} from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import RoutingMachine from "./RoutineMachine";
 import L from "leaflet";
 import DefaultSidebar from "./defaultSidebar/DefaultSidebar";
 import BluePin from "../../../assets/images/blue.svg";
 import RedPin from "../../../assets/images/red.svg";
+import ChargerPin from "../../../assets/images/charger.png"; // Add a new icon for electric chargers
 import Sidebar from "./mapSidebar/MapSidebar";
 import style from "./map.module.scss";
 import "leaflet/dist/leaflet.css";
@@ -36,7 +30,14 @@ const blueIcon = L.icon({
     shadowSize: [41, 41],
 });
 
-const MapComponent = ({ garageSpots }) => {
+const chargerIcon = L.icon({
+    iconUrl: ChargerPin, // New icon for electric chargers
+    iconSize: [45, 71],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+});
+
+const MapComponent = ({ garageSpots, eChargers }) => {
     const [userPosition, setUserPosition] = useState(null);
     const [clickedMarkerPosition, setClickedMarkerPosition] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -45,7 +46,7 @@ const MapComponent = ({ garageSpots }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [distanceFilter, setDistanceFilter] = useState("");
     const [priceFilter, setPriceFilter] = useState("");
-
+    console.log(eChargers);
     useEffect(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -125,7 +126,7 @@ const MapComponent = ({ garageSpots }) => {
 
                 {filteredGarages.map((spot, index) => (
                     <Marker
-                        key={index}
+                        key={`garage-${index}`}
                         position={[spot.latitude, spot.longitude]}
                         icon={spot.isAvailable ? blueIcon : redIcon}
                         eventHandlers={{
@@ -134,6 +135,18 @@ const MapComponent = ({ garageSpots }) => {
                     >
                         <Popup>
                             {spot.locationName} <br /> {spot.address}
+                        </Popup>
+                    </Marker>
+                ))}
+
+                {eChargers?.map((charger, index) => (
+                    <Marker
+                        key={`charger-${index}`}
+                        position={[charger.latitude, charger.longitude]}
+                        icon={chargerIcon}
+                    >
+                        <Popup>
+                            {charger.locationName} <br /> {charger.address}
                         </Popup>
                     </Marker>
                 ))}

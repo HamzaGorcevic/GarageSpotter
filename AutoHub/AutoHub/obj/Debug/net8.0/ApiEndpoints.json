@@ -1,6 +1,32 @@
 [
   {
     "ContainingType": "AutoHub.Controllers.AdminController",
+    "Method": "DeleteElectricCharger",
+    "RelativePath": "Admin/deleteElectricCharger",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "chargerId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "AutoHub.Models.ServiceResponse\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "AutoHub.Controllers.AdminController",
     "Method": "DeletGarage",
     "RelativePath": "Admin/deleteGarage",
     "HttpMethod": "DELETE",
@@ -27,6 +53,26 @@
   },
   {
     "ContainingType": "AutoHub.Controllers.AdminController",
+    "Method": "GetElectricGarages",
+    "RelativePath": "Admin/getElectricChargers",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "AutoHub.Models.ServiceResponse\u00601[[System.Collections.Generic.List\u00601[[AutoHub.Models.ElectricCharger, AutoHub, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "AutoHub.Controllers.AdminController",
     "Method": "GetGarages",
     "RelativePath": "Admin/getGarages",
     "HttpMethod": "GET",
@@ -36,6 +82,32 @@
     "ReturnTypes": [
       {
         "Type": "AutoHub.Models.ServiceResponse\u00601[[System.Collections.Generic.List\u00601[[AutoHub.Models.GarageSpotDto, AutoHub, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "AutoHub.Controllers.AdminController",
+    "Method": "VerifyElectricCharger",
+    "RelativePath": "Admin/verifyElectricCharger",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "verifyChargerDto",
+        "Type": "AutoHub.Dtos.VerifyGarageDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "AutoHub.Models.ServiceResponse\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -114,6 +186,245 @@
     "ReturnTypes": [
       {
         "Type": "AutoHub.Models.ServiceResponse\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "AutoHub.Controllers.ElectricChargerController",
+    "Method": "CreateElectricCharger",
+    "RelativePath": "ElectricCharger/createElectricCharger",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ContentType",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "ContentDisposition",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Headers",
+        "Type": "Microsoft.AspNetCore.Http.IHeaderDictionary",
+        "IsRequired": false
+      },
+      {
+        "Name": "Length",
+        "Type": "System.Int64",
+        "IsRequired": false
+      },
+      {
+        "Name": "Name",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "FileName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Name",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "CountryName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Latitude",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Longitude",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Price",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Description",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "AutoHub.Models.ServiceResponse\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "AutoHub.Controllers.ElectricChargerController",
+    "Method": "GetElectricChargerById",
+    "RelativePath": "ElectricCharger/getElectricChargerById",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "AutoHub.Models.ServiceResponse\u00601[[AutoHub.Dtos.CreateElectricCharagerDto, AutoHub, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "AutoHub.Controllers.ElectricChargerController",
+    "Method": "GetElectricChargersByCountry",
+    "RelativePath": "ElectricCharger/getElectricChargersByCountry",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "countryName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "AutoHub.Models.ServiceResponse\u00601[[System.Collections.Generic.List\u00601[[AutoHub.Models.ElectricCharger, AutoHub, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "AutoHub.Controllers.ElectricChargerController",
+    "Method": "GetOwnerElectricChargers",
+    "RelativePath": "ElectricCharger/getOwnerElectricChargers",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "AutoHub.Models.ServiceResponse\u00601[[System.Collections.Generic.List\u00601[[AutoHub.Models.ElectricCharger, AutoHub, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "AutoHub.Controllers.ElectricChargerController",
+    "Method": "UpdateElectricCharger",
+    "RelativePath": "ElectricCharger/updateElectricCharger",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ContentType",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "ContentDisposition",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Headers",
+        "Type": "Microsoft.AspNetCore.Http.IHeaderDictionary",
+        "IsRequired": false
+      },
+      {
+        "Name": "Length",
+        "Type": "System.Int64",
+        "IsRequired": false
+      },
+      {
+        "Name": "Name",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "FileName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Name",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "CountryName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Latitude",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Longitude",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Price",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Description",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "electricChargerId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "AutoHub.Models.ServiceResponse\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",

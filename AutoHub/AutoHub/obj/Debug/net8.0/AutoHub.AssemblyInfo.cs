@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AutoHub")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8bf14ddf243c2164fd1e0f1041fd501df3cabb3a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+67aeb6f5c18b94a5575b7b31c62238b9419ed784")]
 [assembly: System.Reflection.AssemblyProductAttribute("AutoHub")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AutoHub")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

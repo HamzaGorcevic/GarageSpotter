@@ -40,7 +40,6 @@ namespace AutoHub.Services
         public async Task<ServiceResponse<int>> VerifyGarage(VerifyGarageDto verifyGarageDto)
         {
             var response = new ServiceResponse<int>();
-            Console.WriteLine($"ovdeje {verifyGarageDto.Id.ToString()}");
             var garageSpot = await _dbContext.GarageSpots.FindAsync(verifyGarageDto.Id);
 
             if (garageSpot == null)
@@ -79,5 +78,86 @@ namespace AutoHub.Services
             response.Value = garageSpotId; 
             return response;
         }
+        public async Task<ServiceResponse<int>> DeleteElectricCharger(int chargerId)
+        {
+            var response = new ServiceResponse<int>();
+
+            try
+            {
+                var charger = await _dbContext.ElectricChargers.FindAsync(chargerId);
+                if (charger == null)
+                {
+                    response.Success = false;
+                    response.Message = "Electric charger not found.";
+                    return response;
+                }
+
+                _dbContext.ElectricChargers.Remove(charger);
+                await _dbContext.SaveChangesAsync();
+
+                response.Value = chargerId;
+                response.Success = true;
+                response.Message = "Electric charger deleted successfully.";
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"Error deleting electric charger: {ex.Message}";
+            }
+
+            return response;
+        }
+        public async Task<ServiceResponse<int>> VerifyElectricCharger(VerifyGarageDto verifyElectricCharger)
+        {
+            var response = new ServiceResponse<int>();
+
+            try
+            {
+                var charger = await _dbContext.ElectricChargers.FindAsync(verifyElectricCharger.Id);
+                if (charger == null)
+                {
+                    response.Success = false;
+                    response.Message = "Electric charger not found.";
+                    return response;
+                }
+
+                charger.IsVerified = true;
+                await _dbContext.SaveChangesAsync();
+
+                response.Value = charger.Id;
+                response.Success = true;
+                response.Message = "Electric charger verified successfully.";
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"Error verifying electric charger: {ex.Message}";
+            }
+
+            return response;
+        }
+
+        public async Task<ServiceResponse<List<ElectricCharger>>> GetElectricChargers()
+        {
+            var response = new ServiceResponse<List<ElectricCharger>>();
+
+            try
+            {
+                var chargers = await _dbContext.ElectricChargers
+                    .Where(ec => !ec.IsVerified)
+                    .ToListAsync();
+
+                response.Value = chargers;
+                response.Success = true;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"An error occurred while fetching chargers: {ex.Message}";
+            }
+
+            return response;
+        }
+
     }
 }

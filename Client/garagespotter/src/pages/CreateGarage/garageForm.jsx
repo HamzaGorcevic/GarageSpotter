@@ -238,6 +238,7 @@ const GarageForm = () => {
                         name="countryName"
                         value={formData.countryName}
                         onChange={handleChange}
+                        disabled
                         required
                     />
                 </div>
