@@ -8,10 +8,17 @@ import ReservationModal from "../../../../components/Modals/ReservationModal/Res
 import { BASE_URL } from "../../../../config/config.js";
 import toast from "react-hot-toast";
 
-const MapSidebar = ({ isOpen, onClose, garageSpotId, distance }) => {
+const MapSidebar = ({
+    isOpen,
+    onClose,
+    garageSpotId,
+    distance,
+    isGarageSpot,
+}) => {
     const { authData } = useContext(AuthContext);
     const [isModalOpen, setModalOpen] = useState(false);
     const [garageSpot, setGarageSpot] = useState(null);
+    const [electricCharger, setElectricCharger] = useState(null);
     const [loading, setLoading] = useState(false);
     const sliderRef = useRef(null);
 
@@ -28,7 +35,7 @@ const MapSidebar = ({ isOpen, onClose, garageSpotId, distance }) => {
     const reserveGarageSpot = async (reservationData) => {
         setLoading(true);
         const response = await fetch(
-            `${BASE_URL}/Reservation/reserveSingleSpot  `,
+            `${BASE_URL}/Reservation/reserveSingleSpot`,
             {
                 method: "POST",
                 headers: {
@@ -43,7 +50,6 @@ const MapSidebar = ({ isOpen, onClose, garageSpotId, distance }) => {
         );
         setLoading(false);
         const res = await response.json();
-        console.log(res);
         if (res.success) {
             toast.success(res.message);
             fetchGarageSpot();
@@ -51,7 +57,10 @@ const MapSidebar = ({ isOpen, onClose, garageSpotId, distance }) => {
             toast.error(res.message);
         }
     };
-
+    const onGoogleMaps = (lat, lon) => {
+        const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}&travelmode=driving`;
+        window.open(url, "_blank");
+    };
     const fetchGarageSpot = async () => {
         const response = await fetch(
             `${BASE_URL}/GarageSpot/getGarageSpot?garageSpotId=${garageSpotId}`,
@@ -65,11 +74,31 @@ const MapSidebar = ({ isOpen, onClose, garageSpotId, distance }) => {
         const res = await response.json();
         setGarageSpot(res.value);
     };
+
+    const fetchElectricCharger = async () => {
+        const response = await fetch(
+            `${BASE_URL}/ElectricCharger/getElectricChargerById?id=${garageSpotId}`,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${authData.token}`,
+                },
+            }
+        );
+        const res = await response.json();
+        setElectricCharger(res.value);
+        console.log("WTF", garageSpotId, res.value);
+    };
+
     useEffect(() => {
         if (garageSpotId >= 0) {
-            fetchGarageSpot();
+            if (isGarageSpot) {
+                fetchGarageSpot();
+            } else {
+                fetchElectricCharger();
+            }
         }
-    }, [garageSpotId]);
+    }, [garageSpotId, isGarageSpot]);
 
     return (
         <div className={`${style.sidebar} ${isOpen ? style.open : ""}`}>
@@ -79,68 +108,144 @@ const MapSidebar = ({ isOpen, onClose, garageSpotId, distance }) => {
                 </button>
             </div>
             <div className={style.sidebarContent}>
-                {garageSpot?.garageImages?.length > 0 && (
-                    <div className={style.imageSlider}>
+                {isGarageSpot ? (
+                    <>
+                        {garageSpot?.garageImages?.length > 0 && (
+                            <div className={style.imageSlider}>
+                                <button
+                                    className={`${style.arrow} ${style.arrowLeft}`}
+                                    onClick={() => handleSliderMovement("left")}
+                                >
+                                    &lt;
+                                </button>
+                                <div
+                                    className={style.imageContainer}
+                                    ref={sliderRef}
+                                >
+                                    {garageSpot.garageImages.map(
+                                        (image, index) => (
+                                            <img
+                                                key={index}
+                                                src={image}
+                                                alt={`Garage Image ${
+                                                    index + 1
+                                                }`}
+                                            />
+                                        )
+                                    )}
+                                </div>
+                                <button
+                                    className={`${style.arrow} ${style.arrowRight}`}
+                                    onClick={() =>
+                                        handleSliderMovement("right")
+                                    }
+                                >
+                                    &gt;
+                                </button>
+                            </div>
+                        )}
+                        <h2>{garageSpot?.locationName}</h2>
                         <button
-                            className={`${style.arrow} ${style.arrowLeft}`}
-                            onClick={() => handleSliderMovement("left")}
+                            className={style.reserveButton}
+                            onClick={() => setModalOpen(true)}
                         >
-                            &lt;
+                            Reserve spot
                         </button>
-                        <div className={style.imageContainer} ref={sliderRef}>
-                            {garageSpot.garageImages.map((image, index) => (
-                                <img
-                                    key={index}
-                                    src={image}
-                                    alt={`Garage Image ${index + 1}`}
-                                />
-                            ))}
-                        </div>
                         <button
-                            className={`${style.arrow} ${style.arrowRight}`}
-                            onClick={() => handleSliderMovement("right")}
+                            className={style.reserveButton}
+                            onClick={() =>
+                                onGoogleMaps(
+                                    garageSpot.latitude,
+                                    garageSpot.longitude
+                                )
+                            }
                         >
-                            &gt;
+                            Google maps
                         </button>
-                    </div>
-                )}
-                <h2>{garageSpot?.locationName}</h2>
-                <button
-                    className={style.reserveButton}
-                    onClick={() => setModalOpen(true)}
-                >
-                    Reserve spot
-                </button>
-                <p>
-                    <strong>Address:</strong> {garageSpot?.address}
-                </p>
-                <p>
-                    <strong>Available:</strong>{" "}
-                    {garageSpot?.isAvailable ? "Yes" : "No"}
-                </p>
-                <p>
-                    <strong>Price:</strong> ${garageSpot?.price}
-                </p>
-                <p>
-                    <strong>Distance:</strong> {distance} km
-                </p>
-                <p>
-                    <strong>Total Spots:</strong>{" "}
-                    {garageSpot?.totalSpots.length}
-                </p>
+                        <p>
+                            <strong>Address:</strong> {garageSpot?.address}
+                        </p>
+                        <p>
+                            <strong>Available:</strong>{" "}
+                            {garageSpot?.isAvailable ? "Yes" : "No"}
+                        </p>
+                        <p>
+                            <strong>Price:</strong> ${garageSpot?.price}
+                        </p>
+                        <p>
+                            <strong>Distance:</strong> {distance} km
+                        </p>
+                        <p>
+                            <strong>Total Spots:</strong>{" "}
+                            {garageSpot?.totalSpots.length}
+                        </p>
 
-                <div className={style.containerForSpots}>
-                    {garageSpot?.totalSpots?.map((spot) =>
-                        spot.isAvailable ? (
-                            <img src={greenCar} alt="Available" />
-                        ) : (
-                            <img src={redCar} alt="Unavailable" />
-                        )
-                    )}
-                </div>
+                        <div className={style.containerForSpots}>
+                            {garageSpot?.totalSpots?.map((spot, index) =>
+                                spot.isAvailable ? (
+                                    <img
+                                        key={index}
+                                        src={greenCar}
+                                        alt="Available"
+                                    />
+                                ) : (
+                                    <img
+                                        key={index}
+                                        src={redCar}
+                                        alt="Unavailable"
+                                    />
+                                )
+                            )}
+                        </div>
+                    </>
+                ) : electricCharger ? (
+                    <>
+                        <h2>{electricCharger?.name}</h2>
+                        <p>
+                            <strong>Country:</strong>{" "}
+                            {electricCharger?.countryName}
+                        </p>
+                        <p>
+                            <strong>Latitude:</strong>{" "}
+                            {electricCharger?.latitude}
+                        </p>
+                        <p>
+                            <strong>Longitude:</strong>{" "}
+                            {electricCharger?.longitude}
+                        </p>
+                        <p>
+                            <strong>Charger Type:</strong>{" "}
+                            {electricCharger?.chargerType}
+                        </p>
+                        <p>
+                            <strong>Price:</strong> ${electricCharger?.price}
+                        </p>
+                        <p>
+                            <strong>Description:</strong>{" "}
+                            {electricCharger?.description}
+                        </p>
+                        <p>
+                            <strong>Available Spots:</strong>{" "}
+                            {electricCharger?.availableSpots}
+                        </p>
+                        <button
+                            className={style.reserveButton}
+                            onClick={() =>
+                                onGoogleMaps(
+                                    electricCharger.latitude,
+                                    electricCharger.longitude
+                                )
+                            }
+                        >
+                            Google maps
+                        </button>
+                    </>
+                ) : (
+                    "Wrong path"
+                )}
             </div>
 
-            {isModalOpen && (
+            {isModalOpen && isGarageSpot && (
                 <ReservationModal
                     onClose={() => setModalOpen(false)}
                     loading={loading}

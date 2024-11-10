@@ -254,6 +254,11 @@
         "IsRequired": false
       },
       {
+        "Name": "ChargerType",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
         "Name": "Price",
         "Type": "System.Int32",
         "IsRequired": false
@@ -261,6 +266,11 @@
       {
         "Name": "Description",
         "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "AvailableSpots",
+        "Type": "System.Int32",
         "IsRequired": false
       }
     ],
@@ -407,6 +417,11 @@
         "IsRequired": false
       },
       {
+        "Name": "ChargerType",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
         "Name": "Price",
         "Type": "System.Int32",
         "IsRequired": false
@@ -414,6 +429,11 @@
       {
         "Name": "Description",
         "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "AvailableSpots",
+        "Type": "System.Int32",
         "IsRequired": false
       },
       {

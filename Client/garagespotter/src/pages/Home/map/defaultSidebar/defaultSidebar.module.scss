@@ -17,9 +17,13 @@
         margin-left: auto;
         display: none;
         cursor: pointer;
+        margin-right: 10px;
         @media (max-width: 768px) {
-            display: block;
+            display: inline;
         }
+    }
+    .open {
+        display: inline !important;
     }
     .alwaysVisible {
         background-color: $background-color;

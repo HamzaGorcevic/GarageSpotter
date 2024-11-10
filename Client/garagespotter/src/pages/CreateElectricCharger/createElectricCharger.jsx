@@ -21,6 +21,7 @@ const CreateElectricCharger = () => {
         description: "",
         availableSpots: "",
         price: "",
+        chargerType: "",
     });
     const [error, setError] = useState("");
 
@@ -31,10 +32,11 @@ const CreateElectricCharger = () => {
             [name]: value,
         }));
     };
+
     const fetchGarageSpot = async (garageSpotId) => {
         try {
             const response = await fetch(
-                `${BASE_URL}/ElectricCharger/getElectricChargerById=${garageSpotId}`,
+                `${BASE_URL}/ElectricCharger/getElectricChargerById?id=${garageSpotId}`,
                 {
                     headers: {
                         Authorization: `Bearer ${authData.token}`,
@@ -51,8 +53,9 @@ const CreateElectricCharger = () => {
                     countryName: data.countryName,
                     verificationDocument: data.verificationDocument,
                     description: data.description || "",
-                    availableSpots: data.totalSpots?.length || "",
+                    availableSpots: data.availableSpots || "",
                     price: data.price || "",
+                    chargerType: data.chargerType || "", // Set existing charger type from data
                 });
             } else {
                 setError("Failed to fetch garage spot details.");
@@ -61,6 +64,7 @@ const CreateElectricCharger = () => {
             setError("Error: " + error.message);
         }
     };
+
     useEffect(() => {
         if (id && authData.token) {
             setIsUpdateMode(true);
@@ -111,7 +115,8 @@ const CreateElectricCharger = () => {
             !formData.name ||
             !formData.latitude ||
             !formData.longitude ||
-            !formData.availableSpots
+            !formData.availableSpots ||
+            !formData.chargerType // Ensure chargerType is selected
         ) {
             setError("Please fill in all required fields.");
             toast.error("Please fill in all required fields.");
@@ -130,9 +135,10 @@ const CreateElectricCharger = () => {
         formDataToSend.append("availableSpots", formData.availableSpots);
         formDataToSend.append("countryName", formData.countryName);
         formDataToSend.append("price", formData.price);
+        formDataToSend.append("chargerType", formData.chargerType); // Include chargerType
 
         const apiUrl = isUpdateMode
-            ? `/ElectricCharger/updateElectricCharger`
+            ? `/ElectricCharger/updateElectricCharger?electricChargerId=${id}`
             : `/ElectricCharger/createElectricCharger`;
 
         const httpMethod = isUpdateMode ? "PUT" : "POST";
@@ -228,6 +234,8 @@ const CreateElectricCharger = () => {
                 <div className={styles.formGroup}>
                     <label htmlFor="price">Price:</label>
                     <input
+                        type="number"
+                        min={1}
                         id="price"
                         name="price"
                         value={formData.price}
@@ -237,13 +245,15 @@ const CreateElectricCharger = () => {
                 <div className={styles.formGroup}>
                     <label htmlFor="availableSpots">Available Spots:</label>
                     <input
-                        type="text"
+                        type="number"
+                        min={1}
                         id="availableSpots"
                         name="availableSpots"
                         value={formData.availableSpots}
                         onChange={handleChange}
                     />
                 </div>
+
                 <div className={styles.formGroup}>
                     <label htmlFor="verificationDocument">
                         Verification Document:
@@ -255,6 +265,20 @@ const CreateElectricCharger = () => {
                         onChange={handleFileChange}
                     />
                 </div>
+                <div className={styles.formGroup}>
+                    <label htmlFor="chargerType">Charger Type:</label>
+                    <select
+                        id="chargerType"
+                        name="chargerType"
+                        value={formData.chargerType}
+                        onChange={handleChange}
+                    >
+                        <option value="">Select Charger Type</option>
+                        <option value="Fast">Fast</option>
+                        <option value="Slow">Slow</option>
+                        <option value="UltraFast">Ultra Fast</option>
+                    </select>
+                </div>
                 {error && <div className={styles.errorMessage}>{error}</div>}
 
                 <button
@@ -262,7 +286,7 @@ const CreateElectricCharger = () => {
                     className={styles.submitButton}
                     disabled={loading}
                 >
-                    {loading ? "Submitting..." : "Create Electric Charger"}
+                    {loading ? "Submitting..." : "Submit"}
                 </button>
             </form>
             <MapConstant setLatlng={setLatlng} />

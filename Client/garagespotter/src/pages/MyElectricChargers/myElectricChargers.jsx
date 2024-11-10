@@ -4,7 +4,7 @@ import { BASE_URL } from "../../config/config";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-const ElectricChargers = () => {
+const MyElectricChargers = () => {
     const { authData } = useContext(AuthContext);
     const [chargers, setChargers] = useState([]);
     const navigate = useNavigate();
@@ -20,6 +20,7 @@ const ElectricChargers = () => {
             }
         );
         const res = await response.json();
+        console.log(res.value);
         setChargers(res?.value);
     };
 
@@ -41,19 +42,22 @@ const ElectricChargers = () => {
                     chargers?.map((charger) => (
                         <div className={styles.chargerCard} key={charger.id}>
                             <h2 className={styles.locationName}>
-                                {charger.locationName}, {charger.countryName}
+                                {charger.name}, {charger.countryName}
                             </h2>
                             <p>
-                                <strong>Price per kWh:</strong> $
-                                {charger.pricePerKwh}
+                                <strong>Price per kWh:</strong> ${charger.price}
                             </p>
                             <p>
-                                <strong>Available:</strong>{" "}
-                                {charger.isAvailable ? "Yes" : "No"}
+                                <strong>Is verified:</strong>{" "}
+                                {charger.isVerfied ? "Yes" : "Pending ..."}
                             </p>
                             <p>
-                                <strong>Connector Type:</strong>{" "}
-                                {charger.connectorType}
+                                <strong>Description:</strong>{" "}
+                                {charger?.description}
+                            </p>
+                            <p>
+                                <strong>Availble chargers:</strong>{" "}
+                                {charger?.availableSpots}
                             </p>
                             <p>
                                 <strong>Latitude:</strong> {charger.latitude},{" "}
@@ -75,4 +79,4 @@ const ElectricChargers = () => {
     );
 };
 
-export default ElectricChargers;
+export default MyElectricChargers;

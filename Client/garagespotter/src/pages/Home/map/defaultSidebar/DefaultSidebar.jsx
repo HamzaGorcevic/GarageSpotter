@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import style from "./defaultSidebar.module.scss";
-// Import the 'no garages' image
 import noGarageImage from "../../../../assets/images/no-garages.jpg";
+import defaultChargerImage from "../../../../assets/images/defaultChargerImage.png";
 
 const DefaultSidebar = ({
     filteredGarages,
+    filteredChargers,
     setSidebarOpen,
     setSelectedGarageSpotId,
     countDistanceToSpot,
@@ -15,6 +16,11 @@ const DefaultSidebar = ({
     setDistanceFilter,
     setPriceFilter,
     priceFilter,
+    showGarageSpots,
+    setShowGarageSpots,
+    setChargerTypeFilter,
+    chargerTypeFilter,
+    setIsGarageSpot,
 }) => {
     const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
@@ -23,13 +29,18 @@ const DefaultSidebar = ({
             <div className={style.alwaysVisible}>
                 <input
                     type="text"
-                    placeholder="Search Garage by Name"
+                    placeholder={
+                        showGarageSpots
+                            ? "Search Garage by Name"
+                            : "Search Charger by Name"
+                    }
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className={style.searchGarageName}
                 />
 
                 <div className={style.filtersContainer}>
+                    {/* Distance Filter */}
                     <select
                         value={distanceFilter}
                         onChange={(e) => setDistanceFilter(e.target.value)}
@@ -52,71 +63,151 @@ const DefaultSidebar = ({
                         <option value="20">Under $20</option>
                         <option value="50">Under $50</option>
                     </select>
+
+                    {/* Charger Type Filter */}
+                    {!showGarageSpots && (
+                        <select
+                            value={chargerTypeFilter}
+                            onChange={(e) =>
+                                setChargerTypeFilter(e.target.value)
+                            }
+                            className={style.filterSelect}
+                        >
+                            <option value="">All Charger Types</option>
+                            <option value="Type1">Type 1</option>
+                            <option value="Type2">Type 2</option>
+                            <option value="Fast">Fast Charger</option>
+                        </select>
+                    )}
                 </div>
+
                 <button
                     className={style.toggleButton}
                     onClick={() => setIsSidebarVisible(!isSidebarVisible)}
                 >
                     {isSidebarVisible ? "Show Map" : "Show Sidebar"}
                 </button>
+                <button
+                    className={`${style.toggleButton} ${style.open}`}
+                    onClick={() => setShowGarageSpots(!showGarageSpots)}
+                >
+                    {showGarageSpots ? "Show Chargers" : "Show Garage Spots"}
+                </button>
             </div>
+
             {isSidebarVisible ? (
                 <div className={style.toggledSidebar}>
-                    {filteredGarages.length === 0 ? (
-                        // Display the 'no garages' image when there are no garages
+                    {showGarageSpots ? (
+                        filteredGarages.length === 0 ? (
+                            <div className={style.noGaragesContainer}>
+                                <img
+                                    src={noGarageImage}
+                                    alt="No Garages"
+                                    className={style.noGaragesImage}
+                                />
+                            </div>
+                        ) : (
+                            filteredGarages.map((garage) => (
+                                <div
+                                    key={garage.id}
+                                    className={`${style.garageItem} ${
+                                        selectedGarageSpotId === garage.id
+                                            ? style.selectedGarageItem
+                                            : ""
+                                    }`}
+                                >
+                                    <img
+                                        src={
+                                            garage.garageImages[0] ||
+                                            "/placeholder.png"
+                                        }
+                                        alt={garage.locationName}
+                                        className={style.garageImage}
+                                    />
+                                    <div className={style.garageInfo}>
+                                        <h3 className={style.garageTitle}>
+                                            {garage.locationName}
+                                        </h3>
+                                        <p className={style.price}>
+                                            ${garage.price || "N/A"}
+                                        </p>
+                                        <p className={style.price}>
+                                            {garage.distance || "N/A"} km
+                                        </p>
+                                        <p className={style.availableSpots}>
+                                            {garage.totalSpots.length > 0
+                                                ? `${
+                                                      garage.totalSpots.filter(
+                                                          (spot) =>
+                                                              spot.isAvailable
+                                                      ).length
+                                                  } available spots`
+                                                : "No spots"}
+                                        </p>
+                                        <button
+                                            className={style.reserveButton}
+                                            onClick={() => {
+                                                setSidebarOpen(true);
+                                                setIsGarageSpot(true);
+                                                setSelectedGarageSpotId(
+                                                    garage.id
+                                                );
+                                                countDistanceToSpot(garage);
+                                            }}
+                                        >
+                                            Reserve spot
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                        )
+                    ) : filteredChargers.length === 0 ? (
                         <div className={style.noGaragesContainer}>
                             <img
                                 src={noGarageImage}
-                                alt="No Garages"
+                                alt="No Chargers"
                                 className={style.noGaragesImage}
                             />
                         </div>
                     ) : (
-                        filteredGarages.map((garage) => (
+                        filteredChargers.map((charger) => (
                             <div
-                                key={garage.id}
+                                key={charger.id}
                                 className={`${style.garageItem} ${
-                                    selectedGarageSpotId === garage.id
+                                    selectedGarageSpotId === charger.id
                                         ? style.selectedGarageItem
                                         : ""
                                 }`}
                             >
                                 <img
-                                    src={
-                                        garage.garageImages[0] ||
-                                        "/placeholder.png"
-                                    }
-                                    alt={garage.locationName}
+                                    src={defaultChargerImage}
+                                    alt={charger.name}
                                     className={style.garageImage}
                                 />
                                 <div className={style.garageInfo}>
                                     <h3 className={style.garageTitle}>
-                                        {garage.locationName}
+                                        {charger.name}
                                     </h3>
                                     <p className={style.price}>
-                                        ${garage.price || "N/A"}
+                                        ${charger.price || "N/A"}
                                     </p>
                                     <p className={style.price}>
-                                        {garage.distance || "N/A"} km
+                                        {charger.distance || "N/A"} km
                                     </p>
                                     <p className={style.availableSpots}>
-                                        {garage.totalSpots.length > 0
-                                            ? `${
-                                                  garage.totalSpots.filter(
-                                                      (spot) => spot.isAvailable
-                                                  ).length
-                                              } available spots`
-                                            : "No spots"}
+                                        {charger.availableSpots + " spots" ||
+                                            "No spots"}
                                     </p>
                                     <button
                                         className={style.reserveButton}
                                         onClick={() => {
                                             setSidebarOpen(true);
-                                            setSelectedGarageSpotId(garage.id);
-                                            countDistanceToSpot(garage);
+                                            setIsGarageSpot(false);
+                                            setSelectedGarageSpotId(charger.id);
+                                            countDistanceToSpot(charger);
                                         }}
                                     >
-                                        Reserve spot
+                                        Details
                                     </button>
                                 </div>
                             </div>

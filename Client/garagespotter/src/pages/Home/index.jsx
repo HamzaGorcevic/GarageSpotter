@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import styles from "./Home.module.scss";
-import MapComponent from "./map/map";
+import MapComponent from "./map/mapComponent";
 import { BASE_URL } from "../../config/config";
 import { useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";

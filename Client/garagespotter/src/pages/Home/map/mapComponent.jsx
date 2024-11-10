@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import RoutingMachine from "./RoutineMachine";
+import RoutingMachine from "./RoutineMachine.jsx";
 import L from "leaflet";
-import DefaultSidebar from "./defaultSidebar/DefaultSidebar";
+import DefaultSidebar from "./defaultSidebar/DefaultSidebar.jsx";
 import BluePin from "../../../assets/images/blue.svg";
 import RedPin from "../../../assets/images/red.svg";
 import ChargerPin from "../../../assets/images/charger.png"; // Add a new icon for electric chargers
-import Sidebar from "./mapSidebar/MapSidebar";
+import MapSidebar from "./mapSidebar/MapSidebar.jsx";
 import style from "./map.module.scss";
 import "leaflet/dist/leaflet.css";
 import "leaflet-geosearch/dist/geosearch.css";
 import { getDistanceToSpot } from "../../../utils/distanceUtils.js";
-import MapSidebar from "./mapSidebar/MapSidebar";
 
 const redIcon = L.icon({
     iconUrl: RedPin,
@@ -31,7 +30,7 @@ const blueIcon = L.icon({
 });
 
 const chargerIcon = L.icon({
-    iconUrl: ChargerPin, // New icon for electric chargers
+    iconUrl: ChargerPin,
     iconSize: [45, 71],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
@@ -46,7 +45,11 @@ const MapComponent = ({ garageSpots, eChargers }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [distanceFilter, setDistanceFilter] = useState("");
     const [priceFilter, setPriceFilter] = useState("");
-    console.log(eChargers);
+    const [isGarageSpot, setIsGarageSpot] = useState(true);
+    const [showGarageSpots, setShowGarageSpots] = useState(true);
+    const [chargerTypeFilter, setChargerTypeFilter] = useState("");
+    const [clearRoutes, setClearRoutes] = useState(false);
+
     useEffect(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -75,7 +78,9 @@ const MapComponent = ({ garageSpots, eChargers }) => {
         });
     };
 
-    const handleMarkerClick = (spot) => {
+    const handleMarkerClick = (spot, checkIfGarageSpot) => {
+        setClearRoutes(false);
+        setIsGarageSpot(checkIfGarageSpot);
         countDistanceToSpot(spot);
         setSidebarOpen(true);
     };
@@ -103,10 +108,44 @@ const MapComponent = ({ garageSpots, eChargers }) => {
                 : null,
         }));
 
+    const filteredChargers = eChargers
+        .filter((charger) => {
+            const matchesSearchTerm = charger.name
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase());
+
+            const matchesDistance =
+                !distanceFilter ||
+                getDistanceToSpot(userPosition, charger) <=
+                    parseInt(distanceFilter);
+
+            const matchesPrice =
+                !priceFilter || charger.price <= parseInt(priceFilter);
+
+            const matchChargerType =
+                !chargerTypeFilter || charger.chargerType === chargerTypeFilter;
+
+            return (
+                matchesSearchTerm &&
+                matchesDistance &&
+                matchesPrice &&
+                matchChargerType
+            );
+        })
+        .map((charger) => ({
+            ...charger,
+            distance: userPosition
+                ? getDistanceToSpot(userPosition, charger)
+                : null,
+        }));
+
     // Function to close the sidebar
     const closeSidebar = () => {
         setSidebarOpen(false);
     };
+    useEffect(() => {
+        setClearRoutes(true);
+    }, [distanceFilter, searchTerm, chargerTypeFilter, priceFilter]);
 
     return (
         <div className={style.mapContainer}>
@@ -124,34 +163,39 @@ const MapComponent = ({ garageSpots, eChargers }) => {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
 
-                {filteredGarages.map((spot, index) => (
-                    <Marker
-                        key={`garage-${index}`}
-                        position={[spot.latitude, spot.longitude]}
-                        icon={spot.isAvailable ? blueIcon : redIcon}
-                        eventHandlers={{
-                            click: () => handleMarkerClick(spot),
-                        }}
-                    >
-                        <Popup>
-                            {spot.locationName} <br /> {spot.address}
-                        </Popup>
-                    </Marker>
-                ))}
+                {showGarageSpots
+                    ? filteredGarages.map((spot, index) => (
+                          <Marker
+                              key={`garage-${index}`}
+                              position={[spot.latitude, spot.longitude]}
+                              icon={spot.isAvailable ? blueIcon : redIcon}
+                              eventHandlers={{
+                                  click: () => handleMarkerClick(spot, true),
+                              }}
+                          >
+                              <Popup>
+                                  {spot.locationName} <br /> {spot.address}
+                              </Popup>
+                          </Marker>
+                      ))
+                    : filteredChargers.map((charger, index) => (
+                          <Marker
+                              key={`charger-${index}`}
+                              position={[charger.latitude, charger.longitude]}
+                              icon={chargerIcon}
+                              eventHandlers={{
+                                  click: () =>
+                                      handleMarkerClick(charger, false),
+                              }}
+                          >
+                              <Popup>
+                                  {charger.locationName} <br />{" "}
+                                  {charger.address}
+                              </Popup>
+                          </Marker>
+                      ))}
 
-                {eChargers?.map((charger, index) => (
-                    <Marker
-                        key={`charger-${index}`}
-                        position={[charger.latitude, charger.longitude]}
-                        icon={chargerIcon}
-                    >
-                        <Popup>
-                            {charger.locationName} <br /> {charger.address}
-                        </Popup>
-                    </Marker>
-                ))}
-
-                {userPosition && clickedMarkerPosition && (
+                {userPosition && clickedMarkerPosition && !clearRoutes && (
                     <RoutingMachine
                         key={`${clickedMarkerPosition.lat}-${clickedMarkerPosition.lng}`}
                         start={userPosition}
@@ -163,19 +207,26 @@ const MapComponent = ({ garageSpots, eChargers }) => {
             <DefaultSidebar
                 isOpen={sidebarOpen}
                 filteredGarages={filteredGarages}
+                filteredChargers={filteredChargers}
                 setSidebarOpen={setSidebarOpen}
                 setSelectedGarageSpotId={setSelectedGarageSpotId}
                 countDistanceToSpot={countDistanceToSpot}
                 selectedGarageSpotId={selectedGarageSpotId}
                 userPosition={userPosition}
+                showGarageSpots={showGarageSpots}
+                setShowGarageSpots={setShowGarageSpots}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
                 distanceFilter={distanceFilter}
                 setDistanceFilter={setDistanceFilter}
                 setPriceFilter={setPriceFilter}
                 priceFilter={priceFilter}
+                chargerTypeFilter={chargerTypeFilter}
+                setChargerTypeFilter={setChargerTypeFilter}
+                setIsGarageSpot={setIsGarageSpot}
             />
             <MapSidebar
+                isGarageSpot={isGarageSpot}
                 isOpen={sidebarOpen}
                 onClose={closeSidebar}
                 garageSpotId={selectedGarageSpotId}
