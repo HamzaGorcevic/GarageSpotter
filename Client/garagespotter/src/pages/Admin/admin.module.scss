@@ -9,3 +9,41 @@
     font-size: $font-size-large;
     margin-bottom: $spacing-medium;
 }
+
+.header {
+    display: flex;
+    border-bottom: 2px solid #ddd;
+    margin-bottom: $spacing-medium;
+}
+
+.tab {
+    font-size: 1rem;
+    font-weight: 500;
+    background: none;
+    border: none;
+    color: #333;
+    cursor: pointer;
+    padding: 10px 20px;
+    position: relative;
+    transition: color 0.3s;
+
+    &:hover {
+        color: #0056b3;
+    }
+}
+
+.activeTab {
+    @extend .tab;
+    color: #0056b3;
+
+    &::after {
+        content: "";
+        display: block;
+        width: 100%;
+        height: 2px;
+        background-color: #0056b3;
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+    }
+}

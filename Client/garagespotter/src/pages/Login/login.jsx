@@ -3,6 +3,7 @@ import styles from "./Login.module.scss";
 import { BASE_URL } from "../../config/config";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import toast from "react-hot-toast";
 
 const Login = () => {
     const { login } = useContext(AuthContext);
@@ -25,7 +26,12 @@ const Login = () => {
 
         const res = await response.json();
         setLoading(false);
-        login(res.value, { email: form.email });
+        if (res.success) {
+            login(res.value, { email: form.email });
+            toast.success(res.message);
+        } else {
+            toast.error(res.message);
+        }
     };
 
     return (

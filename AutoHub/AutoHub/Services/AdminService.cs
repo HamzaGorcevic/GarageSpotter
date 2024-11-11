@@ -159,5 +159,43 @@ namespace AutoHub.Services
             return response;
         }
 
+        public async Task<ServiceResponse<int>> DeleteUser(int userId)
+        {
+            var response = new ServiceResponse<int>();
+            var userToDelete = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if(userToDelete == null)
+            {
+                response.Success = false;
+                response.Message = "User doesnt exist!";
+                response.Value = userId;
+                return response;
+            }
+            
+            _dbContext.Users.Remove(userToDelete);
+            await _dbContext.SaveChangesAsync();
+            response.Value = userId;
+            response.Success = true;
+            response.Message = "User deleted succesfully!";
+            return response;
+        }
+
+        public async Task<ServiceResponse<List<UserDto>>> GetUsers()
+        {
+            var response = new ServiceResponse<List<UserDto>>();
+            var users = await _dbContext.Users.ToListAsync();
+            if(users == null)
+            {
+                response.Value = new List<UserDto>();
+                response.Success = false;
+                response.Message = "No user found";
+
+                return response;
+            }
+            var userDtos = _mapper.Map<List<UserDto>>(users);
+            response.Value = userDtos;
+            response.Success = true;
+            response.Message = "Users found";
+            return response;
+        }
     }
 }

@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         if (initialToken) {
             const decodedToken = decodeToken(initialToken);
-            checkTokenExpiration(initialToken, decodedToken.exp);
+            checkTokenExpiration(initialToken, decodedToken?.exp);
         }
     }, []);
 
@@ -26,12 +26,12 @@ export const AuthProvider = ({ children }) => {
         const decodedToken = decodeToken(token);
         const modifiedUser = {
             ...user,
-            role: decodedToken.role,
-            name: decodedToken.unique_name,
+            role: decodedToken?.role,
+            name: decodedToken?.unique_name,
         };
         localStorage.setItem("user", JSON.stringify(modifiedUser));
         setAuthData({ token, user: modifiedUser });
-        checkTokenExpiration(token, decodedToken.exp);
+        checkTokenExpiration(token, decodedToken?.exp);
         navigate("/");
     };
 
@@ -44,9 +44,11 @@ export const AuthProvider = ({ children }) => {
 
     const decodeToken = (token) => {
         try {
-            const payload = token.split(".")[1];
-            const decodedPayload = JSON.parse(atob(payload));
-            return decodedPayload;
+            const payload = token?.split(".")[1];
+            if (payload) {
+                const decodedPayload = JSON.parse(atob(payload));
+                return decodedPayload;
+            }
         } catch (error) {
             console.error("Error decoding token:", error);
             return null;

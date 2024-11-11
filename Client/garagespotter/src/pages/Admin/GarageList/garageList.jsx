@@ -3,10 +3,13 @@ import styles from "./garageList.module.scss";
 import toast from "react-hot-toast";
 import { AuthContext } from "../../../context/AuthContext";
 import { BASE_URL } from "../../../config/config";
+import { DocumentDetailsModal } from "../../../components/Modals/DocumentDetailsModal/documentDetailsModal";
+import ImagesModal from "../../../components/Modals/ImagesModal/imagesModal";
 const GarageList = () => {
     const { authData } = useContext(AuthContext);
     const [garages, setGarages] = useState([]);
-    const [showModal, setShowModal] = useState(false);
+    const [showDocumentModal, setShowDocumentModal] = useState("");
+    const [showImagesModal, setShowImagesModal] = useState([]);
     const fetchGarages = async () => {
         try {
             const response = await fetch(`${BASE_URL}/Admin/getGarages`, {
@@ -17,6 +20,7 @@ const GarageList = () => {
             });
             const data = await response.json();
             setGarages(data?.value || []);
+            console.log(data?.value);
         } catch (error) {
             console.error("Error fetching garages:", error);
             toast.error("Failed to load garages.");
@@ -121,10 +125,20 @@ const GarageList = () => {
                                 <button
                                     className={styles.detailsButton}
                                     onClick={() => {
-                                        setShowModal(true);
+                                        setShowDocumentModal(
+                                            garage.verificationDocument
+                                        );
                                     }}
                                 >
-                                    Details
+                                    View Document
+                                </button>
+                                <button
+                                    className={styles.detailsButton}
+                                    onClick={() => {
+                                        setShowImagesModal(garage.garageImages);
+                                    }}
+                                >
+                                    View Images
                                 </button>
                                 <button
                                     className={styles.deleteButton}
@@ -137,6 +151,22 @@ const GarageList = () => {
                     ))}
                 </tbody>
             </table>
+            {showDocumentModal?.length > 0 ? (
+                <DocumentDetailsModal
+                    documentFile={showDocumentModal}
+                    setShowDocumentModal={setShowDocumentModal}
+                />
+            ) : (
+                ""
+            )}
+            {showImagesModal?.length > 0 ? (
+                <ImagesModal
+                    images={showImagesModal}
+                    setShowImagesModal={setShowImagesModal}
+                />
+            ) : (
+                ""
+            )}
         </div>
     );
 };

@@ -107,7 +107,12 @@ const CreateElectricCharger = () => {
             verificationDocument: file,
         }));
     };
-
+    const scrollDown = () => {
+        window.scrollTo({
+            top: 900,
+            behavior: "smooth",
+        });
+    };
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -191,7 +196,7 @@ const CreateElectricCharger = () => {
                         onChange={handleChange}
                     />
                 </div>
-                <div className={styles.formGroup}>
+                <div className={styles.formGroup} onClick={scrollDown}>
                     <label htmlFor="countryName">Country Name:</label>
                     <input
                         type="text"
@@ -202,9 +207,10 @@ const CreateElectricCharger = () => {
                         disabled
                     />
                 </div>
-                <div className={styles.formGroup}>
+                <div className={styles.formGroup} onClick={scrollDown}>
                     <label htmlFor="latitude">Latitude:</label>
                     <input
+                        disabled
                         type="text"
                         id="latitude"
                         name="latitude"
@@ -212,9 +218,10 @@ const CreateElectricCharger = () => {
                         onChange={handleChange}
                     />
                 </div>
-                <div className={styles.formGroup}>
+                <div className={styles.formGroup} onClick={scrollDown}>
                     <label htmlFor="longitude">Longitude:</label>
                     <input
+                        disabled
                         type="text"
                         id="longitude"
                         name="longitude"

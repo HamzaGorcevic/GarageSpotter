@@ -81,6 +81,9 @@
             box-shadow: 0 0 4px rgba(26, 115, 232, 0.2);
             outline: none;
         }
+        &:disabled {
+            cursor: pointer;
+        }
     }
 }
 

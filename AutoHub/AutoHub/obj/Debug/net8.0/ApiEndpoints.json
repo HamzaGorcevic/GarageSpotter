@@ -53,6 +53,32 @@
   },
   {
     "ContainingType": "AutoHub.Controllers.AdminController",
+    "Method": "DeleteUser",
+    "RelativePath": "Admin/deleteUser",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "AutoHub.Models.ServiceResponse\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "AutoHub.Controllers.AdminController",
     "Method": "GetElectricGarages",
     "RelativePath": "Admin/getElectricChargers",
     "HttpMethod": "GET",
@@ -82,6 +108,26 @@
     "ReturnTypes": [
       {
         "Type": "AutoHub.Models.ServiceResponse\u00601[[System.Collections.Generic.List\u00601[[AutoHub.Models.GarageSpotDto, AutoHub, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "AutoHub.Controllers.AdminController",
+    "Method": "getUsers",
+    "RelativePath": "Admin/getUsers",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "AutoHub.Models.ServiceResponse\u00601[[System.Collections.Generic.List\u00601[[AutoHub.Dtos.UserDto, AutoHub, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",

@@ -10,12 +10,13 @@ const EditProfile = () => {
         name: authData.user?.name,
         email: authData.user?.email,
     });
-
+    const [loading, setLoading] = useState(false);
     const [passwordForm, setPasswordForm] = useState({
         currentPassword: "",
         newPassword: "",
     });
     const [passwordError, setPasswordError] = useState("");
+    const [activeTab, setActiveTab] = useState("editProfile"); // New state for toggling tabs
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -27,7 +28,7 @@ const EditProfile = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        setLoading(true);
         try {
             const response = await fetch(`${BASE_URL}/User/edit`, {
                 method: "PUT",
@@ -49,10 +50,13 @@ const EditProfile = () => {
         } catch (error) {
             toast.error("An error occurred. Please try again later.");
             console.error("Update profile error:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     const handlePasswordSubmit = async (e) => {
+        setLoading(true);
         e.preventDefault();
         setPasswordError("");
 
@@ -74,7 +78,6 @@ const EditProfile = () => {
             });
 
             const res = await response.json();
-            console.log(res);
             if (res.success) {
                 toast.success(res.message || "Password changed successfully!");
                 setPasswordForm({ currentPassword: "", newPassword: "" });
@@ -89,78 +92,142 @@ const EditProfile = () => {
             setPasswordError("An error occurred while changing password.");
             toast.error("An error occurred while changing password.");
             console.error("Change password error:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className={styles.container}>
-            <div className={styles.editProfileContainer}>
-                <h2 className={styles.title}>Edit Profile</h2>
-                <form onSubmit={handleSubmit} className={styles.form}>
-                    <div className={styles.formGroup}>
-                        <label htmlFor="name">Name</label>
-                        <input
-                            type="text"
-                            id="name"
-                            name="name"
-                            value={form.name}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                    <div className={styles.formGroup}>
-                        <label htmlFor="email">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={form.email}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                    <button type="submit" className={styles.submitButton}>
-                        Save Changes
+            <div className={styles.containerForm}>
+                <div className={styles.header}>
+                    <button
+                        className={
+                            activeTab === "editProfile"
+                                ? styles.activeTab
+                                : styles.tab
+                        }
+                        onClick={() => setActiveTab("editProfile")}
+                    >
+                        Edit Profile
                     </button>
-                </form>
-            </div>
-
-            <div className={styles.editProfileContainer}>
-                <h2 className={styles.title}>Change Password</h2>
-                <form onSubmit={handlePasswordSubmit} className={styles.form}>
-                    <div className={styles.formGroup}>
-                        <label htmlFor="currentPassword">
-                            Current Password
-                        </label>
-                        <input
-                            type="password"
-                            id="currentPassword"
-                            name="currentPassword"
-                            value={passwordForm.currentPassword}
-                            onChange={handlePasswordChange}
-                            required
-                        />
-                    </div>
-                    <div className={styles.formGroup}>
-                        <label htmlFor="newPassword">New Password</label>
-                        <input
-                            type="password"
-                            id="newPassword"
-                            name="newPassword"
-                            value={passwordForm.newPassword}
-                            onChange={handlePasswordChange}
-                            required
-                        />
-                    </div>
-                    {passwordError && (
-                        <div className={styles.errorMessage}>
-                            {passwordError}
-                        </div>
-                    )}
-                    <button type="submit" className={styles.submitButton}>
+                    <button
+                        className={
+                            activeTab === "changePassword"
+                                ? styles.activeTab
+                                : styles.tab
+                        }
+                        onClick={() => setActiveTab("changePassword")}
+                    >
                         Change Password
                     </button>
-                </form>
+                </div>
+
+                {activeTab === "editProfile" && (
+                    <div className={styles.editProfileContainer}>
+                        <h2 className={styles.title}>Edit Profile</h2>
+                        <form onSubmit={handleSubmit} className={styles.form}>
+                            <div className={styles.formGroup}>
+                                <label htmlFor="name">Name</label>
+                                <input
+                                    type="text"
+                                    id="name"
+                                    name="name"
+                                    value={form.name}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label htmlFor="email">Email</label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    value={form.email}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+
+                            {loading ? (
+                                <button
+                                    disabled
+                                    className={styles.loadingSpinner}
+                                >
+                                    Loading ...
+                                </button>
+                            ) : (
+                                <button
+                                    type="submit"
+                                    className={styles.submitButton}
+                                >
+                                    {" "}
+                                    Save Changes
+                                </button>
+                            )}
+                        </form>
+                    </div>
+                )}
+
+                {activeTab === "changePassword" && (
+                    <div className={styles.editProfileContainer}>
+                        <h2 className={styles.title}>Change Password</h2>
+                        <form
+                            onSubmit={handlePasswordSubmit}
+                            className={styles.form}
+                        >
+                            <div className={styles.formGroup}>
+                                <label htmlFor="currentPassword">
+                                    Current Password
+                                </label>
+                                <input
+                                    type="password"
+                                    id="currentPassword"
+                                    name="currentPassword"
+                                    value={passwordForm.currentPassword}
+                                    onChange={handlePasswordChange}
+                                    required
+                                />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label htmlFor="newPassword">
+                                    New Password
+                                </label>
+                                <input
+                                    type="password"
+                                    id="newPassword"
+                                    name="newPassword"
+                                    value={passwordForm.newPassword}
+                                    onChange={handlePasswordChange}
+                                    required
+                                />
+                            </div>
+                            {passwordError && (
+                                <div className={styles.errorMessage}>
+                                    {passwordError}
+                                </div>
+                            )}
+
+                            {loading ? (
+                                <button
+                                    disabled
+                                    className={styles.loadingSpinner}
+                                >
+                                    Loading ...
+                                </button>
+                            ) : (
+                                <button
+                                    type="submit"
+                                    className={styles.submitButton}
+                                >
+                                    {" "}
+                                    Change Password
+                                </button>
+                            )}
+                        </form>
+                    </div>
+                )}
             </div>
         </div>
     );
