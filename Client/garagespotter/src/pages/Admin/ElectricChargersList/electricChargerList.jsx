@@ -3,11 +3,12 @@ import styles from "./electricCharger.module.scss";
 import toast from "react-hot-toast";
 import { AuthContext } from "../../../context/AuthContext";
 import { BASE_URL } from "../../../config/config";
+import { DocumentDetailsModal } from "../../../components/Modals/DocumentDetailsModal/documentDetailsModal";
 
 const ChargerList = () => {
     const { authData } = useContext(AuthContext);
     const [chargers, setChargers] = useState([]);
-
+    const [showDocumentModal, setShowDocumentModal] = useState("");
     const fetchChargers = async () => {
         try {
             const response = await fetch(
@@ -96,10 +97,11 @@ const ChargerList = () => {
             <table className={styles.table}>
                 <thead>
                     <tr>
-                        <th>Location Name</th>
+                        <th>Name</th>
                         <th>Country</th>
                         <th>Status</th>
                         <th>Price</th>
+                        <th>Charger Type</th>
                         <th>Latitude</th>
                         <th>Longitude</th>
                         <th>Actions</th>
@@ -108,12 +110,14 @@ const ChargerList = () => {
                 <tbody>
                     {chargers.map((charger) => (
                         <tr key={charger.id}>
-                            <td>{charger.locationName}</td>
+                            <td>{charger.name}</td>
                             <td>{charger.countryName}</td>
                             <td>
                                 {charger.isAvailable ? "Available" : "Occupied"}
                             </td>
                             <td>${charger.price}</td>
+                            <td>{charger.chargerType}</td>
+
                             <td>{charger.latitude}</td>
                             <td>{charger.longitude}</td>
 
@@ -128,10 +132,12 @@ const ChargerList = () => {
                                 <button
                                     className={styles.detailsButton}
                                     onClick={() => {
-                                        // Handle showing modal with details (if needed)
+                                        setShowDocumentModal(
+                                            charger.verificationDocument
+                                        );
                                     }}
                                 >
-                                    Details
+                                    Document Details
                                 </button>
                                 <button
                                     className={styles.deleteButton}
@@ -144,6 +150,12 @@ const ChargerList = () => {
                     ))}
                 </tbody>
             </table>
+            {showDocumentModal.length > 0 && (
+                <DocumentDetailsModal
+                    documentFile={showDocumentModal}
+                    setShowDocumentModal={setShowDocumentModal}
+                />
+            )}
         </div>
     );
 };

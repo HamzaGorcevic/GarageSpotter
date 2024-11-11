@@ -79,7 +79,7 @@ using Microsoft.EntityFrameworkCore;
 
                 try
                 {
-                    var chargers = await _dbContext.ElectricChargers.Where(ec => ec.CountryName == countryName).ToListAsync();
+                    var chargers = await _dbContext.ElectricChargers.Where(ec => ec.CountryName == countryName && ec.IsVerified).ToListAsync();
                     response.Value = chargers;
                     response.Success = true;
                 }

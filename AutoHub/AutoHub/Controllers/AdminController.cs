@@ -58,6 +58,18 @@ namespace AutoHub.Controllers
             return response;
         }
 
+        [HttpDelete("deleteUser")]
+        public async Task<ServiceResponse<int>> DeleteUser(int userId)
+        {
+            var response = await _adminService.DeleteUser(userId);
+            return response;
+        }
+        [HttpGet("getUsers")]
+        public async Task<ServiceResponse<List<UserDto>>> getUsers()
+        {
+            var response = await _adminService.GetUsers();
+            return response;
+        }
 
     }
 }

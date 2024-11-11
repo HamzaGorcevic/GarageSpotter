@@ -208,7 +208,12 @@ const GarageForm = () => {
             }));
         }
     };
-
+    const scrollDown = () => {
+        window.scrollTo({
+            top: 900,
+            behavior: "smooth",
+        });
+    };
     return (
         <div className={style.registerContainer}>
             <h1 className={style.title}>
@@ -231,20 +236,21 @@ const GarageForm = () => {
                         <p className={style.error}>{formErrors.locationName}</p>
                     )}
                 </div>
-                <div className={style.formGroup}>
+                <div className={style.formGroup} onClick={scrollDown}>
                     <label>Country Name:</label>
                     <input
+                        disabled
                         type="text"
                         name="countryName"
                         value={formData.countryName}
                         onChange={handleChange}
-                        disabled
                         required
                     />
                 </div>
-                <div className={style.formGroup}>
+                <div className={style.formGroup} onClick={scrollDown}>
                     <label>Latitude:</label>
                     <input
+                        disabled
                         type="number"
                         name="latitude"
                         value={formData.latitude}
@@ -253,9 +259,10 @@ const GarageForm = () => {
                     />
                 </div>
 
-                <div className={style.formGroup}>
+                <div className={style.formGroup} onClick={scrollDown}>
                     <label>Longitude:</label>
                     <input
+                        disabled
                         type="number"
                         name="longitude"
                         value={formData.longitude}

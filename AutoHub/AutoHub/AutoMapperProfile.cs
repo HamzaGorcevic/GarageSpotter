@@ -9,6 +9,8 @@ namespace AutoHub
         public AutoMapperProfile() {
             CreateMap<RegisterDto, User>();
             CreateMap<User,RegisterDto>();
+            CreateMap<User, UserDto>();
+            CreateMap<UserDto, User>();
             CreateMap<GarageSpot, GarageSpotDto>();
             CreateMap<GarageSpotDto, GarageSpot>();
             CreateMap<CreateGarageSpotDto,GarageSpot>();

@@ -11,5 +11,9 @@ namespace AutoHub.Services
         Task<ServiceResponse<int>> DeleteElectricCharger(int chargerId);
         Task<ServiceResponse<int>> VerifyElectricCharger(VerifyGarageDto verifyElectricCharger);
         Task<ServiceResponse<List<ElectricCharger>>> GetElectricChargers();
+        Task<ServiceResponse<int>> DeleteUser(int userId);
+        Task<ServiceResponse<List<UserDto>>> GetUsers();
+
+
     }
 }
