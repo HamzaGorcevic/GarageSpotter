@@ -148,32 +148,64 @@ namespace AutoHub.Services
             return response;
 
         }
-        public async Task<ServiceResponse<int>> ExtendReservation(ReserveDto updatedReserveDto) {
-
+        public async Task<ServiceResponse<int>> ExtendReservation(ReserveDto updatedReserveDto)
+        {
             var response = new ServiceResponse<int>();
 
-            var reservation= await _dbContext.Reservations.FirstOrDefaultAsync(r => r.Id == updatedReserveDto.Id);
-            
-            if(reservation == null)
+            var reservation = await _dbContext.Reservations.FirstOrDefaultAsync(r => r.Id == updatedReserveDto.Id);
+
+            if (reservation == null)
             {
                 response.Success = false;
                 response.Message = "Reservation not found";
                 response.Value = 0;
                 return response;
             }
-            
-            
-            reservation.Hours = updatedReserveDto.Hours;
-            reservation.ReservationStart = updatedReserveDto.ReservationStart;
-            reservation.ReservationEnd = updatedReserveDto.ReservationEnd;
-            reservation.ReservationStarted =  updatedReserveDto.ReservationStarted;
+
+            // Scenario 1: Reservation is by date-to-date (start and end dates exist)
+            if (reservation.ReservationStart.HasValue && reservation.ReservationEnd.HasValue)
+            {
+                // Extend the reservation by adding new hours if provided
+                if (updatedReserveDto.Hours.HasValue)
+                {
+                    int newHours = updatedReserveDto.Hours.Value;
+                    reservation.ReservationEnd = reservation.ReservationEnd.Value.AddHours(newHours);
+
+                    // Set Hours to null as it's extended by date
+                    reservation.Hours = null;
+                }
+                else if (updatedReserveDto.ReservationEnd.HasValue)
+                {
+                    // Extend with a new ReservationEnd if provided
+                    reservation.ReservationEnd = updatedReserveDto.ReservationEnd;
+                }
+            }
+            // Scenario 2: Reservation is by hours (only hours exist)
+            else if (reservation.Hours.HasValue)
+            {
+                if (updatedReserveDto.ReservationEnd.HasValue)
+                {
+                    // Extend the reservation by setting a new ReservationStart and ReservationEnd
+                    reservation.ReservationStart = updatedReserveDto.ReservationStarted;
+                    reservation.ReservationEnd = updatedReserveDto.ReservationEnd;
+                }
+                else
+                {
+                    // Extend by adding new hours if applicable
+                    if (updatedReserveDto.Hours.HasValue)
+                    {
+                        reservation.Hours += updatedReserveDto.Hours.Value;
+                    }
+                }
+            }
+
+            // Save changes to the database
             await _dbContext.SaveChangesAsync();
 
             response.Success = true;
-            response.Message = "Succesfully found reservation";
+            response.Message = "Successfully updated the reservation";
             response.Value = reservation.Id;
             return response;
-        
         }
 
 

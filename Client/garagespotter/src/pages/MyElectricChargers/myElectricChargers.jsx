@@ -20,7 +20,6 @@ const MyElectricChargers = () => {
             }
         );
         const res = await response.json();
-        console.log(res.value);
         setChargers(res?.value);
     };
 
@@ -49,7 +48,7 @@ const MyElectricChargers = () => {
                             </p>
                             <p>
                                 <strong>Is verified:</strong>{" "}
-                                {charger.isVerfied ? "Yes" : "Pending ..."}
+                                {charger.isVerified ? "Yes" : "Pending ..."}
                             </p>
                             <p>
                                 <strong>Description:</strong>{" "}

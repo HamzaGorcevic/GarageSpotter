@@ -40,8 +40,13 @@ public class AzureBlobService : IAzureBlobService
     public async Task<List<string>> UploadMultipleFilesAsync(List<IFormFile> files, string containerName)
     {
         var urls = new List<string>();
+        int index = 0;
         foreach (var file in files)
         {
+            if(index >= 7)
+            {
+                return urls;
+            }
             var url = await UploadFileAsync(file, containerName);
             urls.Add(url);
         }

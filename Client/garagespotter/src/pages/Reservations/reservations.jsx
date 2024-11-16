@@ -27,6 +27,7 @@ const Reservations = () => {
             }
         );
         const res = await response.json();
+        console.log(res.value);
         setReservations(res?.value || []);
     };
 
@@ -57,6 +58,7 @@ const Reservations = () => {
     };
 
     const extendReservation = async (reservation) => {
+        console.log(reservation);
         try {
             await toast.promise(
                 fetch(`${BASE_URL}/Reservation/extendReservation`, {
@@ -66,7 +68,7 @@ const Reservations = () => {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        id: reservation.id,
+                        id: selectedReservation.id,
                         ...reservation,
                     }),
                 }),
@@ -200,6 +202,7 @@ const Reservations = () => {
                     onClose={onClose}
                     onSubmit={extendReservation}
                     reservationData={selectedReservation}
+                    isExtend={true}
                 />
             )}
 

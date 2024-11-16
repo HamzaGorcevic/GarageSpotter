@@ -23,14 +23,21 @@ const CreateElectricCharger = () => {
         price: "",
         chargerType: "",
     });
-    const [error, setError] = useState("");
+    const [error, setError] = useState({});
 
+    const scrollDown = () => {
+        window.scrollTo({
+            top: 900,
+            behavior: "smooth",
+        });
+    };
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
             ...prevData,
             [name]: value,
         }));
+        setError((prevError) => ({ ...prevError, [name]: "" })); // Clear error when user changes input
     };
 
     const fetchGarageSpot = async (garageSpotId) => {
@@ -55,13 +62,13 @@ const CreateElectricCharger = () => {
                     description: data.description || "",
                     availableSpots: data.availableSpots || "",
                     price: data.price || "",
-                    chargerType: data.chargerType || "", // Set existing charger type from data
+                    chargerType: data.chargerType || "",
                 });
             } else {
-                setError("Failed to fetch garage spot details.");
+                setError({ general: "Failed to fetch garage spot details." });
             }
         } catch (error) {
-            setError("Error: " + error.message);
+            setError({ general: "Error: " + error.message });
         }
     };
 
@@ -88,14 +95,14 @@ const CreateElectricCharger = () => {
             );
             const res = await response.json();
             const countryName = res.address.country || "Unknown country";
-            setError("");
+            setError((prevError) => ({ ...prevError, countryName: "" }));
             setFormData((prevState) => ({
                 ...prevState,
                 countryName,
             }));
         } catch (error) {
             console.error("Error fetching country name:", error);
-            setError("Failed to retrieve country name");
+            setError({ general: "Failed to retrieve country name" });
             toast.error("Failed to retrieve country name!");
         }
     };
@@ -106,24 +113,29 @@ const CreateElectricCharger = () => {
             ...prevData,
             verificationDocument: file,
         }));
+        setError((prevError) => ({ ...prevError, verificationDocument: "" }));
     };
-    const scrollDown = () => {
-        window.scrollTo({
-            top: 900,
-            behavior: "smooth",
-        });
-    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (
-            !formData.name ||
-            !formData.latitude ||
-            !formData.longitude ||
-            !formData.availableSpots ||
-            !formData.chargerType // Ensure chargerType is selected
-        ) {
-            setError("Please fill in all required fields.");
+        const requiredFields = [
+            "name",
+            "latitude",
+            "longitude",
+            "availableSpots",
+            "chargerType",
+        ];
+        const newErrors = {};
+
+        requiredFields.forEach((field) => {
+            if (!formData[field]) {
+                newErrors[field] = "This field is required.";
+            }
+        });
+
+        if (Object.keys(newErrors).length > 0) {
+            setError(newErrors);
             toast.error("Please fill in all required fields.");
             return;
         }
@@ -140,7 +152,7 @@ const CreateElectricCharger = () => {
         formDataToSend.append("availableSpots", formData.availableSpots);
         formDataToSend.append("countryName", formData.countryName);
         formDataToSend.append("price", formData.price);
-        formDataToSend.append("chargerType", formData.chargerType); // Include chargerType
+        formDataToSend.append("chargerType", formData.chargerType);
 
         const apiUrl = isUpdateMode
             ? `/ElectricCharger/updateElectricCharger?electricChargerId=${id}`
@@ -195,6 +207,9 @@ const CreateElectricCharger = () => {
                         value={formData.name}
                         onChange={handleChange}
                     />
+                    {error.name && (
+                        <p className={styles.errorMessage}>{error.name}</p>
+                    )}
                 </div>
                 <div className={styles.formGroup} onClick={scrollDown}>
                     <label htmlFor="countryName">Country Name:</label>
@@ -217,6 +232,9 @@ const CreateElectricCharger = () => {
                         value={formData.latitude}
                         onChange={handleChange}
                     />
+                    {error.latitude && (
+                        <p className={styles.errorMessage}>{error.latitude}</p>
+                    )}
                 </div>
                 <div className={styles.formGroup} onClick={scrollDown}>
                     <label htmlFor="longitude">Longitude:</label>
@@ -228,6 +246,9 @@ const CreateElectricCharger = () => {
                         value={formData.longitude}
                         onChange={handleChange}
                     />
+                    {error.longitude && (
+                        <p className={styles.errorMessage}>{error.longitude}</p>
+                    )}
                 </div>
                 <div className={styles.formGroup}>
                     <label htmlFor="description">Description:</label>
@@ -259,6 +280,11 @@ const CreateElectricCharger = () => {
                         value={formData.availableSpots}
                         onChange={handleChange}
                     />
+                    {error.availableSpots && (
+                        <p className={styles.errorMessage}>
+                            {error.availableSpots}
+                        </p>
+                    )}
                 </div>
 
                 <div className={styles.formGroup}>
@@ -272,6 +298,7 @@ const CreateElectricCharger = () => {
                         onChange={handleFileChange}
                     />
                 </div>
+
                 <div className={styles.formGroup}>
                     <label htmlFor="chargerType">Charger Type:</label>
                     <select
@@ -280,21 +307,34 @@ const CreateElectricCharger = () => {
                         value={formData.chargerType}
                         onChange={handleChange}
                     >
-                        <option value="">Select Charger Type</option>
-                        <option value="Fast">Fast</option>
-                        <option value="Slow">Slow</option>
-                        <option value="UltraFast">Ultra Fast</option>
+                        <option value="">Select a charger type</option>
+                        <option value="type-1">Type 1</option>
+                        <option value="type-2">Type 2</option>
+                        <option value="chademo">CHAdeMO</option>
+                        <option value="ccs-combo-1">CCS Combo Type 1</option>
+                        <option value="ccs-combo-2">CCS Combo Type 2</option>
                     </select>
+                    {error.chargerType && (
+                        <p className={styles.errorMessage}>
+                            {error.chargerType}
+                        </p>
+                    )}
                 </div>
-                {error && <div className={styles.errorMessage}>{error}</div>}
 
                 <button
-                    type="submit"
                     className={styles.submitButton}
+                    type="submit"
                     disabled={loading}
                 >
-                    {loading ? "Submitting..." : "Submit"}
+                    {loading
+                        ? "Loading..."
+                        : isUpdateMode
+                        ? "Update Charger"
+                        : "Create Charger"}
                 </button>
+                {error.general && (
+                    <p className={styles.errorMessage}>{error.general}</p>
+                )}
             </form>
             <MapConstant setLatlng={setLatlng} />
         </div>

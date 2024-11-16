@@ -6,6 +6,7 @@ const ReservationModal = ({
     onSubmit,
     reservationData = null,
     loading = false,
+    isExtend = false,
 }) => {
     const [reservationType, setReservationType] = useState("hours");
 
@@ -25,30 +26,32 @@ const ReservationModal = ({
         const hh = String(currentTime.getHours()).padStart(2, "0");
         const minutes = String(currentTime.getMinutes()).padStart(2, "0");
         const seconds = String(currentTime.getSeconds()).padStart(2, "0");
-        const milliseconds = String(currentTime.getMilliseconds()).padStart(
-            3,
-            "0"
-        );
 
-        const localISOString = `${year}-${month}-${day}T${hh}:${minutes}:${seconds}.${milliseconds}`;
+        const localISOString = `${year}-${month}-${day}T${hh}:${minutes}:${seconds}`;
 
-        // Validation for the selected reservation type
         if (reservationType === "hours" && hours > 0) {
             onSubmit({
                 hours: parseInt(hours),
                 reservationStarted: localISOString,
             });
         } else if (reservationType === "date") {
-            if (reservationStart && reservationEnd) {
+            if ((reservationStart && reservationEnd) || reservationEnd) {
                 if (new Date(reservationStart) > new Date(reservationEnd)) {
                     alert("Start date cannot be later than end date.");
                     return;
                 }
-                onSubmit({
-                    reservationStart,
-                    reservationEnd,
-                    reservationStarted: localISOString,
-                });
+                if (reservationStart) {
+                    onSubmit({
+                        reservationStart,
+                        reservationEnd,
+                        reservationStarted: localISOString,
+                    });
+                } else {
+                    onSubmit({
+                        reservationEnd,
+                        reservationStarted: localISOString,
+                    });
+                }
             }
         }
     };
@@ -76,7 +79,7 @@ const ReservationModal = ({
                             checked={reservationType === "hours"}
                             onChange={() => setReservationType("hours")}
                         />
-                        Reserve by Hours
+                        {isExtend ? "Extend by hours" : "Reserve by date"}
                     </label>
                     <label>
                         <input
@@ -86,7 +89,7 @@ const ReservationModal = ({
                             checked={reservationType === "date"}
                             onChange={() => setReservationType("date")}
                         />
-                        Reserve by Date
+                        {isExtend ? "Extend by end-date" : "Reserve by Date"}
                     </label>
                 </div>
 
@@ -104,17 +107,21 @@ const ReservationModal = ({
 
                 {reservationType === "date" && (
                     <>
-                        <div className={style.inputGroup}>
-                            <label>Reservation Start</label>
-                            <input
-                                type="date"
-                                min={today}
-                                value={reservationStart}
-                                onChange={(e) =>
-                                    setReservationStart(e.target.value)
-                                }
-                            />
-                        </div>
+                        {isExtend ? (
+                            ""
+                        ) : (
+                            <div className={style.inputGroup}>
+                                <label>Reservation Start</label>
+                                <input
+                                    type="date"
+                                    min={today}
+                                    value={reservationStart}
+                                    onChange={(e) =>
+                                        setReservationStart(e.target.value)
+                                    }
+                                />
+                            </div>
+                        )}
 
                         <div className={style.inputGroup}>
                             <label>Reservation End</label>
