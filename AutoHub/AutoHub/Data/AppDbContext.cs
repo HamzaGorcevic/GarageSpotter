@@ -13,7 +13,16 @@ namespace AutoHub.Data
         public DbSet<Reservation> Reservations => Set<Reservation>();
         public DbSet<SingleSpot> SingleSpots => Set<SingleSpot>();
         public DbSet<ElectricCharger> ElectricChargers => Set<ElectricCharger>();
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<GarageSpot>()
+                .HasOne(g => g.Owner)
+                .WithMany(u => u.GarageSpots)
+                .HasForeignKey(g => g.OwnerId)
+                .OnDelete(DeleteBehavior.Cascade);
 
+            base.OnModelCreating(modelBuilder);
+        }
 
     }
 }

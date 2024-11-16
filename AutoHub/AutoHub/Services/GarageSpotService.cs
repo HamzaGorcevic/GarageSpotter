@@ -44,6 +44,155 @@ namespace AutoHub.Services
 
             return response;
         }
+        public async Task<ServiceResponse<List<GarageSpotDto>>> GetOwnerGarageSpots()
+        {
+            var response = new ServiceResponse<List<GarageSpotDto>>();
+            var ownerId = GetUserId();
+
+            var garagespots = await _dbContext.GarageSpots
+                    .Where(g => g.OwnerId == ownerId)
+                    .ToListAsync();
+
+            if (garagespots.Count == 0)
+            {
+                response.Success = false;
+                response.Message = "This owner doesnt have garages anymore";
+                response.Value = null;
+                return response;
+
+            }
+            var garagespotsDto = _mapper.Map<List<GarageSpotDto>>(garagespots);
+
+
+            response.Success = true;
+            response.Message = "Succesfully found garages";
+            response.Value = garagespotsDto;
+
+            return response;
+        }
+        public async Task<ServiceResponse<List<GarageSpotDto>>> GetFavorites()
+        {
+            var response = new ServiceResponse<List<GarageSpotDto>>();
+            var userId = GetUserId(); 
+
+            var user = await _dbContext.Users
+                .Include(u => u.Favorites)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null || user.Favorites == null || user.Favorites.Count == 0)
+            {
+                response.Success = false;
+                response.Message = "No favorite garage spots found for this user.";
+                response.Value = null;
+                return response;
+            }
+
+            var favoriteSpotsDto = _mapper.Map<List<GarageSpotDto>>(user.Favorites);
+
+            response.Success = true;
+            response.Message = "Successfully retrieved favorite garage spots.";
+            response.Value = favoriteSpotsDto;
+
+            return response;
+        }
+        public async Task<ServiceResponse<int>> RemoveFromFavorites(int garageSpotId)
+        {
+            var response = new ServiceResponse<int>();
+
+            try
+            {
+                var userId = GetUserId();  
+
+                var user = await _dbContext.Users
+                    .Include(u => u.Favorites)
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+
+                var garageSpot = await _dbContext.GarageSpots
+                    .FirstOrDefaultAsync(g => g.Id == garageSpotId);
+
+                if (user == null)
+                {
+                    response.Success = false;
+                    response.Message = "User not found.";
+                    return response;
+                }
+
+                if (garageSpot == null)
+                {
+                    response.Success = false;
+                    response.Message = "Garage spot not found.";
+                    return response;
+                }
+
+                var favoriteSpot = user.Favorites?.FirstOrDefault(g => g.Id == garageSpotId);
+
+                if (favoriteSpot == null)
+                {
+                    response.Success = false;
+                    response.Message = "Garage spot is not in your favorites.";
+                    return response;
+                }
+
+                user.Favorites.Remove(favoriteSpot);
+
+                await _dbContext.SaveChangesAsync();  
+
+                response.Success = true;
+                response.Message = "Garage spot removed from favorites successfully.";
+                response.Value = garageSpotId;  
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"An error occurred: {ex.Message}";
+            }
+
+            return response;
+        }
+
+        public async Task<ServiceResponse<string>> AddToFavorites(int garageSpotId)
+        {
+            var response = new ServiceResponse<string>();
+            var userId = GetUserId(); 
+
+            var user = await _dbContext.Users
+                .Include(u => u.Favorites)  
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            var garageSpot = await _dbContext.GarageSpots
+                .FirstOrDefaultAsync(g => g.Id == garageSpotId);
+
+            if (user == null)
+            {
+                response.Success = false;
+                response.Message = "User not found.";
+                return response;
+            }
+
+            if (garageSpot == null)
+            {
+                response.Success = false;
+                response.Message = "Garage spot not found.";
+                return response;
+            }
+
+            if (user.Favorites != null && user.Favorites.Any(g => g.Id == garageSpotId))
+            {
+                response.Success = false;
+                response.Message = "Garage spot is already in favorites.";
+                return response;
+            }
+
+            user.Favorites ??= new List<GarageSpot>();
+            user.Favorites.Add(garageSpot);
+
+            await _dbContext.SaveChangesAsync();
+
+            response.Success = true;
+            response.Message = "Garage spot added to favorites successfully.";
+            return response;
+        }
+
         public async Task<ServiceResponse<GarageSpotDto>> GetGarageSpot(int garageSpotId)
         {
             var response = new ServiceResponse<GarageSpotDto>();
@@ -108,32 +257,7 @@ namespace AutoHub.Services
         }
 
 
-        public async Task<ServiceResponse<List<GarageSpotDto>>> GetOwnerGarageSpots()
-        {
-            var response = new ServiceResponse<List<GarageSpotDto>>();
-            var ownerId = GetUserId();
 
-            var garagespots = await _dbContext.GarageSpots
-                    .Where(g => g.OwnerId == ownerId)
-                    .ToListAsync();
-            
-            if(garagespots.Count == 0)
-            {
-                response.Success = false;
-                response.Message = "This owner doesnt have garages anymore";
-                response.Value = null;
-                return response;
-
-            }
-            var garagespotsDto = _mapper.Map < List<GarageSpotDto>>(garagespots);
-
-           
-            response.Success = true;
-            response.Message = "Succesfully found garages";
-            response.Value = garagespotsDto;
-
-            return response;
-        }
         public async Task<ServiceResponse<int>> UpdateGarageSpot([FromForm] IFormFile verificationDocument, [FromForm] List<IFormFile> garageImages, [FromForm] CreateGarageSpotDto updatedSpot,int garageSpotId)
         {
             var response = new ServiceResponse<int>();

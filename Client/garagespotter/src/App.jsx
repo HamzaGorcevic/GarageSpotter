@@ -17,6 +17,7 @@ import { NotFound } from "./pages/notFound/notFound.jsx";
 import EditProfile from "./pages/EditProfile/editProfile.jsx";
 import CreateElectricCharger from "./pages/CreateElectricCharger/createElectricCharger.jsx";
 import MyElectricChargers from "./pages/MyElectricChargers/myElectricChargers.jsx";
+import Favorites from "./pages/Favorites/favorites.jsx";
 
 function App() {
     return (
@@ -55,6 +56,7 @@ function App() {
                         <Route path="/" element={<LandingPage />} />
                         <Route path="/home" element={<Home />} />
                         <Route path="/create" element={<GarageForm />} />
+                        <Route path="/favorites" element={<Favorites />} />
                         <Route
                             path="/create/charger"
                             element={<CreateElectricCharger />}

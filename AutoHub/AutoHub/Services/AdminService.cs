@@ -28,7 +28,7 @@ namespace AutoHub.Services
                 response.Success = false;
                 response.Value = new List<GarageSpotDto>(); 
                 return response;
-            }
+            }   
 
             var garagesDto = _mapper.Map<List<GarageSpotDto>>(garages);
             response.Message = "Garages successfully found!";
