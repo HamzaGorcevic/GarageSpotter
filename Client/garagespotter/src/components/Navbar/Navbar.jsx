@@ -56,6 +56,9 @@ const Navbar = () => {
                                     </Link>
                                 </li>
                                 <li>
+                                    <Link to="/favorites">Favorites</Link>
+                                </li>
+                                <li>
                                     <Link to="/reservations">Reservations</Link>
                                 </li>
                                 <li>

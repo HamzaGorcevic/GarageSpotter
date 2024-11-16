@@ -87,7 +87,31 @@ const MapSidebar = ({
         );
         const res = await response.json();
         setElectricCharger(res.value);
-        console.log("WTF", garageSpotId, res.value);
+    };
+
+    const addToFavorites = async (spotId) => {
+        try {
+            const response = await fetch(
+                `${BASE_URL}/User/addToFavorites?garageSpotId=${spotId}`,
+                {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${authData.token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            const res = await response.json();
+            if (res.success) {
+                toast.success("Spot added to favorites!");
+            } else {
+                toast.error("Failed to add to favorites: " + res.message);
+            }
+        } catch (error) {
+            toast.error("An error occurred while adding to favorites.");
+            console.error("Error:", error);
+        }
     };
 
     useEffect(() => {
@@ -150,6 +174,12 @@ const MapSidebar = ({
                             onClick={() => setModalOpen(true)}
                         >
                             Reserve spot
+                        </button>
+                        <button
+                            className={style.reserveButton}
+                            onClick={() => addToFavorites(garageSpot.id)}
+                        >
+                            Add to favorites
                         </button>
                         <button
                             className={style.reserveButton}
