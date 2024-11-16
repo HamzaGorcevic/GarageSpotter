@@ -31,7 +31,7 @@ const blueIcon = L.icon({
 
 const chargerIcon = L.icon({
     iconUrl: ChargerPin,
-    iconSize: [45, 71],
+    iconSize: [63, 71],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
 });
@@ -145,7 +145,14 @@ const MapComponent = ({ garageSpots, eChargers }) => {
     };
     useEffect(() => {
         setClearRoutes(true);
-    }, [distanceFilter, searchTerm, chargerTypeFilter, priceFilter]);
+        console.log(clearRoutes);
+    }, [
+        distanceFilter,
+        searchTerm,
+        chargerTypeFilter,
+        priceFilter,
+        showGarageSpots,
+    ]);
 
     return (
         <div className={style.mapContainer}>
@@ -224,6 +231,7 @@ const MapComponent = ({ garageSpots, eChargers }) => {
                 chargerTypeFilter={chargerTypeFilter}
                 setChargerTypeFilter={setChargerTypeFilter}
                 setIsGarageSpot={setIsGarageSpot}
+                setClearRoutes={setClearRoutes}
             />
             <MapSidebar
                 isGarageSpot={isGarageSpot}

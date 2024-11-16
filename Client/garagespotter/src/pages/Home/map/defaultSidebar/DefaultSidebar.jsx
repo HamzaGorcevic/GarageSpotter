@@ -21,6 +21,7 @@ const DefaultSidebar = ({
     setChargerTypeFilter,
     chargerTypeFilter,
     setIsGarageSpot,
+    setClearRoutes,
 }) => {
     const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
@@ -73,10 +74,16 @@ const DefaultSidebar = ({
                             }
                             className={style.filterSelect}
                         >
-                            <option value="">All Charger Types</option>
-                            <option value="Type1">Type 1</option>
-                            <option value="Type2">Type 2</option>
-                            <option value="Fast">Fast Charger</option>
+                            <option value="">All</option>
+                            <option value="type-1">Type 1</option>
+                            <option value="type-2">Type 2</option>
+                            <option value="chademo">CHAdeMO</option>
+                            <option value="ccs-combo-1">
+                                CCS Combo Type 1
+                            </option>
+                            <option value="ccs-combo-2">
+                                CCS Combo Type 2
+                            </option>
                         </select>
                     )}
                 </div>
@@ -147,6 +154,7 @@ const DefaultSidebar = ({
                                         <button
                                             className={style.reserveButton}
                                             onClick={() => {
+                                                setClearRoutes(false);
                                                 setSidebarOpen(true);
                                                 setIsGarageSpot(true);
                                                 setSelectedGarageSpotId(
@@ -201,6 +209,7 @@ const DefaultSidebar = ({
                                     <button
                                         className={style.reserveButton}
                                         onClick={() => {
+                                            setClearRoutes(false);
                                             setSidebarOpen(true);
                                             setIsGarageSpot(false);
                                             setSelectedGarageSpotId(charger.id);

@@ -31,7 +31,20 @@
     &.open {
         left: 436px;
     }
-
+    .addToFavorites {
+        align-self: flex-end;
+        cursor: pointer;
+        padding: $spacing-medium;
+        font-size: $font-size-large;
+        margin-left: 100px;
+        border-radius: 10px;
+        border: none;
+        margin: 0;
+        transition: all 0.2s ease;
+        &:hover {
+            background-color: darken($color: $background-color, $amount: 10);
+        }
+    }
     .reserveButton {
         background-color: $secondary-color;
         color: rgb(241, 236, 236);

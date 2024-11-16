@@ -107,17 +107,17 @@ const GarageForm = () => {
             validImageTypes.includes(file.type)
         );
 
-        if (filteredFiles.length !== selectedFiles.length) {
-            toast.error("Only image files (PNG, JPEG) are allowed.");
+        if (filteredFiles.length + formData.garageImages.length > 7) {
+            toast.error("You can only upload a maximum of 7 images.");
             setAreFilesValid(false);
-            e.target.value = "";
-        } else {
-            setAreFilesValid(true);
+            return;
         }
+
+        setAreFilesValid(true);
 
         setFormData((prevState) => ({
             ...prevState,
-            garageImages: filteredFiles,
+            garageImages: [...prevState.garageImages, ...filteredFiles],
         }));
     };
 
@@ -133,16 +133,14 @@ const GarageForm = () => {
             errors.price = "Price must be at least 1";
         }
         if (!areFilesValid) {
-            errors.validFiles = "Files must be png or jpg format";
+            errors.validFiles = "Files for images must be png or jpg format";
         }
         setFormErrors(errors);
-        console.log(errors);
         return Object.keys(errors).length === 0;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(areFilesValid, !validateForm());
         if (!validateForm()) {
             return;
         }
@@ -208,12 +206,14 @@ const GarageForm = () => {
             }));
         }
     };
+
     const scrollDown = () => {
         window.scrollTo({
             top: 900,
             behavior: "smooth",
         });
     };
+
     return (
         <div className={style.registerContainer}>
             <h1 className={style.title}>
@@ -236,6 +236,7 @@ const GarageForm = () => {
                         <p className={style.error}>{formErrors.locationName}</p>
                     )}
                 </div>
+
                 <div className={style.formGroup} onClick={scrollDown}>
                     <label>Country Name:</label>
                     <input
@@ -247,6 +248,7 @@ const GarageForm = () => {
                         required
                     />
                 </div>
+
                 <div className={style.formGroup} onClick={scrollDown}>
                     <label>Latitude:</label>
                     <input
@@ -278,11 +280,9 @@ const GarageForm = () => {
                         name="numberOfSpots"
                         value={formData.numberOfSpots}
                         onChange={handleChange}
-                        min={1}
                         className={
                             formErrors.numberOfSpots ? style.errorInput : ""
                         }
-                        required
                     />
                     {formErrors.numberOfSpots && (
                         <p className={style.error}>
@@ -296,27 +296,13 @@ const GarageForm = () => {
                     <input
                         type="number"
                         name="price"
-                        onChange={handleChange}
                         value={formData.price}
-                        min={1}
+                        onChange={handleChange}
                         className={formErrors.price ? style.errorInput : ""}
-                        required
                     />
                     {formErrors.price && (
                         <p className={style.error}>{formErrors.price}</p>
                     )}
-                </div>
-
-                <div className={style.formGroup}>
-                    <label>Garage Images:</label>
-                    <input
-                        type="file"
-                        name="garageImages"
-                        onChange={handleMultipleFileChange}
-                        multiple
-                        accept=".png, .jpg, .jpeg"
-                        required
-                    />
                 </div>
 
                 <div className={style.formGroup}>
@@ -325,22 +311,30 @@ const GarageForm = () => {
                         type="file"
                         name="verificationDocument"
                         onChange={handleFileChange}
-                        required
                     />
                 </div>
 
-                {loading ? (
-                    <button disabled className={style.submitButton}>
-                        Loading ...
-                    </button>
-                ) : (
-                    <button type="submit" className={style.submitButton}>
-                        {isUpdateMode
-                            ? "Update Garage Spot"
-                            : "Create Garage Spot"}
-                    </button>
-                )}
-                {error && <p className={style.error}>{error}</p>}
+                <div className={style.formGroup}>
+                    <label>Garage Images:</label>
+                    <input
+                        type="file"
+                        name="garageImages"
+                        multiple
+                        accept="image/png, image/jpg, image/jpeg"
+                        onChange={handleMultipleFileChange}
+                    />
+                    {formErrors.validFiles && (
+                        <p className={style.error}>{formErrors.validFiles}</p>
+                    )}
+                </div>
+
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className={style.submitButton}
+                >
+                    {loading ? "Saving..." : isUpdateMode ? "Update" : "Create"}
+                </button>
             </form>
             <MapConstant setLatlng={setLatlng} />
         </div>

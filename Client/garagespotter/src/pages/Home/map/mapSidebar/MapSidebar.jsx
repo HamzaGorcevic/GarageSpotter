@@ -7,7 +7,9 @@ import { AuthContext } from "../../../../context/AuthContext";
 import ReservationModal from "../../../../components/Modals/ReservationModal/ReservationModal.jsx";
 import { BASE_URL } from "../../../../config/config.js";
 import toast from "react-hot-toast";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 const MapSidebar = ({
     isOpen,
     onClose,
@@ -140,7 +142,7 @@ const MapSidebar = ({
                                     className={`${style.arrow} ${style.arrowLeft}`}
                                     onClick={() => handleSliderMovement("left")}
                                 >
-                                    &lt;
+                                    <FontAwesomeIcon icon={faArrowLeft} />
                                 </button>
                                 <div
                                     className={style.imageContainer}
@@ -164,23 +166,28 @@ const MapSidebar = ({
                                         handleSliderMovement("right")
                                     }
                                 >
-                                    &gt;
+                                    <FontAwesomeIcon icon={faArrowRight} />
                                 </button>
                             </div>
                         )}
                         <h2>{garageSpot?.locationName}</h2>
+                        <button
+                            className={style.addToFavorites}
+                            onClick={() => addToFavorites(garageSpot.id)}
+                        >
+                            Add to favorites
+                            <FontAwesomeIcon
+                                icon={faStar}
+                                style={{ color: "#FFD43B" }}
+                            />{" "}
+                        </button>
                         <button
                             className={style.reserveButton}
                             onClick={() => setModalOpen(true)}
                         >
                             Reserve spot
                         </button>
-                        <button
-                            className={style.reserveButton}
-                            onClick={() => addToFavorites(garageSpot.id)}
-                        >
-                            Add to favorites
-                        </button>
+
                         <button
                             className={style.reserveButton}
                             onClick={() =>

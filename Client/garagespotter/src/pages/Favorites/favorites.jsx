@@ -60,6 +60,7 @@ const Favorites = () => {
             getFavoriteSpots();
         }
     }, [authData]);
+
     return (
         <div className={styles.container}>
             <h1 className={styles.title}>My Favorite Spots</h1>
@@ -72,21 +73,47 @@ const Favorites = () => {
                     favoriteSpots.map((spot) => (
                         <div className={styles.favoriteCard} key={spot.id}>
                             <h2 className={styles.locationName}>
-                                {spot.name}, {spot.countryName}
+                                {spot.locationName}, {spot.countryName}
                             </h2>
-                            <p>
-                                <strong>Description:</strong>{" "}
-                                {spot?.description}
-                            </p>
+
                             <p>
                                 <strong>Latitude:</strong> {spot.latitude},{" "}
                                 <strong>Longitude:</strong> {spot.longitude}
                             </p>
+                            <p>
+                                <strong>Number of Spots:</strong>{" "}
+                                {spot.totalSpots.length}
+                            </p>
+                            <p>
+                                <strong>Price:</strong> ${spot.price}
+                            </p>
+                            {spot.garageImages &&
+                                spot.garageImages.length > 0 && (
+                                    <div className={styles.imageGallery}>
+                                        <strong>Images:</strong>
+                                        <div className={styles.images}>
+                                            {spot.garageImages.map(
+                                                (image, index) => (
+                                                    <img
+                                                        key={index}
+                                                        src={image}
+                                                        alt={`Garage image ${
+                                                            index + 1
+                                                        }`}
+                                                        className={
+                                                            styles.garageImage
+                                                        }
+                                                    />
+                                                )
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
                             <button
                                 className={styles.removeButton}
                                 onClick={() => removeFromFavorites(spot.id)}
                             >
-                                Remove
+                                Remove From Favorites
                             </button>
                         </div>
                     ))
