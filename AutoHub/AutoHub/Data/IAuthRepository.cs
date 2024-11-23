@@ -9,5 +9,6 @@ namespace AutoHub.Data
         public Task<ServiceResponse<string>> Register(RegisterDto registerDto);
         public Task<ServiceResponse<string>> ChangePassword(ChangePasswordDto changePasswordDto);
         public Task<ServiceResponse<User>> EditUser(UpdateUserDto updateUserDto);
+        public Task<ServiceResponse<string>> DeleteProfile(string password);
     }
 }

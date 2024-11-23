@@ -70,10 +70,28 @@ using Microsoft.EntityFrameworkCore;
             return response;
         }
 
+        public async Task<ServiceResponse<List<ElectricCharger>>> GetOwnerElectricChargers()
+        {
+            var response = new ServiceResponse<List<ElectricCharger>>();
+            try
+            {
+                var eChargers = await _dbContext.ElectricChargers.Where(ec => ec.OwnerId == GetUserId()).ToListAsync();
+                response.Success = true;
+                response.Value = eChargers;
+                response.Message = "Electric chargers !";
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Value = [];
+                response.Message = ex.Message;
+                return response;
+            }
+        }
 
 
-
-            public async Task<ServiceResponse<List<ElectricCharger>>> GetElectricChargersByCountry(string countryName)
+        public async Task<ServiceResponse<List<ElectricCharger>>> GetElectricChargersByCountry(string countryName)
             {
                 var response = new ServiceResponse<List<ElectricCharger>>();
 
@@ -129,24 +147,36 @@ using Microsoft.EntityFrameworkCore;
                 return response;
             }
 
-        public async Task<ServiceResponse<List<ElectricCharger>>> GetOwnerElectricChargers()
+        public async Task<ServiceResponse<bool>> DeleteElectricCharger(int ecId)
         {
-            var response = new ServiceResponse<List<ElectricCharger>>();
-            try
+            var response = new ServiceResponse<bool>();
+            var electricCharger = await _dbContext.ElectricChargers.FindAsync(ecId);
+
+            if (electricCharger == null)
             {
-                var eChargers = await _dbContext.ElectricChargers.Where(ec => ec.OwnerId == GetUserId()).ToListAsync();
-                response.Success = true;
-                response.Value = eChargers;
-                response.Message = "Electric chargers !";
-                return response;
-            }
-            catch (Exception ex) { 
                 response.Success = false;
-                response.Value = [];
-                response.Message = ex.Message;
+                response.Message = "EC spot not found.";
                 return response;
             }
+
+            if (electricCharger.OwnerId != GetUserId())
+            {
+                response.Success = false;
+                response.Message = "You are not authorized to delete this garage spot.";
+                return response;
+            }
+
+            _dbContext.ElectricChargers.Remove(electricCharger);
+            await _dbContext.SaveChangesAsync();
+
+            response.Success = true;
+            response.Message = "EC spot deleted successfully.";
+            response.Value = true;
+
+            return response;
         }
+
+
     }
 
     }

@@ -7,7 +7,7 @@
         public string CountryName { get; set; } = string.Empty;
 
         public bool IsAvailable { get; set; } = true;
-
+        public bool IsVerified { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
 

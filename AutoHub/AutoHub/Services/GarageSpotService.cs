@@ -50,7 +50,7 @@ namespace AutoHub.Services
             var ownerId = GetUserId();
 
             var garagespots = await _dbContext.GarageSpots
-                    .Where(g => g.OwnerId == ownerId)
+                    .Where(g => g.OwnerId == ownerId).Include(g=>g.TotalSpots)
                     .ToListAsync();
 
             if (garagespots.Count == 0)

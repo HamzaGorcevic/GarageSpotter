@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Register.module.scss";
 import { BASE_URL } from "../../config/config";
+import toast from "react-hot-toast";
 
 const Register = () => {
     const [form, setForm] = useState({
@@ -10,7 +11,7 @@ const Register = () => {
         password: "",
     });
 
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [loading, setloading] = useState(false);
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -25,7 +26,7 @@ const Register = () => {
             return;
         }
 
-        setIsSubmitting(true);
+        setloading(true);
 
         try {
             const response = await fetch(`${BASE_URL}/Auth/Register`, {
@@ -37,7 +38,7 @@ const Register = () => {
             });
 
             const res = await response.json();
-            setIsSubmitting(false);
+            setloading(false);
 
             if (response.ok) {
                 toast.success(
@@ -50,7 +51,7 @@ const Register = () => {
                 toast.error(errorMessage);
             }
         } catch (error) {
-            setIsSubmitting(false);
+            setloading(false);
             toast.error(
                 "An error occurred during registration. Please try again."
             );
@@ -98,9 +99,9 @@ const Register = () => {
                 <button
                     type="submit"
                     className={styles.submitButton}
-                    disabled={isSubmitting}
+                    disabled={loading}
                 >
-                    {isSubmitting ? (
+                    {loading ? (
                         <div className={styles.loadingSpinner}></div>
                     ) : (
                         "Register"

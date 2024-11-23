@@ -10,6 +10,6 @@ namespace AutoHub.Services
         Task<ServiceResponse<CreateElectricCharagerDto>> GetElectricChargerById(int id);
         Task<ServiceResponse<int>> CreateElectricCharger([FromForm] IFormFile verificationDocument,[FromForm] CreateElectricCharagerDto electricCharger);
         Task<ServiceResponse<int>> UpdateElectricCharger([FromForm] IFormFile verificationDocument, [FromForm] CreateElectricCharagerDto electricCharger,int electricChargerId);
-
+        Task<ServiceResponse<bool>> DeleteElectricCharger(int ecId);
     }
 }

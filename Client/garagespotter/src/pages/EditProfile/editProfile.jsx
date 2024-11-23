@@ -5,7 +5,7 @@ import { AuthContext } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 
 const EditProfile = () => {
-    const { authData, updateUser } = useContext(AuthContext);
+    const { authData, updateUser, logout } = useContext(AuthContext); // Added logout for clearing auth data on delete
     const [form, setForm] = useState({
         name: authData.user?.name,
         email: authData.user?.email,
@@ -16,7 +16,8 @@ const EditProfile = () => {
         newPassword: "",
     });
     const [passwordError, setPasswordError] = useState("");
-    const [activeTab, setActiveTab] = useState("editProfile"); // New state for toggling tabs
+    const [deletePassword, setDeletePassword] = useState(""); // State for delete profile password
+    const [activeTab, setActiveTab] = useState("editProfile"); // State for toggling tabs
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -24,6 +25,10 @@ const EditProfile = () => {
 
     const handlePasswordChange = (e) => {
         setPasswordForm({ ...passwordForm, [e.target.name]: e.target.value });
+    };
+
+    const handleDeletePasswordChange = (e) => {
+        setDeletePassword(e.target.value); // Update deletePassword state
     };
 
     const handleSubmit = async (e) => {
@@ -97,6 +102,38 @@ const EditProfile = () => {
         }
     };
 
+    const handleDeleteProfile = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const response = await fetch(`${BASE_URL}/User/deleteProfile`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${authData.token}`,
+                },
+                body: JSON.stringify({ password: deletePassword }), 
+            });
+            console.log(response);
+            const res = await response.json();
+            console.log(res);
+            if (res.status) {
+                toast.success("Profile deleted successfully!");
+                logout();
+            } else {
+                const errorMsg =
+                    res.message || "Failed to delete profile. Please try again.";
+                toast.error(errorMsg);
+            }
+        } catch (error) {
+            toast.error("An error occurred while deleting the profile.");
+        } finally {
+            setLoading(false);
+            setDeletePassword("");
+        }
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.containerForm}>
@@ -120,6 +157,16 @@ const EditProfile = () => {
                         onClick={() => setActiveTab("changePassword")}
                     >
                         Change Password
+                    </button>
+                    <button
+                        className={
+                            activeTab === "deleteProfile"
+                                ? styles.activeTab
+                                : styles.tab
+                        }
+                        onClick={() => setActiveTab("deleteProfile")}
+                    >
+                        Delete Profile
                     </button>
                 </div>
 
@@ -155,14 +202,12 @@ const EditProfile = () => {
                                     disabled
                                     className={styles.loadingSpinner}
                                 >
-                                    Loading ...
                                 </button>
                             ) : (
                                 <button
                                     type="submit"
-                                    className={styles.submitButton}
+                                    className={styles.addBtn}
                                 >
-                                    {" "}
                                     Save Changes
                                 </button>
                             )}
@@ -214,15 +259,52 @@ const EditProfile = () => {
                                     disabled
                                     className={styles.loadingSpinner}
                                 >
-                                    Loading ...
                                 </button>
                             ) : (
                                 <button
                                     type="submit"
-                                    className={styles.submitButton}
+                                    className={styles.addBtn}
                                 >
-                                    {" "}
                                     Change Password
+                                </button>
+                            )}
+                        </form>
+                    </div>
+                )}
+
+                {activeTab === "deleteProfile" && (
+                    <div className={styles.editProfileContainer}>
+                        <h2 className={styles.title}>Delete Profile</h2>
+                        <form
+                            onSubmit={handleDeleteProfile}
+                            className={styles.form}
+                        >
+                            <div className={styles.formGroup}>
+                                <label htmlFor="deletePassword">
+                                    Confirm Password
+                                </label>
+                                <input
+                                    type="password"
+                                    id="deletePassword"
+                                    name="deletePassword"
+                                    value={deletePassword}
+                                    onChange={handleDeletePasswordChange}
+                                    required
+                                />
+                            </div>
+
+                            {loading ? (
+                                <button
+                                    disabled
+                                    className={styles.loadingSpinner}
+                                >
+                                </button>
+                            ) : (
+                                <button
+                                    type="submit"
+                                    className={styles.deleteBtn}
+                                >
+                                    Delete Profile
                                 </button>
                             )}
                         </form>

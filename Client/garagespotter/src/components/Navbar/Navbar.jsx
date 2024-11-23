@@ -15,6 +15,7 @@ const Navbar = () => {
         setIsMenuOpen(!isMenuOpen);
     };
 
+    
     return (
         <nav className={styles.navbar}>
             <div className={styles.logo}>MyApp</div>
@@ -61,12 +62,17 @@ const Navbar = () => {
                                 <li>
                                     <Link to="/reservations">Reservations</Link>
                                 </li>
-                                <li>
+                                
+                                {authData.user?.role === "Owner" && (
+                                    <>
+                                    <li>
                                     <Link to="/garages">My Garages</Link>
                                 </li>
                                 <li>
                                     <Link to="/chargers">My E Chargers</Link>
                                 </li>
+                                    </>
+                        )}
                             </>
                         ) : (
                             <>

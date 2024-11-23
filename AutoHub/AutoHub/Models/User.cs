@@ -13,6 +13,8 @@ namespace AutoHub.Models
         public UserRole Role { get; set; }
 
         public List<GarageSpot>? GarageSpots { get; set; }
+        public List<ElectricCharger>? ElectricChargers { get; set; }
+
         public List<GarageSpot>? Favorites { get;set; }
     }
 }
