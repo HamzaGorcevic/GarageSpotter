@@ -334,6 +334,32 @@
   },
   {
     "ContainingType": "AutoHub.Controllers.ElectricChargerController",
+    "Method": "OwnerDeleteGarageSpot",
+    "RelativePath": "ElectricCharger/deleteElectricCharger",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "chargerId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "AutoHub.Models.ServiceResponse\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "AutoHub.Controllers.ElectricChargerController",
     "Method": "GetElectricChargerById",
     "RelativePath": "ElectricCharger/getElectricChargerById",
     "HttpMethod": "GET",
@@ -574,6 +600,11 @@
         "IsRequired": false
       },
       {
+        "Name": "IsVerified",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
         "Name": "Price",
         "Type": "System.Int32",
         "IsRequired": false
@@ -587,6 +618,32 @@
     "ReturnTypes": [
       {
         "Type": "AutoHub.Models.ServiceResponse\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "AutoHub.Controllers.GarageSpotController",
+    "Method": "OwnerDeleteGarageSpot",
+    "RelativePath": "GarageSpot/deleteGarageSpot",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "spotId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "AutoHub.Models.ServiceResponse\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -690,32 +747,6 @@
   },
   {
     "ContainingType": "AutoHub.Controllers.GarageSpotController",
-    "Method": "OwnerDeleteGarageSpot",
-    "RelativePath": "GarageSpot/ownerdeletegaragespot",
-    "HttpMethod": "DELETE",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "spotId",
-        "Type": "System.Int32",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "AutoHub.Models.ServiceResponse\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "AutoHub.Controllers.GarageSpotController",
     "Method": "UpdateGarageSpot",
     "RelativePath": "GarageSpot/updateGarageSpot",
     "HttpMethod": "PUT",
@@ -785,6 +816,11 @@
       {
         "Name": "NumberOfSpots",
         "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "IsVerified",
+        "Type": "System.Boolean",
         "IsRequired": false
       },
       {
@@ -950,6 +986,32 @@
       {
         "Name": "changePasswordDto",
         "Type": "AutoHub.Dtos.ChangePasswordDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "AutoHub.Models.ServiceResponse\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "AutoHub.Controllers.UserController",
+    "Method": "DeleteProfile",
+    "RelativePath": "User/deleteProfile",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "deleteUserDto",
+        "Type": "AutoHub.Dtos.DeleteUserDto",
         "IsRequired": true
       }
     ],

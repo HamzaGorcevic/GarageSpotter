@@ -49,7 +49,8 @@ namespace AutoHub.Services
                 return response;
             }
 
-            garageSpot.IsVerified = true; 
+            garageSpot.IsVerified = true;
+            _dbContext.GarageSpots.Update(garageSpot);
             await _dbContext.SaveChangesAsync();
 
             response.Message = "Garage successfully verified!";

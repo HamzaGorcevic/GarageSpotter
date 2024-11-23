@@ -71,24 +71,6 @@
             font-size: $font-size-base;
         }
 
-        .extendButton {
-            background-color: $primary-color;
-            color: #fff;
-            padding: $spacing-small $spacing-medium;
-            border: none;
-            border-radius: $border-radius;
-            cursor: pointer;
-            transition: background-color $transition-default;
-            margin-right: 5px;
-            margin-top: 5px;
-            &:hover {
-                background-color: darken($primary-color, 10%);
-            }
 
-            &:focus {
-                outline: none;
-                box-shadow: $hover-shadow;
-            }
-        }
     }
 }

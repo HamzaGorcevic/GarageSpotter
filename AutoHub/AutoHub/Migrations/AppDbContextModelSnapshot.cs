@@ -223,7 +223,7 @@ namespace AutoHub.Migrations
             modelBuilder.Entity("AutoHub.Models.ElectricCharger", b =>
                 {
                     b.HasOne("AutoHub.Models.User", "Owner")
-                        .WithMany()
+                        .WithMany("ElectricChargers")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -289,6 +289,8 @@ namespace AutoHub.Migrations
 
             modelBuilder.Entity("AutoHub.Models.User", b =>
                 {
+                    b.Navigation("ElectricChargers");
+
                     b.Navigation("Favorites");
 
                     b.Navigation("GarageSpots");

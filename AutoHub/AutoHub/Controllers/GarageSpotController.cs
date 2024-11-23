@@ -63,7 +63,7 @@ namespace AutoHub.Controllers
 
     
 
-        [HttpDelete("ownerdeletegaragespot")]
+        [HttpDelete("deleteGarageSpot")]
         [Authorize(Roles = "Owner")]
         public async Task<ServiceResponse<bool>> OwnerDeleteGarageSpot(int spotId)
         {

@@ -27,3 +27,55 @@ $z-index-tooltip: 900;
 $z-index-navbar: 9999;
 
 $transition-default: 0.3s ease;
+
+
+// custom buttons
+
+.deleteBtn,.viewBtn,.addBtn {
+    background-color: $error-color;
+    color: #fff;
+    margin-top: 10px;
+    padding: $spacing-small $spacing-medium;
+    border: none;
+    border-radius: $border-radius;
+    cursor: pointer;
+    transition: background-color $transition-default,
+        box-shadow $transition-default;
+    margin: 3px;
+    &:hover {
+        background-color: darken($error-color, 10%);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba($error-color, 0.5);
+    }
+}
+.viewBtn{
+    background-color: $secondary-color;
+    &:hover {
+        background-color: darken($secondary-color, 10%);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba($secondary-color, 0.5);
+    }
+
+}
+.addBtn{
+    background-color: $primary-color;
+    &:hover {
+        background-color: darken($primary-color, 10%);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba($primary-color, 0.5);
+    }
+
+}
+

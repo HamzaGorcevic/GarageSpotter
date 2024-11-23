@@ -52,10 +52,18 @@ namespace AutoHub.Controllers
         }
 
         [HttpPut("updateElectricCharger")]
-        [Authorize(Roles = "User,Owner")]
+        [Authorize(Roles = "Owner")]
         public async Task<ServiceResponse<int>> UpdateElectricCharger([FromForm] IFormFile verificationDocument, [FromForm] CreateElectricCharagerDto electricCharger, int electricChargerId)
         {
             return await _electricChargerService.UpdateElectricCharger(verificationDocument, electricCharger, electricChargerId);
+        }
+
+        [HttpDelete("deleteElectricCharger")]
+        [Authorize(Roles = "Owner")]
+
+        public async Task<ServiceResponse<bool>> OwnerDeleteGarageSpot(int chargerId)
+        {
+            return await _electricChargerService.DeleteElectricCharger(chargerId);
         }
 
 

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AutoHub.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241109230603_OwnerEChargerId")]
-    partial class OwnerEChargerId
+    [Migration("20241123155413_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,13 @@ namespace AutoHub.Migrations
                         .HasColumnType("int");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AvailableSpots")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ChargerType")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("CountryName")
                         .IsRequired()
@@ -109,6 +116,9 @@ namespace AutoHub.Migrations
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("VerificationDocument")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -116,6 +126,8 @@ namespace AutoHub.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("OwnerId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("GarageSpots");
                 });
@@ -214,7 +226,7 @@ namespace AutoHub.Migrations
             modelBuilder.Entity("AutoHub.Models.ElectricCharger", b =>
                 {
                     b.HasOne("AutoHub.Models.User", "Owner")
-                        .WithMany()
+                        .WithMany("ElectricChargers")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -229,6 +241,10 @@ namespace AutoHub.Migrations
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("AutoHub.Models.User", null)
+                        .WithMany("Favorites")
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Owner");
                 });
@@ -276,6 +292,10 @@ namespace AutoHub.Migrations
 
             modelBuilder.Entity("AutoHub.Models.User", b =>
                 {
+                    b.Navigation("ElectricChargers");
+
+                    b.Navigation("Favorites");
+
                     b.Navigation("GarageSpots");
                 });
 #pragma warning restore 612, 618

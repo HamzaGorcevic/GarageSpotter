@@ -16,6 +16,7 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+       try{ 
         const response = await fetch(`${BASE_URL}/Auth/Login`, {
             method: "POST",
             headers: {
@@ -32,6 +33,11 @@ const Login = () => {
         } else {
             toast.error(res.message);
         }
+       }catch(message){
+        setLoading(false)
+        toast.error(res.message);
+
+       }
     };
 
     return (

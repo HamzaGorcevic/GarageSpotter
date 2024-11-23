@@ -176,7 +176,7 @@ const Reservations = () => {
                                 reservationEnd={reservation.reservationEnd}
                             />
                             <button
-                                className={styles.extendButton}
+                                className={styles.addBtn}
                                 onClick={() => {
                                     setIsModalOpen(true);
                                     setSelectedReservation(reservation);
@@ -185,7 +185,7 @@ const Reservations = () => {
                                 Extend Reservation
                             </button>
                             <button
-                                className={styles.extendButton} // Add appropriate styling
+                                className={`${styles.viewBtn}`} // Add appropriate styling
                                 onClick={() =>
                                     getGarageSpot(reservation.garageSpotId)
                                 }

@@ -4,7 +4,7 @@ import Login from "./pages/Login/login";
 import Home from "./pages/home";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import GarageForm from "./pages/CreateGarage/garageForm.jsx";
-import Navbar from "./components/Navbar/Navbar.jsx";
+import Navbar from "./components/Navbar/navbar.jsx";
 import LandingPage from "./pages/LandingPage/landingPage.jsx";
 import Reservations from "./pages/Reservations/reservations.jsx";
 import MyGarages from "./pages/MyGarages/myGarages.jsx";
@@ -71,7 +71,6 @@ function App() {
                             path="/reservations"
                             element={<Reservations />}
                         />
-                        <Route path="/garages" element={<MyGarages />} />
                     </Route>
 
                     <Route

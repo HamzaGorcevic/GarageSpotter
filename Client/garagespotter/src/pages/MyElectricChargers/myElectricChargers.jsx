@@ -9,18 +9,54 @@ const MyElectricChargers = () => {
     const [chargers, setChargers] = useState([]);
     const navigate = useNavigate();
 
+    // Fetch chargers
     const getElectricChargers = async () => {
-        const response = await fetch(
-            `${BASE_URL}/ElectricCharger/getOwnerElectricChargers`,
-            {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${authData.token}`,
-                },
+        try {
+            const response = await fetch(
+                `${BASE_URL}/ElectricCharger/getOwnerElectricChargers`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${authData.token}`,
+                    },
+                }
+            );
+
+            if (response.ok) {
+                const res = await response.json();
+                setChargers(res?.value);
+            } else {
+                console.error("Failed to fetch electric chargers");
             }
-        );
-        const res = await response.json();
-        setChargers(res?.value);
+        } catch (error) {
+            console.error("Error fetching electric chargers:", error);
+        }
+    };
+
+    // Delete a charger
+    const handleChargerDelete = async (chargerId) => {
+        try {
+            const response = await fetch(
+                `${BASE_URL}/ElectricCharger/deleteElectricCharger?chargerId=${chargerId}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${authData.token}`,
+                    },
+                }
+            );
+
+            if (response.ok) {
+                setChargers((prev) =>
+                    prev.filter((charger) => charger.id !== chargerId)
+                );
+                console.log("Electric charger deleted successfully");
+            } else {
+                console.error("Failed to delete electric charger");
+            }
+        } catch (error) {
+            console.error("Error deleting electric charger:", error);
+        }
     };
 
     useEffect(() => {
@@ -55,7 +91,7 @@ const MyElectricChargers = () => {
                                 {charger?.description}
                             </p>
                             <p>
-                                <strong>Availble chargers:</strong>{" "}
+                                <strong>Available chargers:</strong>{" "}
                                 {charger?.availableSpots}
                             </p>
                             <p>
@@ -63,12 +99,20 @@ const MyElectricChargers = () => {
                                 <strong>Longitude:</strong> {charger.longitude}
                             </p>
                             <button
-                                className={styles.editButton}
+                                className={styles.addBtn}
                                 onClick={() =>
                                     navigate(`/update/charger/${charger.id}`)
                                 }
                             >
                                 Edit
+                            </button>
+                            <button
+                                className={styles.deleteBtn}
+                                onClick={() =>
+                                    handleChargerDelete(charger.id)
+                                }
+                            >
+                                Delete
                             </button>
                         </div>
                     ))

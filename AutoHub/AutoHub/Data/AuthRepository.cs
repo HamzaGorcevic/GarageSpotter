@@ -60,7 +60,7 @@ namespace AutoHub.Data
             if (!userExists)
             {
                 var newUser = _mapper.Map<User>(registerDto);
-
+                newUser.Role = UserRole.User;
                 CreateHashPassword(registerDto.Password, out byte[]passwordHash,out byte[] passwordSalt);
 
                 newUser.PasswordHash = passwordHash;
@@ -133,6 +133,30 @@ namespace AutoHub.Data
             response.Value = user;
             return response;
         }
+        public async Task<ServiceResponse<string>> DeleteProfile(string password)
+        {
+            var response = new ServiceResponse<string>();
+            var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Id == GetUserId());
+            if (VerifyHashPassword(password, user.PasswordHash, user.PasswordSalt) == false)
+            {
+                response.Success = false;
+                response.Message = "Password is not correct";
+                return response;
+            }
+            if (user == null)
+            {
+                response.Success = false;
+                response.Message = "User not found";
+                return response;
+            }
+
+            _appDbContext.Users.Remove(user);
+            await _appDbContext.SaveChangesAsync();
+
+            response.Success = true;
+            response.Message = "User deleted successfully";
+            return response;
+        }
 
         public bool VerifyHashPassword(string password, byte[] passwordHash,byte[] passwordSalt) {
             using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
@@ -151,6 +175,7 @@ namespace AutoHub.Data
             }
         
         }
+
 
 
 

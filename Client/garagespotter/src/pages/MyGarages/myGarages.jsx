@@ -3,23 +3,60 @@ import styles from "./myGarages.module.scss";
 import { BASE_URL } from "../../config/config";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+
 const MyGarages = () => {
     const { authData } = useContext(AuthContext);
     const [garageSpots, setGarageSpots] = useState([]);
     const navigate = useNavigate();
+
+    // Fetch garage spots
     const getMyGarages = async () => {
-        const response = await fetch(
-            `${BASE_URL}/GarageSpot/getOwnerGarageSpots`,
-            {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${authData.token}`,
-                },
+        try {
+            const response = await fetch(
+                `${BASE_URL}/GarageSpot/getOwnerGarageSpots`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${authData.token}`,
+                    },
+                }
+            );
+            if (response.ok) {
+                const res = await response.json();
+                setGarageSpots(res?.value);
+            } else {
+                console.error("Failed to fetch garage spots");
             }
-        );
-        const res = await response.json();
-        setGarageSpots(res?.value);
+        } catch (error) {
+            console.error("Error fetching garage spots:", error);
+        }
     };
+
+    const handleGarageDelete = async (spotId) => {
+        try {
+            const response = await fetch(
+                `${BASE_URL}/GarageSpot/deleteGarageSpot?spotId=${spotId}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${authData.token}`,
+                    },
+                }
+            );
+
+            if (response.ok) {
+                setGarageSpots((prev) =>
+                    prev.filter((garage) => garage.id !== spotId)
+                );
+                console.log("Garage spot deleted successfully");
+            } else {
+                console.error("Failed to delete garage spot");
+            }
+        } catch (error) {
+            console.error("Error deleting garage spot:", error);
+        }
+    };
+
     useEffect(() => {
         if (authData?.token) {
             getMyGarages();
@@ -43,9 +80,10 @@ const MyGarages = () => {
                             <p>
                                 <strong>Price:</strong> ${garage.price}
                             </p>
+
                             <p>
-                                <strong>Available:</strong>{" "}
-                                {garage.isAvailable ? "Yes" : "No"}
+                                <strong>Is verified:</strong>{" "}
+                                {garage.isVerified ? "Yes" : "Pending ..."}
                             </p>
                             <p>
                                 <strong>Total Spots:</strong>{" "}
@@ -56,10 +94,18 @@ const MyGarages = () => {
                                 <strong>Longitude:</strong> {garage.longitude}
                             </p>
                             <button
-                                className={styles.editButton}
+                                className={styles.addBtn}
                                 onClick={() => navigate(`/update/${garage.id}`)}
                             >
                                 Edit
+                            </button>
+                            <button
+                                className={styles.deleteBtn}
+                                onClick={() =>
+                                    handleGarageDelete(garage.id)
+                                }
+                            >
+                                Delete
                             </button>
                         </div>
                     ))

@@ -2,12 +2,15 @@
 using AutoHub.Dtos;
 using AutoHub.Models;
 using AutoHub.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutoHub.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize(Roles = "User,Owner")]
+
     public class UserController
     {
         private readonly IAuthRepository _authRepository;
@@ -48,6 +51,13 @@ namespace AutoHub.Controllers
         public async Task<ServiceResponse<string>> ChangePassword(ChangePasswordDto changePasswordDto)
         {
             var response = await _authRepository.ChangePassword(changePasswordDto);
+            return response;
+        }
+
+        [HttpDelete("deleteProfile")]
+        public async Task<ServiceResponse<string>> DeleteProfile([FromBody] DeleteUserDto deleteUserDto)
+        {
+            var response = await _authRepository.DeleteProfile(deleteUserDto.Password);
             return response;
         }
 
