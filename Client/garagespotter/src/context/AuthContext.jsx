@@ -66,10 +66,9 @@ export const AuthProvider = ({ children }) => {
     };
 
     const updateUser = (updatedUser) => {
-        let currentUser = localStorage.getItem("user")
-        let modifiedUser = {currentUser,"name":updatedUser.name}
+        let currentUser = JSON.parse(localStorage.getItem("user"))
+        let modifiedUser = {...currentUser,"name":updatedUser.name,"email":updatedUser.email}
         localStorage.setItem("user", JSON.stringify(modifiedUser));
-
         setAuthData(modifiedUser);
     };
 
