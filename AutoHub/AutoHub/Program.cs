@@ -46,9 +46,10 @@ namespace AutoHub
                 options.AddPolicy("AllowOrigins",
                     builder =>
                     {
-                        builder.WithOrigins("http://localhost:5173", "http://192.168.0.105:5173").AllowAnyHeader()
-                                                                        .AllowAnyMethod()
-                                                                       .AllowCredentials();
+                        builder.WithOrigins("http://localhost:5173", "http://192.168.0.105:5173", "https://garagespotterclient.onrender.com")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials();
                     });
 
             });
