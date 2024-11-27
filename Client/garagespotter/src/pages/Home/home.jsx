@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import styles from "./Home.module.scss";
+import styles from "./home.module.scss";
 import MapComponent from "./map/mapComponent";
 import { BASE_URL } from "../../config/config";
 import { useLocation } from "react-router-dom";

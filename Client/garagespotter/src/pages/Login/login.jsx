@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styles from "./Login.module.scss";
+import styles from "./login.module.scss";
 import { BASE_URL } from "../../config/config";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
@@ -34,8 +34,12 @@ const Login = () => {
             toast.error(res.message);
         }
        }catch(message){
-        setLoading(false)
-        toast.error(res.message);
+            setLoading(false);
+            toast.error(
+                "An error occurred during registration. Please try again."
+            );
+            console.error("Registration error:", error);
+   
 
        }
     };
