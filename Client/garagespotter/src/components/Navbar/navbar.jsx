@@ -7,6 +7,8 @@ const Navbar = () => {
     const { authData, logout } = useContext(AuthContext);
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    console.log(authData,authData.token);
     const handleLogout = () => {
         logout();
     };
