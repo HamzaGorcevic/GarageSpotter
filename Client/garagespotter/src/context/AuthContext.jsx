@@ -69,7 +69,7 @@ export const AuthProvider = ({ children }) => {
         let currentUser = JSON.parse(localStorage.getItem("user"))
         let modifiedUser = {...currentUser,"name":updatedUser.name,"email":updatedUser.email}
         localStorage.setItem("user", JSON.stringify(modifiedUser));
-        setAuthData(modifiedUser);
+        setAuthData({"user":modifiedUser,"token":authData.token});
     };
 
     return (
