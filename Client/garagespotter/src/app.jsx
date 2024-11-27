@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Register from "./pages/Register/register.jsx";
 import Login from "./pages/Login/login.jsx";
 import Home from "./pages/Home/home.jsx";
-import Navbar from "./components/Navbar/navbar.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import GarageForm from "./pages/CreateGarage/garageForm.jsx";
 import LandingPage from "./pages/LandingPage/landingPage.jsx";
@@ -17,7 +16,7 @@ import EditProfile from "./pages/EditProfile/editProfile.jsx";
 import CreateElectricCharger from "./pages/CreateElectricCharger/createElectricCharger.jsx";
 import MyElectricChargers from "./pages/MyElectricChargers/myElectricChargers.jsx";
 import Favorites from "./pages/Favorites/favorites.jsx";
-
+import  Navbar from "./components/Navbar/navbar.jsx"
 function App() {
     return (
         <Router>
