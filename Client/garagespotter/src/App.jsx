@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Register from "./pages/Register/register";
 import Login from "./pages/Login/login";
-import Home from "./pages/home";
+import Home from "./pages/Home/home.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import GarageForm from "./pages/CreateGarage/garageForm.jsx";
 import Navbar from "./components/Navbar/navbar.jsx";
