@@ -5,7 +5,11 @@ export const DocumentDetailsModal = ({
     documentFile,
     setShowDocumentModal,
 }) => {
-    console.log(documentFile);
+    window.addEventListener("keydown",(e)=>{
+        if(e.key == "Escape"){
+            setShowDocumentModal(false)
+        }
+    })
     return (
         <div className={styles.modal}>
             <div className={styles.modalContent}>

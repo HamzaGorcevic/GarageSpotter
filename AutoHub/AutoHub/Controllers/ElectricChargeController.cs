@@ -46,7 +46,7 @@ namespace AutoHub.Controllers
 
         [HttpPost("createElectricCharger")]
         [Authorize(Roles = "Owner,User")]
-        public async Task<ServiceResponse<int>> CreateElectricCharger([FromForm] IFormFile verificationDocument, [FromForm] CreateElectricCharagerDto electricChargerDto)
+        public async Task<ServiceResponse<string>> CreateElectricCharger([FromForm] IFormFile verificationDocument, [FromForm] CreateElectricCharagerDto electricChargerDto)
         {   
             return await _electricChargerService.CreateElectricCharger(verificationDocument, electricChargerDto);
         }

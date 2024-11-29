@@ -11,19 +11,21 @@ using Microsoft.EntityFrameworkCore;
         {
             private readonly int userId;
             private readonly IAzureBlobService _azureBlobService;
-        private readonly IMapper _mapper;
-            public ElectricChargerService(IMapper mapper,IHttpContextAccessor httpContextAccessor, AppDbContext dbContext,IAzureBlobService azureBlobService)
+            private readonly IMapper _mapper;
+            private readonly IAuthRepository _authRepository;
+            public ElectricChargerService(IMapper mapper,IHttpContextAccessor httpContextAccessor, IAuthRepository authRepository,AppDbContext dbContext,IAzureBlobService azureBlobService)
                 : base(httpContextAccessor, dbContext)
             {
+                _authRepository = authRepository;
                 userId = GetUserId();
                 _azureBlobService = azureBlobService;
                 _mapper = mapper;
 
             }
 
-            public async Task<ServiceResponse<int>> CreateElectricCharger([FromForm] IFormFile verificationDocument, [FromForm] CreateElectricCharagerDto electricChargerDto)
+            public async Task<ServiceResponse<string>> CreateElectricCharger([FromForm] IFormFile verificationDocument, [FromForm] CreateElectricCharagerDto electricChargerDto)
             {
-                var response = new ServiceResponse<int>();
+                var response = new ServiceResponse<string>();
                 string verificationDocumentPath = "";
                 if (verificationDocument != null)
                 {
@@ -32,8 +34,13 @@ using Microsoft.EntityFrameworkCore;
                 try
                 {
                     var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == GetUserId());
-                    user!.Role = Models.Enums.UserRole.Owner;
-    
+                    string newToken = "";
+                    if (user!.Role != Models.Enums.UserRole.Owner)
+                    {
+                        newToken = _authRepository.CreateToken(user.Name, Models.Enums.UserRole.Owner, userId);
+                        user!.Role = Models.Enums.UserRole.Owner;
+
+                    }
                    var newCharger = _mapper.Map<ElectricCharger>(electricChargerDto);
 
                 newCharger.Owner = user;
@@ -41,8 +48,7 @@ using Microsoft.EntityFrameworkCore;
                 newCharger.VerificationDocument = verificationDocumentPath;
                     _dbContext.ElectricChargers.Add(newCharger);
                     await _dbContext.SaveChangesAsync();
-
-                    response.Value = newCharger.Id;
+                    response.Value = newToken;
                     response.Success = true;
                     response.Message = "Electric charger created successfully.";
                 }
