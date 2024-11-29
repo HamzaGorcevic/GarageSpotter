@@ -66,6 +66,7 @@ const EditProfile = () => {
         setPasswordError("");
 
         if (passwordForm.newPassword.length < 8) {
+            setLoading(false)
             setPasswordError(
                 "New password must be at least 8 characters long."
             );

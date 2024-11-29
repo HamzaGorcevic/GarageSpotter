@@ -17,6 +17,12 @@ const ImagesModal = ({ images, setShowImagesModal }) => {
             (prevIndex) => (prevIndex - 1 + images.length) % images.length
         );
     };
+    window.addEventListener("keydown",(e)=>{
+        console.log(e,"clicked");
+        if(e.key == "Escape"){
+            setShowImagesModal(false)
+        }
+    })
 
     return (
         <div className={styles.modal}>

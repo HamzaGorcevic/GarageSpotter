@@ -71,9 +71,26 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("user", JSON.stringify(modifiedUser));
         setAuthData({"user":modifiedUser,"token":authData.token});
     };
+    const updateToken = (newToken) => {
+        localStorage.setItem("token", newToken); 
+        const decodedToken = decodeToken(newToken); 
+    
+        const existingUser = JSON.parse(localStorage.getItem("user"));
+    
+        const updatedUser = {
+            ...existingUser,
+            role: decodedToken?.role, 
+            name: decodedToken?.unique_name,
+        };
+    
+        localStorage.setItem("user", JSON.stringify(updatedUser)); 
+        setAuthData({ token: newToken, user: updatedUser }); 
+        checkTokenExpiration(newToken, decodedToken?.exp); 
+    };
+    
 
     return (
-        <AuthContext.Provider value={{ authData, login, logout, updateUser }}>
+        <AuthContext.Provider value={{ authData, login, logout, updateUser,updateToken }}>
             {children}
         </AuthContext.Provider>
     );

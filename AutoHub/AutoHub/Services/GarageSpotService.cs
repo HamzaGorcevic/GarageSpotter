@@ -12,8 +12,10 @@ namespace AutoHub.Services
         private readonly AppDbContext _dbContext;
         private readonly IMapper _mapper;
         private readonly IAzureBlobService _azureBlobService;
-        public GarageSpotService(AppDbContext dbContext,IMapper mapper,IAzureBlobService azureBlobService,IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor,dbContext)
+        private readonly IAuthRepository _authRepository;
+        public GarageSpotService(AppDbContext dbContext,IAuthRepository authRepository,IMapper mapper,IAzureBlobService azureBlobService,IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor,dbContext)
         {
+            _authRepository = authRepository;
             _dbContext = dbContext;
             _mapper = mapper;
             _azureBlobService = azureBlobService;
@@ -213,9 +215,9 @@ namespace AutoHub.Services
             return response;
             
         }
-        public async Task<ServiceResponse<int>> CreateGarageSpot( IFormFile verificationDocument, List<IFormFile> garageImages,  CreateGarageSpotDto newSpot)
+        public async Task<ServiceResponse<string>> CreateGarageSpot( IFormFile verificationDocument, List<IFormFile> garageImages,  CreateGarageSpotDto newSpot)
         {
-            var response = new ServiceResponse<int>();
+            var response = new ServiceResponse<string>();
             var userId = GetUserId(); 
 
             if (verificationDocument != null)
@@ -230,10 +232,17 @@ namespace AutoHub.Services
 
             // when user create garage i should make him owner instead of user 
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            user!.Role = Models.Enums.UserRole.Owner;
+            string newToken = "";
+            if (user!.Role != Models.Enums.UserRole.Owner)
+            {
+                newToken = _authRepository.CreateToken(user.Name, Models.Enums.UserRole.Owner, userId);
+                user!.Role = Models.Enums.UserRole.Owner;
+
+            }
             var garageSpot = _mapper.Map<GarageSpot>(newSpot);
             garageSpot.OwnerId = userId;
             garageSpot.Owner = user;
+
             _dbContext.GarageSpots.Add(garageSpot);
             await _dbContext.SaveChangesAsync();
 
@@ -252,7 +261,7 @@ namespace AutoHub.Services
 
             response.Success = true;
             response.Message = $"Garage spot with {newSpot.NumberOfSpots} spots created successfully.";
-            response.Value = garageSpot.Id;
+            response.Value = newToken;
             return response;
         }
 

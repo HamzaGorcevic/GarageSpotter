@@ -10,7 +10,7 @@ const GarageForm = () => {
     const [latlng, setLatlng] = useState([43.23132, 21.21321]);
     const [areFilesValid, setAreFilesValid] = useState(true);
     const [error, setError] = useState("");
-    const { authData } = useContext(AuthContext);
+    const { authData,updateToken } = useContext(AuthContext);
     const { id } = useParams();
     const [isUpdateMode, setIsUpdateMode] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -174,13 +174,16 @@ const GarageForm = () => {
                 },
                 body: formDataToSend,
             });
-
-            if (response.ok) {
+            const res = await response.json()
+            if (res.success) {
                 toast.success(
                     isUpdateMode
                         ? "Garage spot updated successfully"
                         : "Garage spot created successfully"
                 );
+                if(res.value.length > 1){
+                    updateToken(res.value)
+                }
             } else {
                 const errorResponse = await response.text();
                 const errorMessage = isUpdateMode

@@ -11,18 +11,49 @@ const Register = () => {
         password: "",
     });
 
+    const [errors, setErrors] = useState({
+        name: "",
+        email: "",
+        password: "",
+    });
+
     const [loading, setloading] = useState(false);
     const navigate = useNavigate();
 
     const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setForm({ ...form, [name]: value });
+
+        setErrors({ ...errors, [name]: "" });
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+        console.log(form);
+        if (!/^[a-zA-Z0-9]{3,}$/.test(form.name)) {
+            newErrors.name = "Username must be at least 3 characters and alphanumeric.";
+        }
+
+        if (
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)
+        ) {
+            newErrors.email = "Please enter a valid email address.";
+        }
+
+        if (form.password.length < 8) {
+            newErrors.password = "Password must be at least 8 characters long.";
+        }
+        console.log("nErrors:",newErrors);
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (form.password.length < 8) {
-            toast.error("Password must be at least 8 characters long.");
+        console.log("login");
+        // Validate form inputs
+        if (!validateForm()) {
+            console.log(e);
             return;
         }
 
@@ -40,7 +71,7 @@ const Register = () => {
             const res = await response.json();
             setloading(false);
 
-            if (response.ok) {
+            if (res.success) {
                 toast.success(
                     "Registration successful! Redirecting to login..."
                 );
@@ -73,6 +104,7 @@ const Register = () => {
                         onChange={handleChange}
                         required
                     />
+                    {errors.name && <p className={styles.error}>{errors.name}</p>}
                 </div>
                 <div className={styles.formGroup}>
                     <label htmlFor="email">Email</label>
@@ -84,6 +116,7 @@ const Register = () => {
                         onChange={handleChange}
                         required
                     />
+                    {errors.email && <p className={styles.error}>{errors.email}</p>}
                 </div>
                 <div className={styles.formGroup}>
                     <label htmlFor="password">Password</label>
@@ -95,6 +128,7 @@ const Register = () => {
                         onChange={handleChange}
                         required
                     />
+                    {errors.password && <p className={styles.error}>{errors.password}</p>}
                 </div>
                 <button
                     type="submit"

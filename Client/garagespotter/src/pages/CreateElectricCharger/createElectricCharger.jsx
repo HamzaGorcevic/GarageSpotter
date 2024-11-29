@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 
 const CreateElectricCharger = () => {
     const [latlng, setLatlng] = useState([43.23132, 21.21321]);
-    const { authData } = useContext(AuthContext);
+    const { authData,updateToken} = useContext(AuthContext);
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
     const [isUpdateMode, setIsUpdateMode] = useState(false);
@@ -144,7 +144,7 @@ const CreateElectricCharger = () => {
         formDataToSend.append(
             "verificationDocument",
             formData.verificationDocument
-        );
+        );  
         formDataToSend.append("name", formData.name);
         formDataToSend.append("latitude", formData.latitude);
         formDataToSend.append("longitude", formData.longitude);
@@ -179,14 +179,16 @@ const CreateElectricCharger = () => {
                 body: formDataToSend,
             });
 
-            const data = await response.json();
+            const res = await response.json();
             setLoading(false);
-            if (data.success) {
+            if (res.success) {
                 toast.success(successMessage);
-                console.log(successMessage, data);
+                if(res.value.length > 1){
+                    updateToken(res.value)
+                }
             } else {
-                console.error(errorMessage, data.message);
-                toast.error(`${errorMessage} ${data.message}`);
+                console.error(errorMessage, res.message);
+                toast.error(`${errorMessage} ${res.message}`);
             }
         } catch (error) {
             console.error("Request failed:", error);
