@@ -36,8 +36,11 @@ const chargerIcon = L.icon({
     popupAnchor: [1, -34],
 });
 
-const MapComponent = ({ garageSpots, eChargers }) => {
-    const [userPosition, setUserPosition] = useState(null);
+const MapComponent = ({ garageSpots, eChargers, lat, lon }) => {
+    const [userPosition, setUserPosition] = useState({
+        lat: lat | "32.2123",
+        lng: lon | "20.1233",
+    });
     const [clickedMarkerPosition, setClickedMarkerPosition] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [selectedGarageSpotId, setSelectedGarageSpotId] = useState(0);
@@ -49,24 +52,6 @@ const MapComponent = ({ garageSpots, eChargers }) => {
     const [showGarageSpots, setShowGarageSpots] = useState(true);
     const [chargerTypeFilter, setChargerTypeFilter] = useState("");
     const [clearRoutes, setClearRoutes] = useState(false);
-
-    useEffect(() => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    if (position.coords) {
-                        setUserPosition({
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude,
-                        });
-                    }
-                },
-                (error) => {
-                    console.error("Error fetching user location:", error);
-                }
-            );
-        }
-    }, []);
 
     const countDistanceToSpot = (spot) => {
         const convertedDistance = getDistanceToSpot(userPosition, spot);

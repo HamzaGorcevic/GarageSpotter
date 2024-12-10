@@ -4,21 +4,57 @@ import MapComponent from "./map/mapComponent";
 import { BASE_URL } from "../../config/config";
 import { useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import getLatLngFromCountry from "../../hooks/useLocationName";
 
 const Home = () => {
     const location = useLocation();
     const { authData } = useContext(AuthContext);
     const [garageSpots, setGarageSpots] = useState([]);
     const [electricChargers, setElectricChargers] = useState([]);
+    const [mapInfo, setMapInfo] = useState({
+        lat: null,
+        lon: null,
+        country: "Serbia",
+    });
 
     useEffect(() => {
+        const resolveLocation = async () => {
+            const query = new URLSearchParams(location.search);
+            const queryCountry = query.get("country") || "Serbia";
+            const queryLat = query.get("lat");
+            const queryLon = query.get("lon");
+
+            if (queryLat && queryLon) {
+                // If lat/lon are provided in the query params, use them directly
+                setMapInfo({
+                    lat: parseFloat(queryLat),
+                    lon: parseFloat(queryLon),
+                    country: queryCountry,
+                });
+            } else {
+                // Otherwise, resolve lat/lon from the country name
+                const resolvedLocation = await getLatLngFromCountry(
+                    queryCountry
+                );
+                console.log(resolvedLocation, "loc");
+                setMapInfo({
+                    lat: resolvedLocation.lat,
+                    lon: resolvedLocation.lon,
+                    country: resolvedLocation.name || queryCountry,
+                });
+            }
+        };
+
+        resolveLocation();
+    }, [location]);
+
+    useEffect(() => {
+        if (!mapInfo.lat || !mapInfo.lon) return;
+
         const fetchGarageSpots = async () => {
             try {
-                const query = new URLSearchParams(location.search);
-                const country = query.get("country") || "Serbia";
-                console.log(authData);
                 const response = await fetch(
-                    `${BASE_URL}/GarageSpot/getGaragSspotsByCountry?country=${country}`,
+                    `${BASE_URL}/GarageSpot/getGaragSspotsByCountry?country=${mapInfo.country}`,
                     {
                         method: "GET",
                         headers: {
@@ -35,10 +71,8 @@ const Home = () => {
 
         const fetchElectricChargers = async () => {
             try {
-                const query = new URLSearchParams(location.search);
-                const country = query.get("country") || "Serbia";
                 const response = await fetch(
-                    `${BASE_URL}/ElectricCharger/getElectricChargersByCountry?countryName=${country}`,
+                    `${BASE_URL}/ElectricCharger/getElectricChargersByCountry?countryName=${mapInfo.country}`,
                     {
                         method: "GET",
                         headers: {
@@ -55,14 +89,21 @@ const Home = () => {
 
         fetchGarageSpots();
         fetchElectricChargers();
-    }, [location, authData]);
+    }, [mapInfo, authData]);
 
     return (
         <div className={styles.homeContainer}>
-            <MapComponent
-                garageSpots={garageSpots}
-                eChargers={electricChargers}
-            />
+            {mapInfo.lat && mapInfo.lon ? (
+                <MapComponent
+                    garageSpots={garageSpots}
+                    eChargers={electricChargers}
+                    lat={mapInfo.lat}
+                    lon={mapInfo.lon}
+                    country={mapInfo.country}
+                />
+            ) : (
+                <div>Loading map...</div>
+            )}
         </div>
     );
 };
