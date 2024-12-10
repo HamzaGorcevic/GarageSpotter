@@ -23,7 +23,9 @@ const LandingPage = () => {
                     const countryName =
                         res.address.country || "Unknown country";
                     setLoading(false);
-                    navigate(`/home?country=${countryName}`);
+                    navigate(
+                        `/home?country=${countryName}&lat=${latitude}&lon=${longitude}`
+                    );
                 } catch (error) {
                     console.error("Error fetching countryName:", error);
                     setError("Failed to retrieve country name");

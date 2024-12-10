@@ -16,7 +16,7 @@ import EditProfile from "./pages/EditProfile/editProfile.jsx";
 import CreateElectricCharger from "./pages/CreateElectricCharger/createElectricCharger.jsx";
 import MyElectricChargers from "./pages/MyElectricChargers/myElectricChargers.jsx";
 import Favorites from "./pages/Favorites/favorites.jsx";
-import  Navbar from "./components/Navbar/navbar.jsx"
+import Navbar from "./components/Navbar/navbar.jsx";
 function App() {
     return (
         <Router>
@@ -91,7 +91,7 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/access-denied" element={<AccessDenied />} />
-                    <Route path="/not-found" element={<NotFound />} />
+                    <Route path="/*" element={<NotFound />} />
                 </Routes>
             </AuthProvider>
         </Router>
