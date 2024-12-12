@@ -24,7 +24,7 @@ $hover-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 
 $z-index-modal: 1000;
 $z-index-tooltip: 900;
-$z-index-navbar: 9999;
+$z-index-navbar: 9990;
 
 $transition-default: 0.3s ease;
 
@@ -88,6 +88,10 @@ a{
 }
 
 .reserveButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
     width: 100%;
     padding: $spacing-medium;
     background-color: $secondary-color;

@@ -1,16 +1,17 @@
 import React, { useContext, useEffect, useState } from "react";
-import style from "./garageForm.module.scss"; // Import the SCSS module
+import style from "./garageForm.module.scss";
 import { AuthContext } from "../../context/AuthContext";
 import { BASE_URL } from "../../config/config";
 import MapConstant from "../Home/map/constants/constantMap";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
+import { MapPin, ChevronDown } from "lucide-react";
 
 const GarageForm = () => {
     const [latlng, setLatlng] = useState([43.23132, 21.21321]);
     const [areFilesValid, setAreFilesValid] = useState(true);
     const [error, setError] = useState("");
-    const { authData,updateToken } = useContext(AuthContext);
+    const { authData, updateToken } = useContext(AuthContext);
     const { id } = useParams();
     const [isUpdateMode, setIsUpdateMode] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -174,15 +175,15 @@ const GarageForm = () => {
                 },
                 body: formDataToSend,
             });
-            const res = await response.json()
+            const res = await response.json();
             if (res.success) {
                 toast.success(
                     isUpdateMode
                         ? "Garage spot updated successfully"
                         : "Garage spot created successfully"
                 );
-                if(res.value.length > 1){
-                    updateToken(res.value)
+                if (res.value.length > 1) {
+                    updateToken(res.value);
                 }
             } else {
                 const errorResponse = await response.text();
@@ -222,6 +223,43 @@ const GarageForm = () => {
             <h1 className={style.title}>
                 {isUpdateMode ? "Update Garage Spot" : "Register Garage Spot"}
             </h1>
+
+            <div className={style.mapSection}>
+                <div className={style.mapInstructions}>
+                    <h3>
+                        <MapPin size={20} />
+                        Select Location
+                    </h3>
+                    <p>
+                        Click anywhere on the map to select your garage
+                        location. This will automatically update the country and
+                        coordinates.
+                    </p>
+                </div>
+
+                <MapConstant setLatlng={setLatlng} />
+
+                <div className={style.locationInfo}>
+                    <div className={style.infoItem}>
+                        <label>Country</label>
+                        <span>{formData.countryName || "Not selected"}</span>
+                    </div>
+                    <div className={style.infoItem}>
+                        <label>Latitude</label>
+                        <span>{formData.latitude.toFixed(6)}</span>
+                    </div>
+                    <div className={style.infoItem}>
+                        <label>Longitude</label>
+                        <span>{formData.longitude.toFixed(6)}</span>
+                    </div>
+                </div>
+
+                <ChevronDown
+                    className={style.scrollArrow}
+                    onClick={scrollDown}
+                />
+            </div>
+
             <form className={style.form} onSubmit={handleSubmit}>
                 <div className={style.formGroup}>
                     <label>Location Name:</label>
@@ -233,47 +271,12 @@ const GarageForm = () => {
                         className={
                             formErrors.locationName ? style.errorInput : ""
                         }
+                        placeholder="Enter a name for this location"
                         required
                     />
                     {formErrors.locationName && (
                         <p className={style.error}>{formErrors.locationName}</p>
                     )}
-                </div>
-
-                <div className={style.formGroup} onClick={scrollDown}>
-                    <label>Country Name:</label>
-                    <input
-                        disabled
-                        type="text"
-                        name="countryName"
-                        value={formData.countryName}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-
-                <div className={style.formGroup} onClick={scrollDown}>
-                    <label>Latitude:</label>
-                    <input
-                        disabled
-                        type="number"
-                        name="latitude"
-                        value={formData.latitude}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-
-                <div className={style.formGroup} onClick={scrollDown}>
-                    <label>Longitude:</label>
-                    <input
-                        disabled
-                        type="number"
-                        name="longitude"
-                        value={formData.longitude}
-                        onChange={handleChange}
-                        required
-                    />
                 </div>
 
                 <div className={style.formGroup}>
@@ -286,6 +289,7 @@ const GarageForm = () => {
                         className={
                             formErrors.numberOfSpots ? style.errorInput : ""
                         }
+                        placeholder="How many parking spots?"
                     />
                     {formErrors.numberOfSpots && (
                         <p className={style.error}>
@@ -295,13 +299,14 @@ const GarageForm = () => {
                 </div>
 
                 <div className={style.formGroup}>
-                    <label>Price:</label>
+                    <label>Price per Day:</label>
                     <input
                         type="number"
                         name="price"
                         value={formData.price}
                         onChange={handleChange}
                         className={formErrors.price ? style.errorInput : ""}
+                        placeholder="Daily rate"
                     />
                     {formErrors.price && (
                         <p className={style.error}>{formErrors.price}</p>
@@ -314,11 +319,12 @@ const GarageForm = () => {
                         type="file"
                         name="verificationDocument"
                         onChange={handleFileChange}
+                        accept="image/*,.pdf"
                     />
                 </div>
 
                 <div className={style.formGroup}>
-                    <label>Garage Images:</label>
+                    <label>Garage Images (Max 7):</label>
                     <input
                         type="file"
                         name="garageImages"
@@ -336,10 +342,18 @@ const GarageForm = () => {
                     disabled={loading}
                     className={style.submitButton}
                 >
-                    {loading ? "Saving..." : isUpdateMode ? "Update" : "Create"}
+                    {loading ? (
+                        <>
+                            <span className={style.loadingSpinner}></span>
+                            <span>Saving...</span>
+                        </>
+                    ) : isUpdateMode ? (
+                        "Update Garage"
+                    ) : (
+                        "Create Garage"
+                    )}
                 </button>
             </form>
-            <MapConstant setLatlng={setLatlng} />
         </div>
     );
 };
