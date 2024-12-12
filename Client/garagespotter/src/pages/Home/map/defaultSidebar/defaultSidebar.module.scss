@@ -3,58 +3,90 @@
     width: 100%;
     max-width: 450px;
     max-height: 100%;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
     position: absolute;
     z-index: $z-index-modal !important;
     top: 0;
     margin: 0;
+    scrollbar-width: thin;
+    scrollbar-color: $primary-color transparent;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: $primary-color;
+        border-radius: 3px;
+    }
+
     .toggleButton {
         border-radius: $border-radius;
-        padding: $spacing-small;
+        padding: $spacing-small $spacing-medium;
         border: none;
+        background-color: $primary-color;
+        color: white;
         box-shadow: $box-shadow;
         margin-left: auto;
         display: none;
         cursor: pointer;
         margin-right: 10px;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+            background-color: darken($primary-color, 10%);
+        }
+
         @media (max-width: 768px) {
             display: inline;
         }
     }
+
     .open {
         display: inline !important;
     }
+
     .alwaysVisible {
         background-color: $background-color;
-        padding: $spacing-small;
+        padding: $spacing-medium;
         z-index: $z-index-modal;
-        padding-top: 20px;
-        @media (max-width: 768px) {
-            padding: $spacing-large;
-        }
-    }
-    .toggledSidebar {
-        background-color: $background-color;
-        padding: $spacing-small $spacing-small 0 $spacing-small;
+        border-bottom: 1px solid $border-color;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
         @media (max-width: 768px) {
             padding: $spacing-large;
         }
     }
+
+    .toggledSidebar {
+        background-color: $background-color;
+        padding: $spacing-medium;
+
+        @media (max-width: 768px) {
+            padding: $spacing-large;
+        }
+    }
+
     .searchGarageName {
-        width: 96%;
-        padding: $spacing-small;
+        width: 100%;
+        padding: $spacing-medium;
         margin-bottom: $spacing-medium;
         font-size: $font-size-base;
         border: 1px solid $border-color;
         border-radius: $border-radius;
         box-shadow: $box-shadow;
+        transition: all 0.2s ease;
 
         &:focus {
             border-color: $primary-color;
             background-color: #f9f9f9;
             outline: none;
+            box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
         }
 
         &::placeholder {
@@ -68,113 +100,135 @@
         justify-content: space-between;
         gap: $spacing-small;
         margin-bottom: $spacing-medium;
+    }
 
-        .filterSelect {
-            flex: 1;
-            padding: $spacing-small;
-            font-size: $font-size-small;
-            color: $text-color;
-            border: 1px solid $border-color;
-            border-radius: $border-radius;
-            box-shadow: $box-shadow;
-            transition: $transition-default;
-
-            &:focus {
-                border-color: $primary-color;
-                outline: none;
-            }
-        }
-    }
-    @media (max-width: 768px) {
-        width: 100%;
-        max-width: none;
-    }
-    .selectedGarageItem {
-        background-color: #007bff;
-        color: #fff;
-        box-shadow: rgba(38, 41, 43, 0.479) 0px 50px 100px -20px,
-            rgba(39, 44, 48, 0.571) 0px 30px 60px -30px,
-            rgba(23, 27, 31, 0.537) 0px -2px 6px 0px inset !important;
-        padding: $spacing-medium;
-        transition: all 0.3s ease-in-out;
-    }
-    .garageItem {
-        cursor: pointer;
-        display: flex;
-        flex-direction: column;
-        background-color: #fff;
+    .filterSelect {
+        flex: 1;
+        padding: $spacing-small $spacing-medium;
+        font-size: $font-size-small;
+        color: $text-color;
         border: 1px solid $border-color;
         border-radius: $border-radius;
-        margin-bottom: $spacing-medium;
-        padding: $spacing-medium;
         box-shadow: $box-shadow;
-        transition: box-shadow $transition-default;
+        transition: all 0.2s ease;
+        background-color: white;
+        cursor: pointer;
 
-        .reserveButton {
-            background-color: $secondary-color;
-            color: rgb(241, 236, 236);
-            padding: $spacing-small;
-            font-size: $font-size-large;
-            border-radius: $border-radius;
-            border: 0;
-            margin-top: $spacing-small;
-            width: 100%;
-
-            cursor: pointer;
-            transition: $transition-default;
-            &:hover {
-                background-color: #119e37;
-            }
+        &:focus {
+            border-color: $primary-color;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
         }
 
         &:hover {
+            border-color: $primary-color;
+        }
+    }
+
+    .garageItem {
+        cursor: pointer;
+        background-color: white;
+        border-radius: $border-radius;
+        margin-bottom: $spacing-medium;
+        overflow: hidden;
+        box-shadow: $box-shadow;
+        transition: all 0.3s ease;
+        border: 1px solid $border-color;
+
+        &:hover {
+            transform: translateY(-2px);
             box-shadow: $hover-shadow;
         }
-        .garageImage {
+
+        .imageContainer {
+            position: relative;
             width: 100%;
-            height: 100px;
-            object-fit: cover;
-            border-radius: $border-radius;
+            height: 200px;
+            overflow: hidden;
+
+            .garageImage {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.3s ease;
+            }
+
+            .statusBadge {
+                position: absolute;
+                top: $spacing-small;
+                right: $spacing-small;
+                padding: 4px 8px;
+                border-radius: 12px;
+                font-size: $font-size-small;
+                font-weight: bold;
+                background-color: rgba($primary-color, 0.9);
+                color: white;
+                backdrop-filter: blur(4px);
+            }
         }
 
         .garageInfo {
-            margin-top: $spacing-small;
+            padding: $spacing-medium;
+
+            .garageTitle {
+                font-size: $font-size-large;
+                font-weight: bold;
+                color: $text-color;
+                margin-bottom: $spacing-small;
+            }
+
+            .infoGrid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: $spacing-small;
+                margin-bottom: $spacing-medium;
+
+                .infoItem {
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    color: $muted-text-color;
+                    font-size: $font-size-small;
+
+                    .icon {
+                        color: $primary-color;
+                    }
+                }
+            }
         }
 
-        .garageTitle {
-            font-family: $font-family;
-            font-size: $font-size-large;
-            color: $text-color;
-            margin-bottom: $spacing-small;
-        }
 
-        .price {
-            font-family: $font-family;
-            font-size: $font-size-base;
-            color: $primary-color;
-        }
-
-        .availableSpots {
-            font-family: $font-family;
-            font-size: $font-size-small;
-            color: $muted-text-color;
-        }
     }
 
-    // no garages
+    .selectedGarageItem {
+        border: 2px solid $primary-color;
+        background-color: rgba($primary-color, 0.05);
+    }
 
     .noGaragesContainer {
         display: flex;
-        justify-content: center;
+        flex-direction: column;
         align-items: center;
+        justify-content: center;
         height: 92vh;
         background-color: $background-color;
-        overflow: hidden;
+        padding: $spacing-large;
+        text-align: center;
+
+        .noGaragesImage {
+            max-width: 300px;
+            margin-bottom: $spacing-medium;
+            opacity: 0.8;
+        }
+
+        .noGaragesText {
+            color: $muted-text-color;
+            font-size: $font-size-large;
+        }
     }
 
-    .noGaragesImage {
-        max-width: 100%;
-        max-height: 80%;
-        object-fit: contain;
+    @media (max-width: 768px) {
+        width: 100%;
+        max-width: none;
     }
 }

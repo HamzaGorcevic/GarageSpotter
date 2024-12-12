@@ -79,7 +79,7 @@ const ReservationModal = ({
                             checked={reservationType === "hours"}
                             onChange={() => setReservationType("hours")}
                         />
-                        {isExtend ? "Extend by hours" : "Reserve by date"}
+                        {isExtend ? "Extend by Hours" : "Reserve by Hours"}
                     </label>
                     <label>
                         <input
@@ -95,8 +95,9 @@ const ReservationModal = ({
 
                 {reservationType === "hours" && (
                     <div className={style.inputGroup}>
-                        <label>Hours</label>
+                        <label></label>
                         <input
+                            placeholder="Hours"
                             type="number"
                             value={hours}
                             onChange={(e) => setHours(e.target.value)}

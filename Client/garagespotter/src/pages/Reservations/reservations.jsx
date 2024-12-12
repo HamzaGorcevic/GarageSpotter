@@ -6,7 +6,7 @@ import GarageReservationTimer from "../../components/Garage/GarageTimer/garageTi
 import ReservationModal from "../../components/Modals/ReservationModal/ReservationModal";
 import toast from "react-hot-toast";
 import ViewGarageModal from "../../components/Modals/ViewGarageModal/viewGarageModal";
-
+import useExtendReservation from "../../hooks/ReservationHooks/seExtendReservation";
 const Reservations = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -27,9 +27,10 @@ const Reservations = () => {
             }
         );
         const res = await response.json();
-        console.log(res.value);
         setReservations(res?.value || []);
     };
+    const { extendReservation, loading } =
+        useExtendReservation(getReservations); // Pass getReservations for refreshing
 
     useEffect(() => {
         if (authData?.token) {
@@ -57,37 +58,23 @@ const Reservations = () => {
         }
     };
 
-    const extendReservation = async (reservation) => {
-        console.log(reservation);
-        try {
-            await toast.promise(
-                fetch(`${BASE_URL}/Reservation/extendReservation`, {
-                    method: "PUT",
-                    headers: {
-                        Authorization: `Bearer ${authData.token}`,
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        id: selectedReservation.id,
-                        ...reservation,
-                    }),
-                }),
-                {
-                    loading: "Extending reservation...",
-                    success: "Reservation extended successfully!",
-                    error: "Failed to extend reservation.",
-                }
-            );
-            setIsModalOpen(false);
-            getReservations();
-        } catch (error) {
-            console.error("Error extending reservation:", error);
-        }
-    };
-
     const onClose = () => {
         setIsModalOpen(false);
         setIsViewModalOpen(false);
+    };
+
+    const handleExtendSubmit = (newDetails) => {
+        if (selectedReservation) {
+            const reservation = {
+                id: selectedReservation.id,
+                singleSpotId: selectedReservation.singleSpotId,
+                garageSpotId: selectedReservation.garageSpotId,
+                ...newDetails,
+            };
+            extendReservation(reservation).then(() => {
+                setIsModalOpen(false);
+            });
+        }
     };
 
     const filteredReservations = reservations.filter((reservation) => {
@@ -185,7 +172,7 @@ const Reservations = () => {
                                 Extend Reservation
                             </button>
                             <button
-                                className={`${styles.viewBtn}`} // Add appropriate styling
+                                className={`${styles.viewBtn}`}
                                 onClick={() =>
                                     getGarageSpot(reservation.garageSpotId)
                                 }
@@ -200,9 +187,10 @@ const Reservations = () => {
             {isModalOpen && (
                 <ReservationModal
                     onClose={onClose}
-                    onSubmit={extendReservation}
+                    onSubmit={handleExtendSubmit}
                     reservationData={selectedReservation}
                     isExtend={true}
+                    loading={loading} // Optional: Indicate loading
                 />
             )}
 

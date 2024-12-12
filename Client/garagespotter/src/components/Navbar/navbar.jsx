@@ -1,23 +1,22 @@
-import React, { useContext, useEffect, useState } from "react"; // Import useState
-import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext.jsx";
+import React, { useContext, useState } from "react";
+import { Link } from "react-router-dom";
 import styles from "./navbar.module.scss";
+import { AuthContext } from "../../context/AuthContext";
+import NavDropdown from "./navbarDropDown";
 
 const Navbar = () => {
     const { authData, logout } = useContext(AuthContext);
-    const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    console.log(authData,authData.token);
     const handleLogout = () => {
         logout();
     };
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
+        console.log("toggled");
     };
 
-    
     return (
         <nav className={styles.navbar}>
             <div className={styles.logo}>MyApp</div>
@@ -42,7 +41,7 @@ const Navbar = () => {
                     </>
                 ) : (
                     <>
-                        {authData.user?.role != "Admin" ? (
+                        {authData.user?.role !== "Admin" ? (
                             <>
                                 <li>
                                     <Link to="/">Home</Link>
@@ -50,57 +49,64 @@ const Navbar = () => {
                                 <li>
                                     <Link to="/home">Dashboard</Link>
                                 </li>
-                                <li>
-                                    <Link to="/create">Create Garage</Link>
-                                </li>
-                                <li>
-                                    <Link to="/create/charger">
-                                        Create Electric Charger
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link to="/favorites">Favorites</Link>
-                                </li>
-                                <li>
-                                    <Link to="/reservations">Reservations</Link>
-                                </li>
-                                
-                                {authData.user?.role === "Owner" && (
-                                    <>
+
+                                <NavDropdown label="Services">
                                     <li>
-                                    <Link to="/garages">My Garages</Link>
-                                </li>
-                                <li>
-                                    <Link to="/chargers">My E Chargers</Link>
-                                </li>
-                                    </>
-                        )}
+                                        <Link to="/create">Create Garage</Link>
+                                    </li>
+                                    <li>
+                                        <Link to="/create/charger">
+                                            Create Electric Charger
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link to="/reservations">
+                                            Reservations
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link to="/favorites">Favorites</Link>
+                                    </li>
+                                </NavDropdown>
+
+                                {authData.user?.role === "Owner" && (
+                                    <NavDropdown label="My Business">
+                                        <li>
+                                            <Link to="/garages">
+                                                My Garages
+                                            </Link>
+                                        </li>
+                                        <li>
+                                            <Link to="/chargers">
+                                                My E Chargers
+                                            </Link>
+                                        </li>
+                                    </NavDropdown>
+                                )}
                             </>
                         ) : (
                             <>
-                                {authData.user &&
-                                    authData.user.role === "Admin" && (
-                                        <>
-                                            <li>
-                                                <Link to="/admin">
-                                                    Admin Panel
-                                                </Link>
-                                            </li>
-                                        </>
-                                    )}
+                                {authData.user?.role === "Admin" && (
+                                    <li>
+                                        <Link to="/admin">Admin Panel</Link>
+                                    </li>
+                                )}
                             </>
                         )}
-                        <li>
-                            <Link to="/edit-profile">Edit profile</Link>
-                        </li>
-                        <li>
-                            <button
-                                className={styles.logoutButton}
-                                onClick={handleLogout}
-                            >
-                                Logout
-                            </button>
-                        </li>
+
+                        <NavDropdown label="Account">
+                            <li>
+                                <Link to="/edit-profile">Edit Profile</Link>
+                            </li>
+                            <li>
+                                <button
+                                    className={styles.logoutButton}
+                                    onClick={handleLogout}
+                                >
+                                    Logout
+                                </button>
+                            </li>
+                        </NavDropdown>
                     </>
                 )}
             </ul>

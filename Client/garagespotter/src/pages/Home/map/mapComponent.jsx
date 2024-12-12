@@ -147,7 +147,7 @@ const MapComponent = ({ garageSpots, eChargers, lat, lon }) => {
                         ? [userPosition.lat, userPosition.lng]
                         : [43.162, 20.533]
                 }
-                zoom={14}
+                zoom={7}
                 style={{ height: "100vh", width: "100%" }}
             >
                 <TileLayer
