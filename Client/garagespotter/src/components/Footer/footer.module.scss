@@ -1,0 +1,89 @@
+.footer {
+    background-color: $primary-color;
+    color: #fff;
+    padding: $spacing-medium 0;
+    z-index: $z-index-navbar;
+
+    .footerContent {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 $spacing-medium;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: $spacing-large;
+
+        .footerSection {
+            flex: 1;
+            min-width: 250px;
+
+            h3.logo {
+                font-size: $font-size-large;
+                font-weight: bold;
+                margin-bottom: $spacing-medium;
+            }
+
+            h4 {
+                font-size: $font-size-base;
+                margin-bottom: $spacing-medium;
+                font-weight: bold;
+            }
+
+            p {
+                color: rgba(255, 255, 255, 0.8);
+                margin-bottom: $spacing-medium;
+            }
+
+            ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+
+                li {
+                    margin-bottom: $spacing-small;
+
+                    a {
+                        color: #fff;
+                        text-decoration: none;
+                        font-size: $font-size-base;
+                        transition: color $transition-default;
+
+                        &:hover {
+                            color: $accent-color;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .footerBottom {
+        margin-top: $spacing-large;
+        padding-top: $spacing-medium;
+        text-align: center;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+        p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: $font-size-base;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .footerContent {
+            flex-direction: column;
+            gap: $spacing-large;
+
+            .footerSection {
+                text-align: center;
+                min-width: 100%;
+
+                ul {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                }
+            }
+        }
+    }
+}

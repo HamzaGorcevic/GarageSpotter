@@ -10,6 +10,17 @@ import toast from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import {
+    MapPin,
+    Star,
+    Car,
+    BatteryCharging,
+    DollarSign,
+    Info,
+    Map,
+    Home,
+} from "lucide-react";
+
 const MapSidebar = ({
     isOpen,
     onClose,
@@ -175,45 +186,44 @@ const MapSidebar = ({
                             className={style.addToFavorites}
                             onClick={() => addToFavorites(garageSpot.id)}
                         >
-                            Add to favorites
-                            <FontAwesomeIcon
-                                icon={faStar}
-                                style={{ color: "#FFD43B" }}
-                            />{" "}
+                            Add to favorites{" "}
+                            <Star style={{ color: "#FFD43B" }} />
                         </button>
                         <button
                             className={style.reserveButton}
                             onClick={() => setModalOpen(true)}
                         >
-                            Reserve spot
+                            Reserve spot <Car />
                         </button>
 
-                        <button
-                            className={style.reserveButton}
-                            onClick={() =>
-                                onGoogleMaps(
-                                    garageSpot.latitude,
-                                    garageSpot.longitude
-                                )
-                            }
-                        >
-                            Google maps
-                        </button>
                         <p>
-                            <strong>Address:</strong> {garageSpot?.address}
+                            <strong>
+                                <Home /> Address:
+                            </strong>{" "}
+                            {garageSpot?.address}
                         </p>
                         <p>
-                            <strong>Available:</strong>{" "}
+                            <strong>
+                                <BatteryCharging /> Available:
+                            </strong>{" "}
                             {garageSpot?.isAvailable ? "Yes" : "No"}
                         </p>
                         <p>
-                            <strong>Price:</strong> ${garageSpot?.price}
+                            <strong>
+                                <DollarSign /> Price:
+                            </strong>{" "}
+                            ${garageSpot?.price}
                         </p>
                         <p>
-                            <strong>Distance:</strong> {distance} km
+                            <strong>
+                                <MapPin /> Distance:
+                            </strong>{" "}
+                            {distance} km
                         </p>
                         <p>
-                            <strong>Total Spots:</strong>{" "}
+                            <strong>
+                                <Car /> Total Spots:
+                            </strong>{" "}
                             {garageSpot?.totalSpots.length}
                         </p>
 
@@ -234,35 +244,62 @@ const MapSidebar = ({
                                 )
                             )}
                         </div>
+                        <button
+                            className={style.reserveButton}
+                            style={{ background: "#1a73e8" }}
+                            onClick={() =>
+                                onGoogleMaps(
+                                    garageSpot.latitude,
+                                    garageSpot.longitude
+                                )
+                            }
+                        >
+                            Google maps <Map />
+                        </button>
                     </>
                 ) : electricCharger ? (
                     <>
                         <h2>{electricCharger?.name}</h2>
                         <p>
-                            <strong>Country:</strong>{" "}
+                            <strong>
+                                <Home /> Country:
+                            </strong>{" "}
                             {electricCharger?.countryName}
                         </p>
                         <p>
-                            <strong>Latitude:</strong>{" "}
+                            <strong>
+                                <MapPin /> Latitude:
+                            </strong>{" "}
                             {electricCharger?.latitude}
                         </p>
                         <p>
-                            <strong>Longitude:</strong>{" "}
+                            <strong>
+                                <MapPin /> Longitude:
+                            </strong>{" "}
                             {electricCharger?.longitude}
                         </p>
                         <p>
-                            <strong>Charger Type:</strong>{" "}
+                            <strong>
+                                <BatteryCharging /> Charger Type:
+                            </strong>{" "}
                             {electricCharger?.chargerType}
                         </p>
                         <p>
-                            <strong>Price:</strong> ${electricCharger?.price}
+                            <strong>
+                                <DollarSign /> Price:
+                            </strong>{" "}
+                            ${electricCharger?.price}
                         </p>
                         <p>
-                            <strong>Description:</strong>{" "}
+                            <strong>
+                                <Info /> Description:
+                            </strong>{" "}
                             {electricCharger?.description}
                         </p>
                         <p>
-                            <strong>Available Spots:</strong>{" "}
+                            <strong>
+                                <Car /> Available Spots:
+                            </strong>{" "}
                             {electricCharger?.availableSpots}
                         </p>
                         <button
@@ -274,14 +311,14 @@ const MapSidebar = ({
                                 )
                             }
                         >
-                            Google maps
+                            Google maps <Map />
                         </button>
                     </>
                 ) : (
                     "Wrong path"
                 )}
             </div>
-
+            ;
             {isModalOpen && isGarageSpot && (
                 <ReservationModal
                     onClose={() => setModalOpen(false)}

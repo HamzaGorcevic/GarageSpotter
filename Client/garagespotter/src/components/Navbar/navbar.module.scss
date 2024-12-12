@@ -6,6 +6,7 @@
     background-color: $primary-color;
     color: #fff;
     z-index: $z-index-navbar !important;
+    position: relative;
 
     .logo {
         font-size: $font-size-large;
@@ -17,9 +18,11 @@
         list-style: none;
         margin: 0;
         padding: 0;
+        align-items: center;
 
         li {
             margin: 0 $spacing-medium;
+            position: relative;
 
             a,
             button {
@@ -31,6 +34,7 @@
                 border: none;
                 padding: 0;
                 font-family: $font-family;
+                cursor: pointer;
 
                 &:hover {
                     color: $accent-color;
@@ -39,46 +43,140 @@
         }
     }
 
+    .dropdownContainer {
+        position: relative;
+
+        .dropdownTrigger {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #fff;
+            background: none;
+            border: none;
+            font-size: $font-size-base;
+            cursor: pointer;
+            padding: $spacing-small;
+            transition: color $transition-default;
+
+            &:hover {
+                color: $accent-color;
+            }
+
+            .arrow {
+                font-size: 10px;
+                transition: transform 0.2s ease;
+                
+                &.up {
+                    transform: rotate(180deg);
+                }
+            }
+        }
+
+        .dropdownMenu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: $primary-color;
+            border-radius: 4px;
+            padding: $spacing-small 0;
+            min-width: 200px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: $z-index-navbar + 1;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+
+            &.show {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            li {
+                margin: 0;
+                
+                a,
+                button {
+                    padding: $spacing-small $spacing-medium;
+                    display: block;
+                    width: 100%;
+                    text-align: left;
+
+                    &:hover {
+                        background-color: rgba(255, 255, 255, 0.1);
+                    }
+                }
+            }
+        }
+    }
+
     .hamburger {
-        display: none; // Hide hamburger icon by default
+        display: none;
         flex-direction: column;
         cursor: pointer;
+        z-index: $z-index-navbar + 2;
 
         .line {
             width: 25px;
             height: 3px;
             background-color: #fff;
             margin: 4px 0;
+            transition: all 0.3s ease;
         }
     }
 
     @media (max-width: 768px) {
         .navLinks {
-            display: none; // Hide links on mobile by default
+            display: none;
             flex-direction: column;
             width: 100%;
             background-color: $primary-color;
             position: absolute;
-            top: 60px; // Adjust based on navbar height
+            top: 100%;
             left: 0;
-            z-index: $z-index-navbar;
+            padding: $spacing-medium 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+            &.active {
+                display: flex;
+            }
 
             li {
                 margin: $spacing-small 0;
+                width: 100%;
+                text-align: center;
+            }
 
-                a,
-                button {
-                    padding: $spacing-small;
-                    display: block;
+            .dropdownContainer {
+                width: 100%;
+
+                .dropdownTrigger {
+                    width: 100%;
+                    justify-content: center;
+                    padding: $spacing-small $spacing-medium;
+                }
+
+                .dropdownMenu {
+                    position: static;
+                    box-shadow: none;
+                    width: 100%;
+                    background-color: rgba(255, 255, 255, 0.1);
+                    display: none;
+                    opacity: 1;
+                    visibility: visible;
+
+                    &.show {
+                        display: block;
+                    }
+                }
+
+                &.open {
+                    background-color: rgba(255, 255, 255, 0.1);
                 }
             }
         }
 
         .hamburger {
-            display: flex; // Show hamburger icon on mobile
+            display: flex;
         }
     }
-}
-.active {
-    display: flex !important; // Override display: none on mobile when active
 }
