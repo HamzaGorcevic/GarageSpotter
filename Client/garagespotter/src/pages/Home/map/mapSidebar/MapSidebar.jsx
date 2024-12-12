@@ -148,47 +148,53 @@ const MapSidebar = ({
                 {isGarageSpot ? (
                     <>
                         {garageSpot?.garageImages?.length > 0 && (
-                            <div className={style.imageSlider}>
-                                <button
-                                    className={`${style.arrow} ${style.arrowLeft}`}
-                                    onClick={() => handleSliderMovement("left")}
-                                >
-                                    <FontAwesomeIcon icon={faArrowLeft} />
-                                </button>
-                                <div
-                                    className={style.imageContainer}
-                                    ref={sliderRef}
-                                >
-                                    {garageSpot.garageImages.map(
-                                        (image, index) => (
-                                            <img
-                                                key={index}
-                                                src={image}
-                                                alt={`Garage Image ${
-                                                    index + 1
-                                                }`}
-                                            />
-                                        )
-                                    )}
+                            <div style={{ position: "relative" }}>
+                                <div className={style.imageSlider}>
+                                    <button
+                                        className={`${style.arrow} ${style.arrowLeft}`}
+                                        onClick={() =>
+                                            handleSliderMovement("left")
+                                        }
+                                    >
+                                        <FontAwesomeIcon icon={faArrowLeft} />
+                                    </button>
+                                    <div
+                                        className={style.imageContainer}
+                                        ref={sliderRef}
+                                    >
+                                        {garageSpot.garageImages.map(
+                                            (image, index) => (
+                                                <img
+                                                    key={index}
+                                                    src={image}
+                                                    alt={`Garage Image ${
+                                                        index + 1
+                                                    }`}
+                                                />
+                                            )
+                                        )}
+                                    </div>
+                                    <button
+                                        className={`${style.arrow} ${style.arrowRight}`}
+                                        onClick={() =>
+                                            handleSliderMovement("right")
+                                        }
+                                    >
+                                        <FontAwesomeIcon icon={faArrowRight} />
+                                    </button>
                                 </div>
                                 <button
-                                    className={`${style.arrow} ${style.arrowRight}`}
+                                    className={style.addToFavorites}
                                     onClick={() =>
-                                        handleSliderMovement("right")
+                                        addToFavorites(garageSpot.id)
                                     }
                                 >
-                                    <FontAwesomeIcon icon={faArrowRight} />
+                                    <Star style={{ color: "#FFD43B" }} />
                                 </button>
                             </div>
                         )}
                         <h2>{garageSpot?.locationName}</h2>
-                        <button
-                            className={style.addToFavorites}
-                            onClick={() => addToFavorites(garageSpot.id)}
-                        >
-                            Add to favorites{" "}
-                            <Star style={{ color: "#FFD43B" }} />
-                        </button>
+
                         <button
                             className={style.reserveButton}
                             onClick={() => setModalOpen(true)}
@@ -196,36 +202,38 @@ const MapSidebar = ({
                             Reserve spot <Car />
                         </button>
 
-                        <p>
-                            <strong>
-                                <Home /> Address:
-                            </strong>{" "}
-                            {garageSpot?.address}
-                        </p>
-                        <p>
-                            <strong>
-                                <BatteryCharging /> Available:
-                            </strong>{" "}
-                            {garageSpot?.isAvailable ? "Yes" : "No"}
-                        </p>
-                        <p>
-                            <strong>
-                                <DollarSign /> Price:
-                            </strong>{" "}
-                            ${garageSpot?.price}
-                        </p>
-                        <p>
-                            <strong>
-                                <MapPin /> Distance:
-                            </strong>{" "}
-                            {distance} km
-                        </p>
-                        <p>
-                            <strong>
-                                <Car /> Total Spots:
-                            </strong>{" "}
-                            {garageSpot?.totalSpots.length}
-                        </p>
+                        <div className={style.contentDescription}>
+                            <p>
+                                <strong>
+                                    <Home /> Address:
+                                </strong>{" "}
+                                {garageSpot?.address}
+                            </p>
+                            <p>
+                                <strong>
+                                    <BatteryCharging /> Available:
+                                </strong>{" "}
+                                {garageSpot?.isAvailable ? "Yes" : "No"}
+                            </p>
+                            <p>
+                                <strong>
+                                    <DollarSign /> Price:
+                                </strong>{" "}
+                                ${garageSpot?.price}
+                            </p>
+                            <p>
+                                <strong>
+                                    <MapPin /> Distance:
+                                </strong>{" "}
+                                {distance} km
+                            </p>
+                            <p>
+                                <strong>
+                                    <Car /> Total Spots:
+                                </strong>{" "}
+                                {garageSpot?.totalSpots.length}
+                            </p>
+                        </div>
 
                         <div className={style.containerForSpots}>
                             {garageSpot?.totalSpots?.map((spot, index) =>

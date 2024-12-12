@@ -1,21 +1,31 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import styles from "./createElectricCharger.module.scss";
 import MapConstant from "../Home/map/constants/constantMap";
 import { useParams } from "react-router-dom";
-import { BASE_URL } from "../../config/config";
 import toast from "react-hot-toast";
+import { MapPin, ChevronDown } from "lucide-react";
+import { BASE_URL } from "../../config/config";
+// Charger type options
+const CHARGER_TYPES = [
+    { value: "type-1", label: "Type 1" },
+    { value: "type-2", label: "Type 2" },
+    { value: "chademo", label: "CHAdeMO" },
+    { value: "ccs-combo-1", label: "CCS Combo Type 1" },
+    { value: "ccs-combo-2", label: "CCS Combo Type 2" },
+];
 
 const CreateElectricCharger = () => {
     const [latlng, setLatlng] = useState([43.23132, 21.21321]);
-    const { authData,updateToken} = useContext(AuthContext);
+    const { authData, updateToken } = useContext(AuthContext);
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
     const [isUpdateMode, setIsUpdateMode] = useState(false);
+    const [error, setError] = useState({});
     const [formData, setFormData] = useState({
         name: "",
-        latitude: "",
-        longitude: "",
+        latitude: latlng[0],
+        longitude: latlng[1],
         verificationDocument: null,
         countryName: "",
         description: "",
@@ -23,27 +33,18 @@ const CreateElectricCharger = () => {
         price: "",
         chargerType: "",
     });
-    const [error, setError] = useState({});
 
-    const scrollDown = () => {
-        window.scrollTo({
-            top: 900,
-            behavior: "smooth",
-        });
-    };
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-        setError((prevError) => ({ ...prevError, [name]: "" })); // Clear error when user changes input
-    };
+    useEffect(() => {
+        if (id && authData.token) {
+            setIsUpdateMode(true);
+            fetchChargerData();
+        }
+    }, [id, authData]);
 
-    const fetchGarageSpot = async (garageSpotId) => {
+    const fetchChargerData = async () => {
         try {
             const response = await fetch(
-                `${BASE_URL}/ElectricCharger/getElectricChargerById?id=${garageSpotId}`,
+                `${BASE_URL}/ElectricCharger/getElectricChargerById?id=${id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${authData.token}`,
@@ -51,154 +52,185 @@ const CreateElectricCharger = () => {
                 }
             );
             if (response.ok) {
-                let data = await response.json();
-                data = data.value;
+                const data = await response.json();
                 setFormData({
-                    name: data.name,
-                    latitude: data.latitude,
-                    longitude: data.longitude,
-                    countryName: data.countryName,
-                    verificationDocument: data.verificationDocument,
-                    description: data.description || "",
-                    availableSpots: data.availableSpots || "",
-                    price: data.price || "",
-                    chargerType: data.chargerType || "",
+                    name: data.value.name,
+                    latitude: data.value.latitude,
+                    longitude: data.value.longitude,
+                    countryName: data.value.countryName,
+                    verificationDocument: data.value.verificationDocument,
+                    description: data.value.description || "",
+                    availableSpots: data.value.availableSpots || "",
+                    price: data.value.price || "",
+                    chargerType: data.value.chargerType || "",
                 });
             } else {
-                setError({ general: "Failed to fetch garage spot details." });
+                setError({ general: "Failed to fetch charger details" });
+                toast.error("Failed to fetch charger details");
             }
         } catch (error) {
-            setError({ general: "Error: " + error.message });
+            setError({ general: "Error fetching charger details" });
+            toast.error("Error fetching charger details");
         }
     };
 
     useEffect(() => {
-        if (id && authData.token) {
-            setIsUpdateMode(true);
-            fetchGarageSpot(id);
-        }
-    }, [id, authData]);
-
-    useEffect(() => {
-        setFormData((prevState) => ({
-            ...prevState,
+        setFormData((prev) => ({
+            ...prev,
             latitude: latlng[0],
             longitude: latlng[1],
         }));
-        getcountryNameFromCoordinates(latlng[0], latlng[1]);
+        updateCountryName();
     }, [latlng]);
 
-    const getcountryNameFromCoordinates = async (latitude, longitude) => {
+    const updateCountryName = async () => {
         try {
             const response = await fetch(
-                `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+                `https://nominatim.openstreetmap.org/reverse?lat=${latlng[0]}&lon=${latlng[1]}&format=json`
             );
-            const res = await response.json();
-            const countryName = res.address.country || "Unknown country";
-            setError((prevError) => ({ ...prevError, countryName: "" }));
-            setFormData((prevState) => ({
-                ...prevState,
-                countryName,
-            }));
+            const data = await response.json();
+            const countryName = data.address.country || "Unknown country";
+            setFormData((prev) => ({ ...prev, countryName }));
         } catch (error) {
-            console.error("Error fetching country name:", error);
-            setError({ general: "Failed to retrieve country name" });
-            toast.error("Failed to retrieve country name!");
+            toast.error("Failed to retrieve country name");
         }
     };
 
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+        setError((prev) => ({ ...prev, [name]: "" }));
+    };
+
     const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        setFormData((prevData) => ({
-            ...prevData,
-            verificationDocument: file,
-        }));
-        setError((prevError) => ({ ...prevError, verificationDocument: "" }));
+        const file = e.target.files?.[0];
+        if (file) {
+            setFormData((prev) => ({
+                ...prev,
+                verificationDocument: file,
+            }));
+        }
+    };
+
+    const validateForm = () => {
+        const errors = {};
+        const requiredFields = ["name", "availableSpots", "chargerType"];
+
+        requiredFields.forEach((field) => {
+            if (!formData[field]) {
+                errors[field] = "This field is required";
+            }
+        });
+
+        if (formData.availableSpots && Number(formData.availableSpots) < 1) {
+            errors.availableSpots = "Must have at least 1 available spot";
+        }
+
+        if (formData.price && Number(formData.price) < 0) {
+            errors.price = "Price cannot be negative";
+        }
+
+        setError(errors);
+        return Object.keys(errors).length === 0;
+    };
+
+    const scrollDown = () => {
+        window.scrollTo({ top: 900, behavior: "smooth" });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        const requiredFields = [
-            "name",
-            "latitude",
-            "longitude",
-            "availableSpots",
-            "chargerType",
-        ];
-        const newErrors = {};
-
-        requiredFields.forEach((field) => {
-            if (!formData[field]) {
-                newErrors[field] = "This field is required.";
-            }
-        });
-
-        if (Object.keys(newErrors).length > 0) {
-            setError(newErrors);
-            toast.error("Please fill in all required fields.");
+        if (!validateForm()) {
+            toast.error("Please fill in all required fields correctly");
             return;
         }
 
-        const formDataToSend = new FormData();
-        formDataToSend.append(
-            "verificationDocument",
-            formData.verificationDocument
-        );  
-        formDataToSend.append("name", formData.name);
-        formDataToSend.append("latitude", formData.latitude);
-        formDataToSend.append("longitude", formData.longitude);
-        formDataToSend.append("description", formData.description);
-        formDataToSend.append("availableSpots", formData.availableSpots);
-        formDataToSend.append("countryName", formData.countryName);
-        formDataToSend.append("price", formData.price);
-        formDataToSend.append("chargerType", formData.chargerType);
-
-        const apiUrl = isUpdateMode
-            ? `/ElectricCharger/updateElectricCharger?electricChargerId=${id}`
-            : `/ElectricCharger/createElectricCharger`;
-
-        const httpMethod = isUpdateMode ? "PUT" : "POST";
-
-        const successMessage = isUpdateMode
-            ? "Electric charger updated successfully!"
-            : "Electric charger created successfully!";
-
-        const errorMessage = isUpdateMode
-            ? "Error updating electric charger:"
-            : "Error creating electric charger:";
-
         try {
             setLoading(true);
+            const formDataToSend = new FormData();
+            Object.entries(formData).forEach(([key, value]) => {
+                if (value !== null) {
+                    formDataToSend.append(key, value);
+                }
+            });
 
-            const response = await fetch(BASE_URL + apiUrl, {
-                method: httpMethod,
+            const url = isUpdateMode
+                ? `${BASE_URL}/ElectricCharger/updateElectricCharger?electricChargerId=${id}`
+                : `${BASE_URL}/ElectricCharger/createElectricCharger`;
+
+            const response = await fetch(url, {
+                method: isUpdateMode ? "PUT" : "POST",
                 headers: {
                     Authorization: `Bearer ${authData.token}`,
                 },
                 body: formDataToSend,
             });
 
-            const res = await response.json();
-            setLoading(false);
-            if (res.success) {
-                toast.success(successMessage);
-                if(res.value.length > 1){
-                    updateToken(res.value)
+            const result = await response.json();
+
+            if (result.success) {
+                toast.success(
+                    isUpdateMode
+                        ? "Electric charger updated successfully!"
+                        : "Electric charger created successfully!"
+                );
+                if (result.value?.length > 1) {
+                    updateToken(result.value);
                 }
             } else {
-                console.error(errorMessage, res.message);
-                toast.error(`${errorMessage} ${res.message}`);
+                throw new Error(result.message || "Operation failed");
             }
         } catch (error) {
-            console.error("Request failed:", error);
-            toast.error("Request failed: " + error.message);
+            toast.error(error.message || "Failed to process request");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className={styles.createElectricChargerContainer}>
-            <h2 className={styles.title}>Create Electric Charger</h2>
+            <h2 className={styles.title}>
+                {isUpdateMode
+                    ? "Update Electric Charger"
+                    : "Create Electric Charger"}
+            </h2>
+
+            <div className={styles.mapSection}>
+                <div className={styles.mapInstructions}>
+                    <h3>
+                        <MapPin size={20} />
+                        Select Location
+                    </h3>
+                    <p>
+                        Click anywhere on the map to select your charger
+                        location. This will automatically update the country and
+                        coordinates.
+                    </p>
+                </div>
+
+                <MapConstant setLatlng={setLatlng} />
+
+                <div className={styles.locationInfo}>
+                    <div className={styles.infoItem}>
+                        <label>Country</label>
+                        <span>{formData.countryName || "Not selected"}</span>
+                    </div>
+                    <div className={styles.infoItem}>
+                        <label>Latitude</label>
+                        <span>{Number(formData.latitude).toFixed(6)}</span>
+                    </div>
+                    <div className={styles.infoItem}>
+                        <label>Longitude</label>
+                        <span>{Number(formData.longitude).toFixed(6)}</span>
+                    </div>
+                </div>
+
+                <ChevronDown
+                    className={styles.scrollArrow}
+                    onClick={scrollDown}
+                />
+            </div>
+
             <form className={styles.form} onSubmit={handleSubmit}>
                 <div className={styles.formGroup}>
                     <label htmlFor="name">Name:</label>
@@ -208,50 +240,13 @@ const CreateElectricCharger = () => {
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
+                        placeholder="Enter charger name"
                     />
                     {error.name && (
                         <p className={styles.errorMessage}>{error.name}</p>
                     )}
                 </div>
-                <div className={styles.formGroup} onClick={scrollDown}>
-                    <label htmlFor="countryName">Country Name:</label>
-                    <input
-                        type="text"
-                        id="countryName"
-                        name="countryName"
-                        value={formData.countryName}
-                        onChange={handleChange}
-                        disabled
-                    />
-                </div>
-                <div className={styles.formGroup} onClick={scrollDown}>
-                    <label htmlFor="latitude">Latitude:</label>
-                    <input
-                        disabled
-                        type="text"
-                        id="latitude"
-                        name="latitude"
-                        value={formData.latitude}
-                        onChange={handleChange}
-                    />
-                    {error.latitude && (
-                        <p className={styles.errorMessage}>{error.latitude}</p>
-                    )}
-                </div>
-                <div className={styles.formGroup} onClick={scrollDown}>
-                    <label htmlFor="longitude">Longitude:</label>
-                    <input
-                        disabled
-                        type="text"
-                        id="longitude"
-                        name="longitude"
-                        value={formData.longitude}
-                        onChange={handleChange}
-                    />
-                    {error.longitude && (
-                        <p className={styles.errorMessage}>{error.longitude}</p>
-                    )}
-                </div>
+
                 <div className={styles.formGroup}>
                     <label htmlFor="description">Description:</label>
                     <input
@@ -259,28 +254,36 @@ const CreateElectricCharger = () => {
                         name="description"
                         value={formData.description}
                         onChange={handleChange}
+                        placeholder="Describe your charging station"
                     />
                 </div>
+
                 <div className={styles.formGroup}>
                     <label htmlFor="price">Price:</label>
                     <input
                         type="number"
-                        min={1}
                         id="price"
                         name="price"
                         value={formData.price}
                         onChange={handleChange}
+                        min="0"
+                        placeholder="Enter price per charge"
                     />
+                    {error.price && (
+                        <p className={styles.errorMessage}>{error.price}</p>
+                    )}
                 </div>
+
                 <div className={styles.formGroup}>
                     <label htmlFor="availableSpots">Available Spots:</label>
                     <input
                         type="number"
-                        min={1}
                         id="availableSpots"
                         name="availableSpots"
                         value={formData.availableSpots}
                         onChange={handleChange}
+                        min="1"
+                        placeholder="Number of charging spots"
                     />
                     {error.availableSpots && (
                         <p className={styles.errorMessage}>
@@ -298,6 +301,7 @@ const CreateElectricCharger = () => {
                         id="verificationDocument"
                         name="verificationDocument"
                         onChange={handleFileChange}
+                        accept="image/*,.pdf"
                     />
                 </div>
 
@@ -310,11 +314,11 @@ const CreateElectricCharger = () => {
                         onChange={handleChange}
                     >
                         <option value="">Select a charger type</option>
-                        <option value="type-1">Type 1</option>
-                        <option value="type-2">Type 2</option>
-                        <option value="chademo">CHAdeMO</option>
-                        <option value="ccs-combo-1">CCS Combo Type 1</option>
-                        <option value="ccs-combo-2">CCS Combo Type 2</option>
+                        {CHARGER_TYPES.map((type) => (
+                            <option key={type.value} value={type.value}>
+                                {type.label}
+                            </option>
+                        ))}
                     </select>
                     {error.chargerType && (
                         <p className={styles.errorMessage}>
@@ -324,21 +328,22 @@ const CreateElectricCharger = () => {
                 </div>
 
                 <button
-                    className={styles.submitButton}
                     type="submit"
+                    className={styles.submitButton}
                     disabled={loading}
                 >
-                    {loading
-                        ? "Loading..."
-                        : isUpdateMode
-                        ? "Update Charger"
-                        : "Create Charger"}
+                    {loading ? (
+                        <>
+                            <div className={styles.loadingSpinner} />
+                            <span>Saving...</span>
+                        </>
+                    ) : isUpdateMode ? (
+                        "Update Charger"
+                    ) : (
+                        "Create Charger"
+                    )}
                 </button>
-                {error.general && (
-                    <p className={styles.errorMessage}>{error.general}</p>
-                )}
             </form>
-            <MapConstant setLatlng={setLatlng} />
         </div>
     );
 };

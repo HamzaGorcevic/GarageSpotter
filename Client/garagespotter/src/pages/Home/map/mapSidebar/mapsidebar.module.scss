@@ -28,27 +28,32 @@
         justify-content: start;
         align-items: center;
         flex-wrap: wrap;
+        img{
+            height: 50%;
+        }
     }
     &.open {
         left: 436px;
     }
     .addToFavorites {
-        align-self: flex-end;
         cursor: pointer;
+        z-index: 1000;
         padding: $spacing-medium;
         font-size: $font-size-large;
-        margin-left: 229px;
+        bottom: 0;
+        transform: translateY(100%);
+        right: 0px;
+        position: absolute;
         border: none;
-        background-color: $primary-color; // Updated background color
         color: #fff; // Text color for better contrast
         transition: all 0.2s ease;
         font-size: 13px !important;
         font-weight: bold;
+        background-color: transparent;
 
     
         &:hover {
             background-color: darken($color: $primary-color, $amount: 15); // Darker shade on hover for emphasis
-            transform: scale(1.05); // Slight zoom effect on hover
         }
     
         .icon {
@@ -78,12 +83,32 @@
         overflow-y: auto;
         background-color:rgba(26, 115, 232, 0.05);
 
-          /* Hide the scrollbar */
-    -ms-overflow-style: none; /* Internet Explorer 10+ */
-    scrollbar-width: none; /* Firefox */
-    ::-webkit-scrollbar {
-        display: none; /* Chrome, Safari, and Opera */
-    }
+
+            /* Hide the scrollbar */
+        -ms-overflow-style: none; /* Internet Explorer 10+ */
+        scrollbar-width: none; /* Firefox */
+        ::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, and Opera */
+        }
+        .contentDescription{
+            width: 100%;
+            display: grid;
+            grid-template-columns: auto auto ;
+            p{
+                align-items: center;
+                justify-content: space-between;
+                color: rgb(40, 40, 40);
+                strong{
+                    font-weight: normal;
+                    svg{
+                        color: $primary-color;
+
+                    }
+                }
+    
+            }
+        }
+     
         .imageSlider {
             display: flex;
             position: relative;
@@ -91,6 +116,7 @@
             overflow-x: hidden;
         
             .imageContainer {
+                position: relative;
                 display: flex;
                 scroll-snap-type: x mandatory;
                 overflow-x: auto; // Horizontal scrolling for the images

@@ -56,7 +56,7 @@ const MapConstant = ({ setLatlng }) => {
         useMapEvents({
             click(e) {
                 window.scrollTo({
-                    top: 50,
+                    top: 900,
                     behavior: "smooth",
                 });
                 const { lat, lng } = e.latlng;
