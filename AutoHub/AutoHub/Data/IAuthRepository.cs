@@ -12,5 +12,6 @@ namespace AutoHub.Data
         public Task<ServiceResponse<User>> EditUser(UpdateUserDto updateUserDto);
         public Task<ServiceResponse<string>> DeleteProfile(string password);
         public string CreateToken(string name, UserRole role, int userId);
+        public Task<ServiceResponse<string>> LoginWithGoogle(string googleToken);
     }
 }

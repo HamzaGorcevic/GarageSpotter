@@ -1,5 +1,4 @@
-﻿
-using AutoHub.Data;
+﻿using AutoHub.Data;
 using AutoHub.Dtos;
 using AutoHub.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -8,31 +7,50 @@ namespace AutoHub.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class AuthController
+    public class AuthController : ControllerBase
     {
+        private readonly IAuthRepository _authRepository;
 
-        IAuthRepository _authRepository;
-        public AuthController(IAuthRepository authRepository) {
+        public AuthController(IAuthRepository authRepository)
+        {
             _authRepository = authRepository;
-        
         }
 
         [HttpPost("login")]
-        public async Task<ServiceResponse<string>> Login(LoginDto loginDto)
+        public async Task<ActionResult<ServiceResponse<string>>> Login(LoginDto loginDto)
         {
             var response = await _authRepository.Login(loginDto);
-            return response;
-
+            if (!response.Success)
+                return BadRequest(response);
+            return Ok(response);
         }
 
         [HttpPost("register")]
-
-        public async Task<ServiceResponse<string>> Register(RegisterDto registerDto)
+        public async Task<ActionResult<ServiceResponse<string>>> Register(RegisterDto registerDto)
         {
-            var response = await (_authRepository.Register(registerDto));
-            return response;    
+            var response = await _authRepository.Register(registerDto);
+            if (!response.Success)
+                return BadRequest(response);
+            return Ok(response);
         }
 
+        [HttpPost("google-login")]
+        public async Task<ActionResult<ServiceResponse<string>>> GoogleLogin([FromBody] string googleToken)
+        {
+            var response = await _authRepository.LoginWithGoogle(googleToken);
+            if (!response.Success)
+                return BadRequest(response);
+            return Ok(response);
+        }
 
+        [HttpPost("google-register")]
+        public async Task<ActionResult<ServiceResponse<string>>> GoogleRegister(RegisterDto registerDto)
+        {
+            registerDto.IsGoogleLogin = true;
+            var response = await _authRepository.Register(registerDto);
+            if (!response.Success)
+                return BadRequest(response);
+            return Ok(response);
+        }
     }
 }

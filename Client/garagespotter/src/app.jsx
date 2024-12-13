@@ -18,86 +18,105 @@ import MyElectricChargers from "./pages/MyElectricChargers/myElectricChargers.js
 import Favorites from "./pages/Favorites/favorites.jsx";
 import Navbar from "./components/Navbar/Navbar.jsx";
 import Footer from "./components/Footer/footer.jsx";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 function App() {
     return (
-        <Router>
-            <Toaster
-                position="top-center"
-                reverseOrder={false}
-                gutter={8}
-                containerClassName=""
-                containerStyle={{}}
-                toastOptions={{
-                    className: "",
-                    duration: 5000,
-                    style: {
-                        background: "#363636",
-                        color: "#fff",
-                        zIndex: 9999,
-                    },
-
-                    success: {
-                        duration: 3000,
-                        theme: {
-                            primary: "#1a73e8",
-                            secondary: "#dadce0",
+        <GoogleOAuthProvider
+            clientId={
+                "338263297768-ch4slvrh0pjnrsb3enbg0ifasdnmhmun.apps.googleusercontent.com"
+            }
+        >
+            <Router>
+                <Toaster
+                    position="top-center"
+                    reverseOrder={false}
+                    gutter={8}
+                    containerClassName=""
+                    containerStyle={{}}
+                    toastOptions={{
+                        className: "",
+                        duration: 5000,
+                        style: {
+                            background: "#363636",
+                            color: "#fff",
+                            zIndex: 9999,
                         },
-                    },
-                }}
-            />
-            <AuthProvider>
-                <Navbar />
-                <Routes>
-                    <Route
-                        element={
-                            <ProtectedRoute allowedRoles={["User", "Owner"]} />
-                        }
-                    >
-                        <Route path="/" element={<LandingPage />} />
-                        <Route path="/home" element={<Home />} />
-                        <Route path="/create" element={<GarageForm />} />
-                        <Route path="/favorites" element={<Favorites />} />
-                        <Route
-                            path="/create/charger"
-                            element={<CreateElectricCharger />}
-                        />
 
-                        <Route path="/update/:id" element={<GarageForm />} />
+                        success: {
+                            duration: 3000,
+                            theme: {
+                                primary: "#1a73e8",
+                                secondary: "#dadce0",
+                            },
+                        },
+                    }}
+                />
+                <AuthProvider>
+                    <Navbar />
+                    <Routes>
                         <Route
-                            path="/update/charger/:id"
-                            element={<CreateElectricCharger />}
-                        />
+                            element={
+                                <ProtectedRoute
+                                    allowedRoles={["User", "Owner"]}
+                                />
+                            }
+                        >
+                            <Route path="/" element={<LandingPage />} />
+                            <Route path="/home" element={<Home />} />
+                            <Route path="/create" element={<GarageForm />} />
+                            <Route path="/favorites" element={<Favorites />} />
+                            <Route
+                                path="/create/charger"
+                                element={<CreateElectricCharger />}
+                            />
+
+                            <Route
+                                path="/update/:id"
+                                element={<GarageForm />}
+                            />
+                            <Route
+                                path="/update/charger/:id"
+                                element={<CreateElectricCharger />}
+                            />
+                            <Route
+                                path="/reservations"
+                                element={<Reservations />}
+                            />
+                        </Route>
+
                         <Route
-                            path="/reservations"
-                            element={<Reservations />}
-                        />
-                    </Route>
+                            element={
+                                <ProtectedRoute allowedRoles={["Owner"]} />
+                            }
+                        >
+                            <Route path="/garages" element={<MyGarages />} />
+                            <Route
+                                path="/chargers"
+                                element={<MyElectricChargers />}
+                            />
+                        </Route>
 
-                    <Route
-                        element={<ProtectedRoute allowedRoles={["Owner"]} />}
-                    >
-                        <Route path="/garages" element={<MyGarages />} />
                         <Route
-                            path="/chargers"
-                            element={<MyElectricChargers />}
+                            element={
+                                <ProtectedRoute allowedRoles={["Admin"]} />
+                            }
+                        >
+                            <Route path="/admin" element={<Admin />} />
+                        </Route>
+
+                        <Route path="/edit-profile" element={<EditProfile />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route
+                            path="/access-denied"
+                            element={<AccessDenied />}
                         />
-                    </Route>
-
-                    <Route
-                        element={<ProtectedRoute allowedRoles={["Admin"]} />}
-                    >
-                        <Route path="/admin" element={<Admin />} />
-                    </Route>
-
-                    <Route path="/edit-profile" element={<EditProfile />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/access-denied" element={<AccessDenied />} />
-                    <Route path="/*" element={<NotFound />} />
-                </Routes>
-                <Footer />
-            </AuthProvider>
-        </Router>
+                        <Route path="/*" element={<NotFound />} />
+                    </Routes>
+                    <Footer />
+                </AuthProvider>
+            </Router>
+        </GoogleOAuthProvider>
     );
 }
 
