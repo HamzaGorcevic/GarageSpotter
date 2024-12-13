@@ -145,13 +145,13 @@ namespace AutoHub.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ReservationEnd")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("ReservationStart")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("ReservationStarted")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("SingleSpotId")
                         .HasColumnType("integer");
@@ -201,6 +201,9 @@ namespace AutoHub.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("GoogleId")
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
