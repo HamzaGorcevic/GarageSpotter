@@ -10,6 +10,7 @@ namespace AutoHub.Models
         public byte[]? PasswordHash { get; set; }
         public byte[]? PasswordSalt { get; set; }
         public UserRole Role { get; set; }
+        public string? GoogleId { get; set; }
 
         public List<GarageSpot>? GarageSpots
         {

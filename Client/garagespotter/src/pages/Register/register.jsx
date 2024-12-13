@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
 import styles from "./register.module.scss";
 import { BASE_URL } from "../../config/config";
 import toast from "react-hot-toast";
@@ -17,59 +18,58 @@ const Register = () => {
         password: "",
     });
 
-    const [loading, setloading] = useState(false);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setForm({ ...form, [name]: value });
-
         setErrors({ ...errors, [name]: "" });
     };
 
     const validateForm = () => {
         const newErrors = {};
-        console.log(form);
+
         if (!/^[a-zA-Z0-9]{3,}$/.test(form.name)) {
-            newErrors.name = "Username must be at least 3 characters and alphanumeric.";
+            newErrors.name =
+                "Username must be at least 3 characters and alphanumeric.";
         }
 
-        if (
-            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)
-        ) {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
             newErrors.email = "Please enter a valid email address.";
         }
 
         if (form.password.length < 8) {
             newErrors.password = "Password must be at least 8 characters long.";
         }
-        console.log("nErrors:",newErrors);
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("login");
-        // Validate form inputs
+
         if (!validateForm()) {
-            console.log(e);
             return;
         }
 
-        setloading(true);
+        setLoading(true);
 
         try {
-            const response = await fetch(`${BASE_URL}/Auth/Register`, {
+            const response = await fetch(`${BASE_URL}/Auth/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(form),
+                body: JSON.stringify({
+                    ...form,
+                    isGoogleLogin: false,
+                }),
             });
 
             const res = await response.json();
-            setloading(false);
+            setLoading(false);
 
             if (res.success) {
                 toast.success(
@@ -77,18 +77,52 @@ const Register = () => {
                 );
                 navigate("/login");
             } else {
-                const errorMessage =
-                    res.message || "Registration failed. Please try again.";
-                toast.error(errorMessage);
+                toast.error(
+                    res.message || "Registration failed. Please try again."
+                );
             }
         } catch (error) {
-            setloading(false);
+            setLoading(false);
             toast.error(
                 "An error occurred during registration. Please try again."
             );
             console.error("Registration error:", error);
         }
     };
+
+    const googleRegister = useGoogleLogin({
+        onSuccess: async (response) => {
+            try {
+                const res = await fetch(`${BASE_URL}/Auth/register`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        isGoogleLogin: true,
+                        googleToken: response.access_token,
+                    }),
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    toast.success("Successfully registered with Google!");
+                    navigate("/login");
+                } else {
+                    toast.error(
+                        data.message || "Failed to register with Google"
+                    );
+                }
+            } catch (error) {
+                toast.error("An error occurred during Google registration");
+                console.error(error);
+            }
+        },
+        onError: () => {
+            toast.error("Google registration failed");
+        },
+    });
 
     return (
         <div className={styles.registerContainer}>
@@ -104,7 +138,9 @@ const Register = () => {
                         onChange={handleChange}
                         required
                     />
-                    {errors.name && <p className={styles.error}>{errors.name}</p>}
+                    {errors.name && (
+                        <p className={styles.error}>{errors.name}</p>
+                    )}
                 </div>
                 <div className={styles.formGroup}>
                     <label htmlFor="email">Email</label>
@@ -116,7 +152,9 @@ const Register = () => {
                         onChange={handleChange}
                         required
                     />
-                    {errors.email && <p className={styles.error}>{errors.email}</p>}
+                    {errors.email && (
+                        <p className={styles.error}>{errors.email}</p>
+                    )}
                 </div>
                 <div className={styles.formGroup}>
                     <label htmlFor="password">Password</label>
@@ -128,7 +166,9 @@ const Register = () => {
                         onChange={handleChange}
                         required
                     />
-                    {errors.password && <p className={styles.error}>{errors.password}</p>}
+                    {errors.password && (
+                        <p className={styles.error}>{errors.password}</p>
+                    )}
                 </div>
                 <button
                     type="submit"
@@ -140,6 +180,14 @@ const Register = () => {
                     ) : (
                         "Register"
                     )}
+                </button>
+
+                <button
+                    type="button"
+                    onClick={() => googleRegister()}
+                    className={`${styles.submitButton} ${styles.googleButton}`}
+                >
+                    Register with Google
                 </button>
             </form>
         </div>

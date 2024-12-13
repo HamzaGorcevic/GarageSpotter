@@ -8,6 +8,7 @@ using Microsoft.OpenApi.Models;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.Google;
 
 namespace AutoHub
 {
@@ -16,9 +17,12 @@ namespace AutoHub
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            // postgresQL issue with date wich are requeired to be in utc format
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
             builder.Configuration["Token"] = Environment.GetEnvironmentVariable("TOKEN");
             builder.Configuration["AzureBlobStorage:ConnectionString"] = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING");
-            builder.Configuration["ConnectionStrings:DefaultConnection"] = Environment.GetEnvironmentVariable("DATABASE"); 
+            //builder.Configuration["ConnectionStrings:DefaultConnection"] = Environment.GetEnvironmentVariable("DATABASE"); 
             // Add services to the container.
 
             builder.Services.AddControllers();
@@ -118,8 +122,15 @@ namespace AutoHub
                         ValidateLifetime = true,
                         RoleClaimType = ClaimTypes.Role
                     };
+                })
+                .AddGoogle(googleOptions =>
+                {
+                    googleOptions.ClientId = "338263297768-ch4slvrh0pjnrsb3enbg0ifasdnmhmun.apps.googleusercontent.com";
+                    googleOptions.ClientSecret = "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T";
+                    googleOptions.CallbackPath = "/auth/google/callback"; 
                 });
-            //
+
+
 
             var app = builder.Build();
 

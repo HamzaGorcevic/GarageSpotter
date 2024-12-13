@@ -1,7 +1,18 @@
-﻿using System;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class LoginDto
+namespace AutoHub.Dtos
 {
-	public string Email { get; set; }
-	public string Password { get; set; }
+    public class LoginDto
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        [Required]
+        public string Password { get; set; } = string.Empty;
+
+        public bool IsGoogleLogin { get; set; } = false;
+
+        public string? GoogleToken { get; set; }
+    }
 }

@@ -4,82 +4,174 @@ using AutoHub.Models.Enums;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
 namespace AutoHub.Data
 {
-    public class AuthRepository :BaseService, IAuthRepository
+    public class AuthRepository : BaseService, IAuthRepository
     {
-        AppDbContext _appDbContext;
-        IConfiguration _configuration;
-        IMapper _mapper;
-        public AuthRepository(AppDbContext appDbContext,IConfiguration configuration,IMapper mapper,IHttpContextAccessor httpContextAccessor):base(httpContextAccessor,appDbContext)
+        private readonly AppDbContext _appDbContext;
+        private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper;
+        private readonly HttpClient _httpClient;
+
+        public AuthRepository(AppDbContext appDbContext, IConfiguration configuration, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+            : base(httpContextAccessor, appDbContext)
         {
             _appDbContext = appDbContext;
-            _configuration = configuration; 
-            _mapper = mapper;   
+            _configuration = configuration;
+            _mapper = mapper;
+            _httpClient = new HttpClient();
+        }
+
+        public async Task<ServiceResponse<string>> LoginWithGoogle(string googleToken)
+        {
+            var response = new ServiceResponse<string>();
+            try
+            {
+                var googleUserInfo = await GetGoogleUserInfo(googleToken);
+                if (googleUserInfo == null)
+                {
+                    response.Success = false;
+                    response.Message = "Invalid Google token";
+                    return response;
+                }
+
+                var email = googleUserInfo["email"].ToString();
+                var name = googleUserInfo["name"].ToString();
+                var googleId = googleUserInfo["sub"].ToString();
+
+                var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+                if (user == null)
+                {
+                    // Auto-register the user if they don't exist
+                    user = new User
+                    {
+                        Email = email,
+                        Name = name,
+                        GoogleId = googleId,
+                        Role = UserRole.User
+                    };
+                    _appDbContext.Users.Add(user);
+                    await _appDbContext.SaveChangesAsync();
+                }
+                else if (string.IsNullOrEmpty(user.GoogleId))
+                {
+                    // Link Google account to existing user
+                    user.GoogleId = googleId;
+                    _appDbContext.Users.Update(user);
+                    await _appDbContext.SaveChangesAsync();
+                }
+
+                response.Success = true;
+                response.Message = "Successfully logged in with Google";
+                response.Value = CreateToken(user.Name, user.Role, user.Id);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = "Error processing Google login";
+                return response;
+            }
+        }
+
+        private async Task<Dictionary<string, object>> GetGoogleUserInfo(string token)
+        {
+            try
+            {
+                var userInfoResponse = await _httpClient.GetAsync($"https://www.googleapis.com/oauth2/v3/userinfo?access_token={token}");
+                if (userInfoResponse.IsSuccessStatusCode)
+                {
+                    var jsonResponse = await userInfoResponse.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonResponse);
+                }
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public async Task<ServiceResponse<string>> Login(LoginDto loginDto)
         {
             var response = new ServiceResponse<string>();
 
-            var user = await _appDbContext.Users.FirstOrDefaultAsync(u=>u.Email == loginDto.Email);
-
-            if (user != null)
+            if (loginDto.IsGoogleLogin.HasValue && loginDto.IsGoogleLogin.Value)
             {
-                if (!VerifyHashPassword(loginDto.Password, user.PasswordHash, user.PasswordSalt))
-                {
-                    response.Success = false;
-                    response.Message = "Wrong password";
-                    return response;
-
-                }
-                response.Success = true;
-                response.Message = "Succesffully logged in";
-                response.Value = CreateToken(user.Name, user.Role,user.Id);
-                return response;
-
-                
-                
+                return await LoginWithGoogle(loginDto.GoogleToken);
             }
-            response.Success = false;
-            response.Message = "That user doesnt exist";
+
+            var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Email == loginDto.Email);
+            if (user == null)
+            {
+                response.Success = false;
+                response.Message = "User not found";
+                return response;
+            }
+
+            if (!VerifyHashPassword(loginDto.Password, user.PasswordHash, user.PasswordSalt))
+            {
+                response.Success = false;
+                response.Message = "Wrong password";
+                return response;
+            }
+
+            response.Success = true;
+            response.Message = "Successfully logged in";
+            response.Value = CreateToken(user.Name, user.Role, user.Id);
             return response;
-
-
         }
 
         public async Task<ServiceResponse<string>> Register(RegisterDto registerDto)
         {
-            var userExists = await _appDbContext.Users.AnyAsync(u=>u.Email == registerDto.Email);
-
             var response = new ServiceResponse<string>();
-            if (!userExists)
-            {
-                var newUser = _mapper.Map<User>(registerDto);
-                newUser.Role = UserRole.User;
-                CreateHashPassword(registerDto.Password, out byte[]passwordHash,out byte[] passwordSalt);
+            var userExists = await _appDbContext.Users.AnyAsync(u => u.Email == registerDto.Email);
 
+            if (userExists)
+            {
+                response.Success = false;
+                response.Message = "User with that email already exists";
+                return response;
+            }
+
+            var newUser = _mapper.Map<User>(registerDto);
+            newUser.Role = UserRole.User;
+
+            if (registerDto.IsGoogleLogin.HasValue && registerDto.IsGoogleLogin.Value)
+            {
+                var googleUserInfo = await GetGoogleUserInfo(registerDto.GoogleToken);
+                if (googleUserInfo == null)
+                {
+                    response.Success = false;
+                    response.Message = "Invalid Google token";
+                    return response;
+                }
+
+                newUser.GoogleId = googleUserInfo["sub"].ToString();
+                newUser.Name = googleUserInfo["name"].ToString();
+            }
+            else
+            {
+                CreateHashPassword(registerDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
                 newUser.PasswordHash = passwordHash;
                 newUser.PasswordSalt = passwordSalt;
-                _appDbContext.Users.Add(newUser);
-
-                _appDbContext.SaveChanges();
-
-                response.Success = true;
-                response.Message = "Succesfully adedd";
-                response.Value = "200";
-                return response;
-
             }
-            response.Success = false;
-            response.Message = "User with that email does already  exist";
+
+            _appDbContext.Users.Add(newUser);
+            await _appDbContext.SaveChangesAsync();
+
+            response.Success = true;
+            response.Message = "Successfully registered";
+            response.Value = CreateToken(newUser.Name, newUser.Role, newUser.Id);
             return response;
         }
-        public async Task<ServiceResponse<string>> ChangePassword( ChangePasswordDto changePasswordDto)
+
+        public async Task<ServiceResponse<string>> ChangePassword(ChangePasswordDto changePasswordDto)
         {
             var response = new ServiceResponse<string>();
             var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Id == GetUserId());
@@ -110,10 +202,11 @@ namespace AutoHub.Data
             response.Value = "200";
             return response;
         }
-        public async Task<ServiceResponse<User>> EditUser( UpdateUserDto updateUserDto)
+
+        public async Task<ServiceResponse<User>> EditUser(UpdateUserDto updateUserDto)
         {
             var response = new ServiceResponse<User>();
-            var user = await _appDbContext.Users.FirstOrDefaultAsync(u=>u.Id==GetUserId());
+            var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Id == GetUserId());
 
             if (user == null)
             {
@@ -133,6 +226,7 @@ namespace AutoHub.Data
             response.Value = user;
             return response;
         }
+
         public async Task<ServiceResponse<string>> DeleteProfile(string password)
         {
             var response = new ServiceResponse<string>();
@@ -158,50 +252,29 @@ namespace AutoHub.Data
             return response;
         }
 
-        public bool VerifyHashPassword(string password, byte[] passwordHash,byte[] passwordSalt) {
-            using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
-            {
-
-                var computedHas = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-
-                for (int i = 0; i < computedHas.Length; i++)
-                {
-                    if(computedHas[i] != passwordHash[i])
-                    {
-                        return false;
-                    }
-                }
-                return true;    
-            }
-        
+        private bool VerifyHashPassword(string password, byte[] passwordHash, byte[] passwordSalt)
+        {
+            using var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt);
+            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+            return computedHash.SequenceEqual(passwordHash);
         }
 
-
-
-
-        public void CreateHashPassword(string password, out byte[] passwordHash,out byte[] passwordSalt)
+        private void CreateHashPassword(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
-            using (var hmc =new System.Security.Cryptography.HMACSHA512()) {
-                passwordSalt = hmc.Key;
-                passwordHash = hmc.ComputeHash(Encoding.UTF8.GetBytes(password));
-            
-            
-            }
+            using var hmac = new System.Security.Cryptography.HMACSHA512();
+            passwordSalt = hmac.Key;
+            passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         }
 
-
-        public string CreateToken(string name, UserRole role,int userId)
+        public string CreateToken(string name, UserRole role, int userId)
         {
-
             var claims = new ClaimsIdentity();
             claims.AddClaim(new Claim(ClaimTypes.Name, name));
             claims.AddClaim(new Claim(ClaimTypes.Role, role.ToString()));
             claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId.ToString()));
 
             var handler = new JwtSecurityTokenHandler();
-
             var key = Encoding.UTF8.GetBytes(_configuration.GetSection("Token").Value);
-
             var credentials = new SigningCredentials(
                 new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature);
@@ -211,15 +284,12 @@ namespace AutoHub.Data
                 Subject = claims,
                 Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = credentials,
-
             };
 
             var token = handler.CreateToken(tokenDescriptor);
-
             return handler.WriteToken(token);
-
         }
 
-
+    
     }
 }

@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { useGoogleLogin } from "@react-oauth/google";
 import styles from "./login.module.scss";
 import { BASE_URL } from "../../config/config";
-import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 import useLogin from "../../hooks/useLogin";
@@ -9,30 +9,56 @@ import useLogin from "../../hooks/useLogin";
 const Login = () => {
     const { login } = useContext(AuthContext);
     const [form, setForm] = useState({ email: "", password: "" });
-    const {loginUser,loading} = useLogin(login);
+    const { loginUser, loading } = useLogin(login);
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (e) => {
-            e.preventDefault();
-            loginUser(form)
-        
-        };
+        e.preventDefault();
+        loginUser({ ...form, isGoogleLogin: false });
+    };
+
+    const googleLogin = useGoogleLogin({
+        onSuccess: async (response) => {
+            try {
+                const res = await fetch(`${BASE_URL}/Auth/login`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        email: "",
+                        password: "",
+                        isGoogleLogin: true,
+                        googleToken: response.access_token,
+                    }),
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    login(data.value);
+                    toast.success("Successfully logged in with Google!");
+                } else {
+                    toast.error(data.message || "Failed to login with Google");
+                }
+            } catch (error) {
+                toast.error("An error occurred during Google login");
+                console.error(error);
+            }
+        },
+        onError: () => {
+            toast.error("Google login failed");
+        },
+    });
 
     return (
         <div className={styles.loginContainer}>
-            {" "}
-            {/* Use the correct class name */}
-            <h2 className={styles.title}>Login</h2>{" "}
-            {/* Use the correct class name */}
+            <h2 className={styles.title}>Login</h2>
             <form onSubmit={handleSubmit} className={styles.form}>
-                {" "}
-                {/* Use styles for form */}
                 <div className={styles.formGroup}>
-                    {" "}
-                    {/* Use styles for form group */}
                     <label htmlFor="email">Email</label>
                     <input
                         type="email"
@@ -44,8 +70,6 @@ const Login = () => {
                     />
                 </div>
                 <div className={styles.formGroup}>
-                    {" "}
-                    {/* Use styles for form group */}
                     <label htmlFor="password">Password</label>
                     <input
                         type="password"
@@ -56,7 +80,6 @@ const Login = () => {
                         required
                     />
                 </div>
-                <p><a href="/register">If you dont have account register here</a></p>
                 <button
                     type="submit"
                     className={styles.submitButton}
@@ -68,6 +91,20 @@ const Login = () => {
                         "Login"
                     )}
                 </button>
+
+                <button
+                    type="button"
+                    onClick={() => googleLogin()}
+                    className={`${styles.submitButton} ${styles.googleButton}`}
+                >
+                    Sign in with Google
+                </button>
+
+                <p>
+                    <a href="/register">
+                        If you don't have an account register here
+                    </a>
+                </p>
             </form>
         </div>
     );
