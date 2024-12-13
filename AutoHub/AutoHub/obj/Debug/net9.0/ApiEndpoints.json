@@ -191,58 +191,6 @@
   },
   {
     "ContainingType": "AutoHub.Controllers.AuthController",
-    "Method": "GoogleLogin",
-    "RelativePath": "Auth/google-login",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "googleToken",
-        "Type": "System.String",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "AutoHub.Models.ServiceResponse\u00601[[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "AutoHub.Controllers.AuthController",
-    "Method": "GoogleRegister",
-    "RelativePath": "Auth/google-register",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "registerDto",
-        "Type": "RegisterDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "AutoHub.Models.ServiceResponse\u00601[[System.String, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "AutoHub.Controllers.AuthController",
     "Method": "Login",
     "RelativePath": "Auth/login",
     "HttpMethod": "POST",
@@ -251,7 +199,7 @@
     "Parameters": [
       {
         "Name": "loginDto",
-        "Type": "LoginDto",
+        "Type": "AutoHub.Dtos.LoginDto",
         "IsRequired": true
       }
     ],

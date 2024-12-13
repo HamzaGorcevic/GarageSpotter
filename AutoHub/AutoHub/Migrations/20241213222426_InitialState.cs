@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AutoHub.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialState : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -23,7 +23,8 @@ namespace AutoHub.Migrations
                     Email = table.Column<string>(type: "text", nullable: false),
                     PasswordHash = table.Column<byte[]>(type: "bytea", nullable: true),
                     PasswordSalt = table.Column<byte[]>(type: "bytea", nullable: true),
-                    Role = table.Column<int>(type: "integer", nullable: false)
+                    Role = table.Column<int>(type: "integer", nullable: false),
+                    GoogleId = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -122,9 +123,9 @@ namespace AutoHub.Migrations
                     UserId = table.Column<int>(type: "integer", nullable: false),
                     GarageSpotId = table.Column<int>(type: "integer", nullable: false),
                     SingleSpotId = table.Column<int>(type: "integer", nullable: false),
-                    ReservationStart = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ReservationEnd = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ReservationStarted = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ReservationStart = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    ReservationEnd = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    ReservationStarted = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     Hours = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
