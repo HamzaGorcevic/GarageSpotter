@@ -1,5 +1,5 @@
 # Stage 1: Build the application
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 
 # Set the working directory in the container to /src
 WORKDIR /src
@@ -16,7 +16,7 @@ COPY . /src
 RUN dotnet publish "AutoHub.csproj" -c Release -o /app/publish
 
 # Stage 2: Build the runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
 EXPOSE 80   
 EXPOSE 443   
