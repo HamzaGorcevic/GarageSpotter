@@ -34,23 +34,5 @@ namespace AutoHub.Controllers
             return Ok(response);
         }
 
-        [HttpPost("google-login")]
-        public async Task<ActionResult<ServiceResponse<string>>> GoogleLogin([FromBody] string googleToken)
-        {
-            var response = await _authRepository.LoginWithGoogle(googleToken);
-            if (!response.Success)
-                return BadRequest(response);
-            return Ok(response);
-        }
-
-        [HttpPost("google-register")]
-        public async Task<ActionResult<ServiceResponse<string>>> GoogleRegister(RegisterDto registerDto)
-        {
-            registerDto.IsGoogleLogin = true;
-            var response = await _authRepository.Register(registerDto);
-            if (!response.Success)
-                return BadRequest(response);
-            return Ok(response);
-        }
     }
 }

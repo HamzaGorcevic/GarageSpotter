@@ -11,7 +11,7 @@ namespace AutoHub.Dtos
         [Required]
         public string Password { get; set; } = string.Empty;
 
-        public bool IsGoogleLogin { get; set; } = false;
+        public bool? IsGoogleLogin { get; set; } = false;
 
         public string? GoogleToken { get; set; }
     }
