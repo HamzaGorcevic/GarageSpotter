@@ -33,6 +33,15 @@ namespace AutoHub.Controllers
                 return BadRequest(response);
             return Ok(response);
         }
+        [HttpGet("verify-email")]
+        public async Task<ActionResult<ServiceResponse<string>>> VerifyEmail([FromQuery] string token)
+        {
+            var response = await _authRepository.VerifyEmail(token);
+            if (!response.Success)
+                return BadRequest(response);
+            return Ok(response);
+        }
 
+        
     }
 }

@@ -11,6 +11,11 @@ namespace AutoHub.Models
         public byte[]? PasswordSalt { get; set; }
         public UserRole Role { get; set; }
         public string? GoogleId { get; set; }
+        public DateTime? VerificationTokenExpiry { get; set; }
+        public bool PasswordVerification = true;
+        public string ?VerificationToken { get; set; }
+        public bool IsEmailVerified { get; set; }
+
 
         public List<GarageSpot>? GarageSpots
         {

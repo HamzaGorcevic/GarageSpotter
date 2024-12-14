@@ -1,8 +1,11 @@
 ﻿using AutoHub.Dtos;
 using AutoHub.Models;
 using AutoHub.Models.Enums;
+using AutoHub.Services;
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
@@ -17,14 +20,18 @@ namespace AutoHub.Data
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
         private readonly HttpClient _httpClient;
+        private readonly IEmailService _emailService;
+        private readonly IMemoryCache _cache; // Inject MemoryCache
 
-        public AuthRepository(AppDbContext appDbContext, IConfiguration configuration, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public AuthRepository(AppDbContext appDbContext, IEmailService emailService,IMemoryCache cache ,IConfiguration configuration, IMapper mapper, IHttpContextAccessor httpContextAccessor)
             : base(httpContextAccessor, appDbContext)
         {
             _appDbContext = appDbContext;
             _configuration = configuration;
             _mapper = mapper;
             _httpClient = new HttpClient();
+            _emailService = emailService;
+            _cache = cache;
         }
 
         public async Task<ServiceResponse<string>> LoginWithGoogle(string googleToken)
@@ -53,7 +60,9 @@ namespace AutoHub.Data
                         Email = email,
                         Name = name,
                         GoogleId = googleId,
-                        Role = UserRole.User
+                        IsEmailVerified = true,
+                        Role = UserRole.User,
+                        PasswordVerification = false
                     };
                     _appDbContext.Users.Add(user);
                     await _appDbContext.SaveChangesAsync();
@@ -68,7 +77,7 @@ namespace AutoHub.Data
 
                 response.Success = true;
                 response.Message = "Successfully logged in with Google";
-                response.Value = CreateToken(user.Name, user.Role, user.Id);
+                response.Value = CreateToken(user.Name, user.Role, user.Id,user.Email,user.PasswordVerification);
                 return response;
             }
             catch (Exception ex)
@@ -78,7 +87,7 @@ namespace AutoHub.Data
                 return response;
             }
         }
-
+        
         private async Task<Dictionary<string, object>> GetGoogleUserInfo(string token)
         {
             try
@@ -95,6 +104,23 @@ namespace AutoHub.Data
             {
                 return null;
             }
+        }
+
+        public async Task<ServiceResponse<string>> UpdatePassword(string password)
+        {
+            var response = new ServiceResponse<string>();
+            var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Id == GetUserId());
+            user.PasswordVerification = true;
+            CreateHashPassword(password, out byte[] passwordHash, out byte[] passwordSalt);
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+            await _appDbContext.SaveChangesAsync();
+            response.Message = "Succesfully updated password";
+            response.Value = "Updated";
+            response.Success = true;
+            return response;
+
+
         }
 
         public async Task<ServiceResponse<string>> Login(LoginDto loginDto)
@@ -123,109 +149,109 @@ namespace AutoHub.Data
 
             response.Success = true;
             response.Message = "Successfully logged in";
-            response.Value = CreateToken(user.Name, user.Role, user.Id);
+            response.Value = CreateToken(user.Name, user.Role, user.Id,user.Email,user.PasswordVerification);
             return response;
         }
 
         public async Task<ServiceResponse<string>> Register(RegisterDto registerDto)
         {
             var response = new ServiceResponse<string>();
-            string email;
-            User newUser;
-
             if (registerDto.IsGoogleLogin.HasValue && registerDto.IsGoogleLogin.Value)
             {
-                // Fetch Google user info
-                var googleUserInfo = await GetGoogleUserInfo(registerDto.GoogleToken);
-                if (googleUserInfo == null)
-                {
-                    response.Success = false;
-                    response.Message = "Invalid Google token";
-                    return response;
-                }
-
-                // Extract email from Google user info
-                email = googleUserInfo["email"]?.ToString();
-                if (string.IsNullOrEmpty(email))
-                {
-                    response.Success = false;
-                    response.Message = "Email not found in Google user info";
-                    return response;
-                }
-
-                // Check if a user with this Google ID already exists
-                var existingGoogleUser = await _appDbContext.Users.FirstOrDefaultAsync(u => u.GoogleId == googleUserInfo["sub"].ToString());
-                if (existingGoogleUser != null)
-                {
-                    response.Success = false;
-                    response.Message = "User with this Google account already exists";
-                    return response;
-                }
-
-                // Map user for Google registration
-                newUser = new User
-                {
-                    Email = email,
-                    GoogleId = googleUserInfo["sub"].ToString(),
-                    Name = googleUserInfo["name"]?.ToString(),
-                    Role = UserRole.User,
-                    PasswordHash = null,
-                    PasswordSalt = null
-                };
+                return await LoginWithGoogle(registerDto.GoogleToken);
             }
-            else
+
+            if (string.IsNullOrEmpty(registerDto.Email))
             {
-                // For regular registration, use the email from registerDto
-                email = registerDto.Email;
-                if (string.IsNullOrEmpty(email))
-                {
-                    response.Success = false;
-                    response.Message = "Email is required for registration";
-                    return response;
-                }
-
-                // Check if the email already exists
-                var userExists = await _appDbContext.Users.AnyAsync(u => u.Email == email);
-                if (userExists)
-                {
-                    response.Success = false;
-                    response.Message = "User with that email already exists";
-                    return response;
-                }
-
-                // Validate password for regular registration
-                if (string.IsNullOrEmpty(registerDto.Password))
-                {
-                    response.Success = false;
-                    response.Message = "Password is required for regular registration";
-                    return response;
-                }
-
-                // Handle password hashing for non-Google registration
-                CreateHashPassword(registerDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
-
-                // Map user for regular registration
-                newUser = new User
-                {
-                    Email = email,
-                    Name = registerDto.Name,
-                    Role = UserRole.User,
-                    PasswordHash = passwordHash,
-                    PasswordSalt = passwordSalt
-                };
+                response.Success = false;
+                response.Message = "Email is required for registration";
+                return response;
             }
 
-            // Add the new user to the database
+            // Check if the email is already registered
+            var emailExists = await _appDbContext.Users.AnyAsync(u => u.Email == registerDto.Email);
+            if (emailExists)
+            {
+                response.Success = false;
+                response.Message = "User with that email already exists";
+                return response;
+            }
+
+            if (string.IsNullOrEmpty(registerDto.Password))
+            {
+                response.Success = false;
+                response.Message = "Password is required for registration";
+                return response;
+            }
+
+            // Generate verification token
+            var verificationToken = Guid.NewGuid().ToString();
+            var tokenExpiry = DateTime.UtcNow.AddHours(24);
+
+            // Store token temporarily (in-memory or cache)
+            _cache.Set(verificationToken, new VerificationData
+            {
+                Name = registerDto.Name,
+                Email = registerDto.Email,
+                Password = registerDto.Password,
+                Token = verificationToken,
+                TokenExpiry = tokenExpiry
+            });
+
+
+            // Send verification email
+            var verificationLink = $"{_configuration["AppUrl"]}/verify-email?token={verificationToken}";
+            await _emailService.SendVerificationEmailAsync(registerDto.Email, verificationLink);
+
+            response.Success = true;
+            response.Message = "Registration successful. Please check your email to verify your account.";
+            return response;
+        }
+        public async Task<ServiceResponse<string>> VerifyEmail(string token)
+        {
+            var response = new ServiceResponse<string>();
+
+            if (!_cache.TryGetValue(token, out VerificationData verificationData))
+            {
+                response.Success = false;
+                response.Message = "Invalid or expired verification token";
+                return response;
+            }
+
+            // Check token expiry
+            if (verificationData.TokenExpiry < DateTime.UtcNow)
+            {
+                response.Success = false;
+                response.Message = "Verification token has expired";
+                return response;
+            }
+
+            // Create and save the new user
+            CreateHashPassword(verificationData.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+            var newUser = new User
+            {
+                Email = verificationData.Email,
+                Name = verificationData.Name,
+                Role = UserRole.User,
+                IsEmailVerified = true,
+                VerificationToken = token,
+                VerificationTokenExpiry=verificationData.TokenExpiry,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt
+            };
+
             _appDbContext.Users.Add(newUser);
             await _appDbContext.SaveChangesAsync();
 
-            // Generate token
+            // Remove the token from cache
+            _cache.Remove(token);
+
             response.Success = true;
-            response.Message = "Successfully registered";
-            response.Value = CreateToken(newUser.Name, newUser.Role, newUser.Id);
+            response.Message = "Email verified successfully";
+            response.Value = CreateToken(newUser.Name, newUser.Role, newUser.Id, newUser.Email, newUser.PasswordVerification);
             return response;
         }
-
 
         public async Task<ServiceResponse<string>> ChangePassword(ChangePasswordDto changePasswordDto)
         {
@@ -322,12 +348,14 @@ namespace AutoHub.Data
             passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         }
 
-        public string CreateToken(string name, UserRole role, int userId)
+        public string CreateToken(string name, UserRole role, int userId,string email,bool passwordVerified)
         {
             var claims = new ClaimsIdentity();
             claims.AddClaim(new Claim(ClaimTypes.Name, name));
             claims.AddClaim(new Claim(ClaimTypes.Role, role.ToString()));
             claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId.ToString()));
+            claims.AddClaim(new Claim(ClaimTypes.Email, email));
+            claims.AddClaim(new Claim("passwordVerified", passwordVerified.ToString()));
 
             var handler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_configuration.GetSection("Token").Value);

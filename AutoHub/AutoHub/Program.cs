@@ -38,13 +38,14 @@ namespace AutoHub
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
             //
-
+            builder.Services.AddMemoryCache();
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IGarageSpotService, GarageSpotService>();
             builder.Services.AddScoped<IReservationService, ReservationService>();
             builder.Services.AddScoped<IAzureBlobService, AzureBlobService>();
             builder.Services.AddScoped<IAdminService, AdminService>();
             builder.Services.AddScoped<IElectricChargerService, ElectricChargerService>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowOrigins",

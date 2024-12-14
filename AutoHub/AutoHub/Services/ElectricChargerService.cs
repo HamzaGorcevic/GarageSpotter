@@ -37,7 +37,7 @@ using Microsoft.EntityFrameworkCore;
                     string newToken = "";
                     if (user!.Role != Models.Enums.UserRole.Owner)
                     {
-                        newToken = _authRepository.CreateToken(user.Name, Models.Enums.UserRole.Owner, userId);
+                        newToken = _authRepository.CreateToken(user.Name, Models.Enums.UserRole.Owner, userId,user.Email,user.PasswordVerification);
                         user!.Role = Models.Enums.UserRole.Owner;
 
                     }
