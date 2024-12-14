@@ -16,9 +16,9 @@ import EditProfile from "./pages/EditProfile/editProfile.jsx";
 import CreateElectricCharger from "./pages/CreateElectricCharger/createElectricCharger.jsx";
 import MyElectricChargers from "./pages/MyElectricChargers/myElectricChargers.jsx";
 import Favorites from "./pages/Favorites/favorites.jsx";
-import Navbar from "./components/Navbar/navbar.jsx";
 import Footer from "./components/Footer/footer.jsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import Navbar from "./components/Navbar/navbar.jsx";
 function App() {
     return (
         <GoogleOAuthProvider
