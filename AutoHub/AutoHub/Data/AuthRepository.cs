@@ -130,20 +130,12 @@ namespace AutoHub.Data
         public async Task<ServiceResponse<string>> Register(RegisterDto registerDto)
         {
             var response = new ServiceResponse<string>();
-            var userExists = await _appDbContext.Users.AnyAsync(u => u.Email == registerDto.Email);
-
-            if (userExists)
-            {
-                response.Success = false;
-                response.Message = "User with that email already exists";
-                return response;
-            }
-
-            var newUser = _mapper.Map<User>(registerDto);
-            newUser.Role = UserRole.User;
+            string email;
+            User newUser;
 
             if (registerDto.IsGoogleLogin.HasValue && registerDto.IsGoogleLogin.Value)
             {
+                // Fetch Google user info
                 var googleUserInfo = await GetGoogleUserInfo(registerDto.GoogleToken);
                 if (googleUserInfo == null)
                 {
@@ -152,24 +144,88 @@ namespace AutoHub.Data
                     return response;
                 }
 
-                newUser.GoogleId = googleUserInfo["sub"].ToString();
-                newUser.Name = googleUserInfo["name"].ToString();
+                // Extract email from Google user info
+                email = googleUserInfo["email"]?.ToString();
+                if (string.IsNullOrEmpty(email))
+                {
+                    response.Success = false;
+                    response.Message = "Email not found in Google user info";
+                    return response;
+                }
+
+                // Check if a user with this Google ID already exists
+                var existingGoogleUser = await _appDbContext.Users.FirstOrDefaultAsync(u => u.GoogleId == googleUserInfo["sub"].ToString());
+                if (existingGoogleUser != null)
+                {
+                    response.Success = false;
+                    response.Message = "User with this Google account already exists";
+                    return response;
+                }
+
+                // Map user for Google registration
+                newUser = new User
+                {
+                    Email = email,
+                    GoogleId = googleUserInfo["sub"].ToString(),
+                    Name = googleUserInfo["name"]?.ToString(),
+                    Role = UserRole.User,
+                    PasswordHash = null,
+                    PasswordSalt = null
+                };
             }
             else
             {
+                // For regular registration, use the email from registerDto
+                email = registerDto.Email;
+                if (string.IsNullOrEmpty(email))
+                {
+                    response.Success = false;
+                    response.Message = "Email is required for registration";
+                    return response;
+                }
+
+                // Check if the email already exists
+                var userExists = await _appDbContext.Users.AnyAsync(u => u.Email == email);
+                if (userExists)
+                {
+                    response.Success = false;
+                    response.Message = "User with that email already exists";
+                    return response;
+                }
+
+                // Validate password for regular registration
+                if (string.IsNullOrEmpty(registerDto.Password))
+                {
+                    response.Success = false;
+                    response.Message = "Password is required for regular registration";
+                    return response;
+                }
+
+                // Handle password hashing for non-Google registration
                 CreateHashPassword(registerDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
-                newUser.PasswordHash = passwordHash;
-                newUser.PasswordSalt = passwordSalt;
+
+                // Map user for regular registration
+                newUser = new User
+                {
+                    Email = email,
+                    Name = registerDto.Name,
+                    Role = UserRole.User,
+                    PasswordHash = passwordHash,
+                    PasswordSalt = passwordSalt
+                };
             }
 
+            // Add the new user to the database
             _appDbContext.Users.Add(newUser);
             await _appDbContext.SaveChangesAsync();
 
+            // Generate token
             response.Success = true;
             response.Message = "Successfully registered";
             response.Value = CreateToken(newUser.Name, newUser.Role, newUser.Id);
             return response;
         }
+
 
         public async Task<ServiceResponse<string>> ChangePassword(ChangePasswordDto changePasswordDto)
         {
