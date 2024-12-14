@@ -6,9 +6,9 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
 
-    // Initialize authData from localStorage immediately
     const initialToken = localStorage.getItem("token");
     const initialUser = JSON.parse(localStorage.getItem("user"));
+
     const [authData, setAuthData] = useState({
         token: initialToken,
         user: initialUser,
@@ -28,6 +28,8 @@ export const AuthProvider = ({ children }) => {
             ...user,
             role: decodedToken?.role,
             name: decodedToken?.unique_name,
+            email: decodedToken?.email,
+            passwordVerified: decodedToken?.passwordVerified,
         };
         localStorage.setItem("user", JSON.stringify(modifiedUser));
         setAuthData({ token, user: modifiedUser });
@@ -71,10 +73,12 @@ export const AuthProvider = ({ children }) => {
             ...currentUser,
             name: updatedUser.name,
             email: updatedUser.email,
+            passwordVerified: updatedUser.passwordVerified,
         };
         localStorage.setItem("user", JSON.stringify(modifiedUser));
         setAuthData({ user: modifiedUser, token: authData.token });
     };
+
     const updateToken = (newToken) => {
         localStorage.setItem("token", newToken);
         const decodedToken = decodeToken(newToken);
@@ -85,6 +89,8 @@ export const AuthProvider = ({ children }) => {
             ...existingUser,
             role: decodedToken?.role,
             name: decodedToken?.unique_name,
+            email: decodedToken?.email,
+            passwordVerified: decodedToken?.passwordVerified,
         };
 
         localStorage.setItem("user", JSON.stringify(updatedUser));

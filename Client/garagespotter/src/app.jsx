@@ -19,6 +19,7 @@ import Favorites from "./pages/Favorites/favorites.jsx";
 import Footer from "./components/Footer/footer.jsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import Navbar from "./components/Navbar/navbar.jsx";
+import EmailVerification from "./components/EmailVerification/emailVerification.jsx";
 function App() {
     return (
         <GoogleOAuthProvider
@@ -107,6 +108,10 @@ function App() {
                         <Route path="/edit-profile" element={<EditProfile />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+                        <Route
+                            path="/verify-email"
+                            element={<EmailVerification />}
+                        />
                         <Route
                             path="/access-denied"
                             element={<AccessDenied />}

@@ -53,6 +53,12 @@ namespace AutoHub.Controllers
             var response = await _authRepository.ChangePassword(changePasswordDto);
             return response;
         }
+        [HttpPut("updatePassword")]
+        public async Task<ServiceResponse<string>> UpdatePassword([FromBody] string updatePassword)
+        {
+            var response = await _authRepository.UpdatePassword(updatePassword);
+            return response;
+        }
 
         [HttpDelete("deleteProfile")]
         public async Task<ServiceResponse<string>> DeleteProfile([FromBody] DeleteUserDto deleteUserDto)
