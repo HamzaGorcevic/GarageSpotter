@@ -21,28 +21,14 @@ const Home = () => {
         const resolveLocation = async () => {
             const query = new URLSearchParams(location.search);
             const queryCountry = query.get("country") || "Serbia";
-            const queryLat = query.get("lat");
-            const queryLon = query.get("lon");
 
-            if (queryLat && queryLon) {
-                // If lat/lon are provided in the query params, use them directly
-                setMapInfo({
-                    lat: parseFloat(queryLat),
-                    lon: parseFloat(queryLon),
-                    country: queryCountry,
-                });
-            } else {
-                // Otherwise, resolve lat/lon from the country name
-                const resolvedLocation = await getLatLngFromCountry(
-                    queryCountry
-                );
-                console.log(resolvedLocation, "loc");
-                setMapInfo({
-                    lat: resolvedLocation.lat,
-                    lon: resolvedLocation.lon,
-                    country: resolvedLocation.name || queryCountry,
-                });
-            }
+            // Otherwise, resolve lat/lon from the country name
+            const resolvedLocation = await getLatLngFromCountry(queryCountry);
+            setMapInfo({
+                lat: resolvedLocation.lat,
+                lon: resolvedLocation.lon,
+                country: resolvedLocation.name || queryCountry,
+            });
         };
 
         resolveLocation();
