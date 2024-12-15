@@ -14,12 +14,19 @@ const getLatLngFromCountry = async (countryName) => {
         if (results.length === 0) {
             throw new Error("No results found for the specified country");
         }
-        console.log(results);
-        const { lat, lon, name } = results[0];
-        return { lat, lon, name };
+
+        const { lat, lon, display_name } = results[0];
+
+        const standardizedCountryName = display_name.split(",")[0];
+
+        return {
+            lat: parseFloat(lat),
+            lon: parseFloat(lon),
+            name: standardizedCountryName,
+        };
     } catch (error) {
         console.error("Error fetching lat/lng:", error);
-        return null;
+        return { lat: null, lon: null, name: countryName }; // Fallback to original name
     }
 };
 

@@ -26,7 +26,7 @@ const Navbar = () => {
 
     return (
         <nav className={styles.navbar}>
-            <div className={styles.logo}>MyApp</div>
+            <div className={styles.logo}>GarageSpotter</div>
             <div className={styles.hamburger} onClick={toggleMenu}>
                 <div className={styles.line}></div>
                 <div className={styles.line}></div>
