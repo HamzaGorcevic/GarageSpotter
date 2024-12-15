@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
 import styles from "./register.module.scss";
 import { BASE_URL } from "../../config/config";
 import toast from "react-hot-toast";
+import GoogleSvg from "../../assets/google.svg";
+import { AuthContext } from "../../context/AuthContext";
 
 const Register = () => {
     const [form, setForm] = useState({
@@ -20,6 +22,7 @@ const Register = () => {
 
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -107,8 +110,10 @@ const Register = () => {
                 const data = await res.json();
 
                 if (data.success) {
-                    toast.success("Successfully registered with Google!");
-                    navigate("/login");
+                    toast.success(data.message);
+                    if (data.value.length > 20) {
+                        login(data.value);
+                    }
                 } else {
                     toast.error(
                         data.message || "Failed to register with Google"
@@ -187,6 +192,12 @@ const Register = () => {
                     onClick={() => googleRegister()}
                     className={`${styles.submitButton} ${styles.googleButton}`}
                 >
+                    <img
+                        src={GoogleSvg}
+                        alt="Google Icon"
+                        width="30"
+                        height="30"
+                    />
                     Register with Google
                 </button>
             </form>

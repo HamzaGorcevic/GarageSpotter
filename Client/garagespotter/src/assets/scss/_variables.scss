@@ -2,9 +2,12 @@ $primary-color: #1a73e8;
 $secondary-color: #34a853;
 $accent-color: #ffcc00;
 $error-color: #ea4335;
+$warning-color:#ffcc00;
+
 $background-color: #f4f7fa;
 $map-background: #e5e5e5;
 $text-color: #202124;
+$text-color-light:#f4f7fa;
 $muted-text-color: #5f6368;
 $border-color: #dadce0;
 
@@ -104,4 +107,11 @@ a{
     &:hover {
         background-color: darken($secondary-color, 10%);
     }
+}
+.googleButton{
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
 }

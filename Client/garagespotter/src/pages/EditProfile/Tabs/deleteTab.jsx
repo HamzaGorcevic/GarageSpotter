@@ -3,6 +3,7 @@ import { AlertTriangle, Loader2 } from "lucide-react";
 import { deleteProfile } from "../../../utils/api/user";
 import styles from "../editProfile.module.scss";
 import { AuthContext } from "../../../context/AuthContext";
+import toast from "react-hot-toast";
 
 const DeleteTab = () => {
     const { authData, logout } = useContext(AuthContext);
@@ -15,7 +16,7 @@ const DeleteTab = () => {
 
         try {
             const res = await deleteProfile(deletePassword, authData.token);
-            if (res.status) {
+            if (res.success) {
                 toast.success("Profile deleted successfully!");
                 logout();
             } else {
@@ -51,7 +52,7 @@ const DeleteTab = () => {
                 </div>
                 <button
                     type="submit"
-                    className={styles.destructiveButton}
+                    className={styles.deleteBtn}
                     disabled={loading}
                 >
                     {loading ? (

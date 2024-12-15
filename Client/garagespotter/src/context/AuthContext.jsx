@@ -29,8 +29,9 @@ export const AuthProvider = ({ children }) => {
             role: decodedToken?.role,
             name: decodedToken?.unique_name,
             email: decodedToken?.email,
-            passwordVerified: decodedToken?.passwordVerified,
+            passwordVerification: decodedToken?.passwordVerification,
         };
+        console.log(modifiedUser, "dec", decodeToken);
         localStorage.setItem("user", JSON.stringify(modifiedUser));
         setAuthData({ token, user: modifiedUser });
         checkTokenExpiration(token, decodedToken?.exp);
@@ -73,8 +74,9 @@ export const AuthProvider = ({ children }) => {
             ...currentUser,
             name: updatedUser.name,
             email: updatedUser.email,
-            passwordVerified: updatedUser.passwordVerified,
+            passwordVerification: updatedUser.passwordVerification,
         };
+        console.log(modifiedUser);
         localStorage.setItem("user", JSON.stringify(modifiedUser));
         setAuthData({ user: modifiedUser, token: authData.token });
     };
@@ -90,7 +92,7 @@ export const AuthProvider = ({ children }) => {
             role: decodedToken?.role,
             name: decodedToken?.unique_name,
             email: decodedToken?.email,
-            passwordVerified: decodedToken?.passwordVerified,
+            passwordVerification: decodedToken?.passwordVerification,
         };
 
         localStorage.setItem("user", JSON.stringify(updatedUser));

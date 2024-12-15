@@ -11,14 +11,11 @@ import { AuthContext } from "../../context/AuthContext";
 const EditProfile = () => {
     const { authData } = useContext(AuthContext);
     const [activeTab, setActiveTab] = useState("profile");
-    const [passwordVerified, setPasswordVerified] = useState(false);
-    useEffect(() => {
-        const booleanValue =
-            authData.user?.passwordVerified === "False" ? false : true;
-        setPasswordVerified(booleanValue);
-    }, [authData]);
-    console.log(passwordVerified);
-    if (!passwordVerified) {
+
+    const passwordVerification =
+        authData.user?.passwordVerification === "False" ? false : true;
+
+    if (!passwordVerification) {
         return <NewUserPassword />;
     }
 

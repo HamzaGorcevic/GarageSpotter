@@ -91,7 +91,7 @@ const PasswordTab = () => {
                 )}
                 <button
                     type="submit"
-                    className={styles.primaryButton}
+                    className={styles.addBtn}
                     disabled={loading}
                 >
                     {loading ? (

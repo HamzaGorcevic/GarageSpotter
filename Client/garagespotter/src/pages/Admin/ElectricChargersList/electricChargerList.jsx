@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useContext } from "react";
-import styles from "./electricCharger.module.scss";
 import toast from "react-hot-toast";
 import { AuthContext } from "../../../context/AuthContext";
 import { BASE_URL } from "../../../config/config";
 import { DocumentDetailsModal } from "../../../components/Modals/DocumentDetailsModal/documentDetailsModal";
-
+import styles from "../admin.module.scss";
 const ChargerList = () => {
     const { authData } = useContext(AuthContext);
     const [chargers, setChargers] = useState([]);
     const [showDocumentModal, setShowDocumentModal] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedChargerId, setSelectedChargerId] = useState(null);
+
     const fetchChargers = async () => {
         try {
             const response = await fetch(
@@ -34,10 +37,15 @@ const ChargerList = () => {
         }
     }, [authData]);
 
-    const deleteCharger = async (chargerId) => {
+    const handleDeleteClick = (chargerId) => {
+        setSelectedChargerId(chargerId);
+        setShowDeleteModal(true);
+    };
+
+    const deleteCharger = async () => {
         try {
             const response = await fetch(
-                `${BASE_URL}/Admin/deleteElectricCharger?chargerId=${chargerId}`,
+                `${BASE_URL}/Admin/deleteElectricCharger?chargerId=${selectedChargerId}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -50,7 +58,9 @@ const ChargerList = () => {
             if (result.success) {
                 toast.success("Charger deleted successfully.");
                 setChargers(
-                    chargers.filter((charger) => charger.id !== chargerId)
+                    chargers.filter(
+                        (charger) => charger.id !== selectedChargerId
+                    )
                 );
             } else {
                 toast.error(result.message || "Failed to delete charger.");
@@ -58,6 +68,9 @@ const ChargerList = () => {
         } catch (error) {
             console.error("Error deleting charger:", error);
             toast.error("Failed to delete charger.");
+        } finally {
+            setShowDeleteModal(false);
+            setSelectedChargerId(null);
         }
     };
 
@@ -79,9 +92,6 @@ const ChargerList = () => {
             if (result.success) {
                 toast.success("Charger verified successfully.");
                 fetchChargers();
-                setChargers(
-                    chargers.filter((charger) => charger.id !== chargerId)
-                );
             } else {
                 toast.error(result.message || "Failed to verify charger.");
             }
@@ -91,9 +101,26 @@ const ChargerList = () => {
         }
     };
 
+    const filteredChargers = chargers.filter((charger) =>
+        Object.values(charger)
+            .join(" ")
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
+    );
+
     return (
-        <div className={styles.chargerList}>
+        <div className={styles.tableContainer}>
             <h2 className={styles.title}>Electric Charger List</h2>
+            <div className={styles.searchContainer}>
+                <input
+                    type="text"
+                    placeholder="Search chargers..."
+                    className={styles.searchInput}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+
             <table className={styles.table}>
                 <thead>
                     <tr>
@@ -108,7 +135,7 @@ const ChargerList = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {chargers.map((charger) => (
+                    {filteredChargers.map((charger) => (
                         <tr key={charger.id}>
                             <td>{charger.name}</td>
                             <td>{charger.countryName}</td>
@@ -117,10 +144,8 @@ const ChargerList = () => {
                             </td>
                             <td>${charger.price}</td>
                             <td>{charger.chargerType}</td>
-
                             <td>{charger.latitude}</td>
                             <td>{charger.longitude}</td>
-
                             <td className={styles.actions}>
                                 <button
                                     className={styles.verifyButton}
@@ -141,7 +166,9 @@ const ChargerList = () => {
                                 </button>
                                 <button
                                     className={styles.deleteButton}
-                                    onClick={() => deleteCharger(charger.id)}
+                                    onClick={() =>
+                                        handleDeleteClick(charger.id)
+                                    }
                                 >
                                     Delete
                                 </button>
@@ -150,11 +177,35 @@ const ChargerList = () => {
                     ))}
                 </tbody>
             </table>
+
             {showDocumentModal.length > 0 && (
                 <DocumentDetailsModal
                     documentFile={showDocumentModal}
                     setShowDocumentModal={setShowDocumentModal}
                 />
+            )}
+
+            {showDeleteModal && (
+                <div className={styles.confirmationModal}>
+                    <div className={styles.modalContent}>
+                        <h3 className={styles.modalTitle}>Confirm Deletion</h3>
+                        <p>Are you sure you want to delete this charger?</p>
+                        <div className={styles.modalButtons}>
+                            <button
+                                className={styles.cancelButton}
+                                onClick={() => setShowDeleteModal(false)}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className={styles.confirmButton}
+                                onClick={deleteCharger}
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );
