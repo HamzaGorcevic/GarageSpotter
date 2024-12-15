@@ -12,7 +12,7 @@ namespace AutoHub.Models
         public UserRole Role { get; set; }
         public string? GoogleId { get; set; }
         public DateTime? VerificationTokenExpiry { get; set; }
-        public bool PasswordVerification = true;
+        public bool PasswordVerification { get; set; } = false;
         public string ?VerificationToken { get; set; }
         public bool IsEmailVerified { get; set; }
 

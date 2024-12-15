@@ -47,3 +47,260 @@
         left: 0;
     }
 }
+
+.tableContainer {
+    background-color: $background-color;
+    padding: $spacing-large;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+    transition: $transition-default;
+    width: 100%;
+    overflow-x: auto;
+
+    @media (max-width: 760px) {
+        padding: $spacing-small;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .title {
+        font-family: $font-family;
+        color: $text-color;
+        font-size: $font-size-large;
+        margin-bottom: $spacing-medium;
+
+        @media (max-width: 760px) {
+            font-size: 1.25rem;
+            padding: 0 $spacing-small;
+        }
+    }
+
+    .searchContainer {
+        margin-bottom: $spacing-medium;
+        width: 100%;
+        
+        @media (max-width: 760px) {
+            padding: 0 $spacing-small;
+        }
+        
+        .searchInput { 
+            width: 100%;
+            max-width: 400px;
+            padding: $spacing-small;
+            border: 1px solid $border-color;
+            border-radius: $border-radius;
+            font-size: $font-size-base;
+            
+            @media (max-width: 760px) {
+                max-width: 100%;
+                font-size: 0.875rem;
+            }
+            
+            &:focus {
+                outline: none;
+                border-color: $primary-color;
+                box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+            }
+        }
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: $spacing-medium;
+
+        @media (max-width: 760px) {
+            display: block;
+            margin-top: $spacing-small;
+            
+            thead {
+                display: none;
+            }
+            
+            tbody {
+                display: block;
+            }
+            
+            tr {
+                display: block;
+                margin: $spacing-small;
+                padding: $spacing-small;
+                border: 1px solid $border-color;
+                border-radius: $border-radius;
+                background-color: $background-color !important;
+                box-shadow: $box-shadow;
+            }
+            
+            td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: $spacing-small;
+                border-bottom: 1px solid $border-color;
+                font-size: 0.875rem;
+                
+                &:before {
+                    content: attr(data-label);
+                    font-weight: bold;
+                    margin-right: $spacing-small;
+                    flex: 1;
+                }
+                
+                &:last-child {
+                    border-bottom: none;
+                }
+            }
+        }
+
+        th,
+        td {
+            padding: $spacing-small $spacing-medium;
+            text-align: left;
+            font-size: $font-size-base;
+
+            @media (max-width: 760px) {
+                font-size: 0.875rem;
+            }
+        }
+
+        th {
+            background-color: $primary-color;
+            color: white;
+            white-space: nowrap;
+        }
+
+        tr:nth-child(even) {
+            background-color: $map-background;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            
+            @media (max-width: 760px) {
+                flex-direction: column;
+                gap: $spacing-small;
+            }
+        }
+
+        .verifyButton,
+        .detailsButton,
+        .deleteButton {
+            padding: $spacing-small $spacing-medium;
+            border: none;
+            border-radius: $border-radius;
+            cursor: pointer;
+            transition: $transition-default;
+            color: white;
+            font-size: 0.875rem;
+
+            @media (max-width: 760px) {
+                width: 100%;
+                text-align: center;
+                padding: $spacing-small;
+            }
+
+            &:hover {
+                box-shadow: $hover-shadow;
+                opacity: 0.9;
+            }
+
+            &:active {
+                transform: translateY(1px);
+            }
+        }
+
+        .verifyButton {
+            background-color: $primary-color;
+        }
+
+        .detailsButton {
+            background-color: $secondary-color;
+        }
+
+        .deleteButton {
+            background-color: $error-color;
+        }
+    }
+}
+
+.confirmationModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+
+    .modalContent {
+        background-color: white;
+        padding: $spacing-large;
+        border-radius: $border-radius;
+        box-shadow: $box-shadow;
+        width: 90%;
+        max-width: 400px;
+
+        @media (max-width: 760px) {
+            width: 95%;
+            padding: $spacing-medium;
+            margin: $spacing-small;
+        }
+
+        .modalTitle {
+            font-size: $font-size-large;
+            margin-bottom: $spacing-medium;
+            color: $text-color;
+
+            @media (max-width: 760px) {
+                font-size: 1.25rem;
+            }
+        }
+
+        .modalButtons {
+            display: flex;
+            justify-content: flex-end;
+            gap: $spacing-medium;
+            margin-top: $spacing-large;
+
+            @media (max-width: 760px) {
+                flex-direction: column-reverse;
+                gap: $spacing-small;
+            }
+
+            button {
+                padding: $spacing-small $spacing-medium;
+                border: none;
+                border-radius: $border-radius;
+                cursor: pointer;
+                transition: $transition-default;
+                color: white;
+
+                @media (max-width: 760px) {
+                    width: 100%;
+                    padding: $spacing-small;
+                }
+
+                &.confirmButton {
+                    background-color: $error-color;
+                }
+
+                &.cancelButton {
+                    background-color: $secondary-color;
+                }
+
+                &:hover {
+                    box-shadow: $hover-shadow;
+                    opacity: 0.9;
+                }
+
+                &:active {
+                    transform: translateY(1px);
+                }
+            }
+        }
+    }
+}

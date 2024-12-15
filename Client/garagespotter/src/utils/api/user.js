@@ -1,5 +1,5 @@
 import { BASE_URL } from "../../config/config";
-export const updateProfile = async (data) => {
+export const updateProfile = async (data, token) => {
     const response = await fetch(`${BASE_URL}/User/edit`, {
         method: "PUT",
         headers: {

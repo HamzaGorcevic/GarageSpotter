@@ -2,11 +2,12 @@ import React, { useContext, useState } from "react";
 import { UserCircle, Loader2 } from "lucide-react";
 import styles from "../editProfile.module.scss";
 import { AuthContext } from "../../../context/AuthContext";
+import toast from "react-hot-toast";
+import { updateProfile } from "../../../utils/api/user";
 
 const ProfileTab = () => {
     const { authData, updateUser } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
-    console.log("auh", authData.user);
     const [form, setForm] = useState({
         name: authData.user?.name || "",
         email: authData.user?.email || "",
@@ -16,7 +17,7 @@ const ProfileTab = () => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
@@ -30,6 +31,7 @@ const ProfileTab = () => {
             }
         } catch (error) {
             toast.error("An error occurred. Please try again later.");
+            console.log(error);
         } finally {
             setLoading(false);
         }
@@ -63,12 +65,13 @@ const ProfileTab = () => {
                         type="email"
                         value={form.email}
                         onChange={handleChange}
+                        disabled
                         required
                     />
                 </div>
                 <button
                     type="submit"
-                    className={styles.primaryButton}
+                    className={styles.addBtn}
                     disabled={loading}
                 >
                     {loading ? (

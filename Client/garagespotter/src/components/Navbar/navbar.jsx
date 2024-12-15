@@ -1,5 +1,5 @@
-import React, { useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import styles from "./navbar.module.scss";
 import { AuthContext } from "../../context/AuthContext";
 import NavDropdown from "./navbarDropDown";
@@ -7,6 +7,7 @@ import NavDropdown from "./navbarDropDown";
 const Navbar = () => {
     const { authData, logout } = useContext(AuthContext);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const location = useLocation();
 
     const handleLogout = () => {
         logout();
@@ -14,8 +15,14 @@ const Navbar = () => {
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
-        console.log("toggled");
     };
+
+    // Close the menu when the route changes
+    useEffect(() => {
+        if (isMenuOpen) {
+            setIsMenuOpen(false);
+        }
+    }, [location]);
 
     return (
         <nav className={styles.navbar}>

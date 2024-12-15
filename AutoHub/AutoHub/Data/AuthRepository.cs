@@ -23,7 +23,7 @@ namespace AutoHub.Data
         private readonly IEmailService _emailService;
         private readonly IMemoryCache _cache; // Inject MemoryCache
 
-        public AuthRepository(AppDbContext appDbContext, IEmailService emailService,IMemoryCache cache ,IConfiguration configuration, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public AuthRepository(AppDbContext appDbContext, IEmailService emailService, IMemoryCache cache, IConfiguration configuration, IMapper mapper, IHttpContextAccessor httpContextAccessor)
             : base(httpContextAccessor, appDbContext)
         {
             _appDbContext = appDbContext;
@@ -77,7 +77,7 @@ namespace AutoHub.Data
 
                 response.Success = true;
                 response.Message = "Successfully logged in with Google";
-                response.Value = CreateToken(user.Name, user.Role, user.Id,user.Email,user.PasswordVerification);
+                response.Value = CreateToken(user.Name, user.Role, user.Id, user.Email, user.PasswordVerification);
                 return response;
             }
             catch (Exception ex)
@@ -87,7 +87,7 @@ namespace AutoHub.Data
                 return response;
             }
         }
-        
+
         private async Task<Dictionary<string, object>> GetGoogleUserInfo(string token)
         {
             try
@@ -109,19 +109,34 @@ namespace AutoHub.Data
         public async Task<ServiceResponse<string>> UpdatePassword(string password)
         {
             var response = new ServiceResponse<string>();
+
             var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Id == GetUserId());
+            if (user == null)
+            {
+                response.Message = "User not found";
+                response.Success = false;
+                return response;
+            }
+
             user.PasswordVerification = true;
+            Console.WriteLine($"PasswordVerification before save: {user.PasswordVerification}");
+
             CreateHashPassword(password, out byte[] passwordHash, out byte[] passwordSalt);
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
+
+            // Force EF to track changes if necessary
+            _appDbContext.Entry(user).Property(u => u.PasswordVerification).IsModified = true;
+
             await _appDbContext.SaveChangesAsync();
-            response.Message = "Succesfully updated password";
+
+            response.Message = "Successfully updated password";
             response.Value = "Updated";
             response.Success = true;
+
             return response;
-
-
         }
+
 
         public async Task<ServiceResponse<string>> Login(LoginDto loginDto)
         {
@@ -149,7 +164,7 @@ namespace AutoHub.Data
 
             response.Success = true;
             response.Message = "Successfully logged in";
-            response.Value = CreateToken(user.Name, user.Role, user.Id,user.Email,user.PasswordVerification);
+            response.Value = CreateToken(user.Name, user.Role, user.Id, user.Email, user.PasswordVerification);
             return response;
         }
 
@@ -236,9 +251,10 @@ namespace AutoHub.Data
                 Role = UserRole.User,
                 IsEmailVerified = true,
                 VerificationToken = token,
-                VerificationTokenExpiry=verificationData.TokenExpiry,
+                VerificationTokenExpiry = verificationData.TokenExpiry,
                 PasswordHash = passwordHash,
-                PasswordSalt = passwordSalt
+                PasswordSalt = passwordSalt,
+                PasswordVerification = true
             };
 
             _appDbContext.Users.Add(newUser);
@@ -313,16 +329,16 @@ namespace AutoHub.Data
         {
             var response = new ServiceResponse<string>();
             var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Id == GetUserId());
-            if (VerifyHashPassword(password, user.PasswordHash, user.PasswordSalt) == false)
-            {
-                response.Success = false;
-                response.Message = "Password is not correct";
-                return response;
-            }
             if (user == null)
             {
                 response.Success = false;
                 response.Message = "User not found";
+                return response;
+            }
+            if (VerifyHashPassword(password, user.PasswordHash, user.PasswordSalt) == false)
+            {
+                response.Success = false;
+                response.Message = "Password is not correct";
                 return response;
             }
 
@@ -336,6 +352,10 @@ namespace AutoHub.Data
 
         private bool VerifyHashPassword(string password, byte[] passwordHash, byte[] passwordSalt)
         {
+            if (password == null || passwordHash == null || passwordSalt == null)
+            {
+                return false;
+            }
             using var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt);
             var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
             return computedHash.SequenceEqual(passwordHash);
@@ -348,14 +368,14 @@ namespace AutoHub.Data
             passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         }
 
-        public string CreateToken(string name, UserRole role, int userId,string email,bool passwordVerified)
+        public string CreateToken(string name, UserRole role, int userId, string email, bool passwordVerification)
         {
             var claims = new ClaimsIdentity();
             claims.AddClaim(new Claim(ClaimTypes.Name, name));
             claims.AddClaim(new Claim(ClaimTypes.Role, role.ToString()));
             claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId.ToString()));
             claims.AddClaim(new Claim(ClaimTypes.Email, email));
-            claims.AddClaim(new Claim("passwordVerified", passwordVerified.ToString()));
+            claims.AddClaim(new Claim("passwordVerification", passwordVerification.ToString()));
 
             var handler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_configuration.GetSection("Token").Value);
@@ -374,6 +394,6 @@ namespace AutoHub.Data
             return handler.WriteToken(token);
         }
 
-    
+
     }
 }
