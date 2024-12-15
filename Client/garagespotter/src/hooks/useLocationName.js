@@ -3,7 +3,7 @@ const getLatLngFromCountry = async (countryName) => {
         const response = await fetch(
             `https://nominatim.openstreetmap.org/search?country=${encodeURIComponent(
                 countryName
-            )}&format=json`
+            )}&format=json&accept-language=en`
         );
 
         if (!response.ok) {

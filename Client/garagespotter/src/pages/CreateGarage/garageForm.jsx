@@ -77,7 +77,7 @@ const GarageForm = () => {
     const getcountryNameFromCoordinates = async (latitude, longitude) => {
         try {
             const response = await fetch(
-                `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+                `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=en`
             );
             const res = await response.json();
             const countryName = res.address.country || "Unknown country";

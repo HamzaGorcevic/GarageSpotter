@@ -86,7 +86,7 @@ const CreateElectricCharger = () => {
     const updateCountryName = async () => {
         try {
             const response = await fetch(
-                `https://nominatim.openstreetmap.org/reverse?lat=${latlng[0]}&lon=${latlng[1]}&format=json`
+                `https://nominatim.openstreetmap.org/reverse?lat=${latlng[0]}&lon=${latlng[1]}&format=json&accept-language=en`
             );
             const data = await response.json();
             const countryName = data.address.country || "Unknown country";
