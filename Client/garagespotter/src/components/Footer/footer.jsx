@@ -7,7 +7,7 @@ const Footer = () => {
         <footer className={styles.footer}>
             <div className={styles.footerContent}>
                 <div className={styles.footerSection}>
-                    <h3 className={styles.logo}>MyApp</h3>
+                    <h3 className={styles.logo}>GarageSpotter</h3>
                     <p>Find and reserve your perfect parking spot</p>
                 </div>
 
@@ -50,7 +50,7 @@ const Footer = () => {
 
             <div className={styles.footerBottom}>
                 <p>
-                    &copy; {new Date().getFullYear()} MyApp. All rights
+                    &copy; {new Date().getFullYear()} GarageSpotter. All rights
                     reserved.
                 </p>
             </div>

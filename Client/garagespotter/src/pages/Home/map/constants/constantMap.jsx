@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-    MapContainer,
-    TileLayer,
-    Marker,
-    Popup,
-    useMapEvents,
-    useMap,
-} from "react-leaflet";
-
+import { MapContainer, TileLayer, useMapEvents, useMap } from "react-leaflet";
 import { GeoSearchControl, OpenStreetMapProvider } from "leaflet-geosearch";
 import "leaflet/dist/leaflet.css";
 import "leaflet-geosearch/dist/geosearch.css";
@@ -36,12 +28,19 @@ const MapConstant = ({ setLatlng }) => {
     function LeafletgeoSearch() {
         const map = useMap();
         useEffect(() => {
-            const provider = new OpenStreetMapProvider();
+            const provider = new OpenStreetMapProvider({
+                params: {
+                    "accept-language": "en", // Force English language results
+                    format: "json",
+                },
+            });
 
             const searchControl = new GeoSearchControl({
                 provider,
                 style: "bar",
                 showMarker: false,
+                searchLabel: "Search for a location", // English label
+                notFoundMessage: "No results found", // English message
             });
 
             map.addControl(searchControl);
@@ -51,16 +50,17 @@ const MapConstant = ({ setLatlng }) => {
         return null;
     }
 
-    // Function to log latitude and longitude of the clicked point
     const MapClickHandler = () => {
         useMapEvents({
-            click(e) {
+            async click(e) {
                 window.scrollTo({
                     top: 900,
                     behavior: "smooth",
                 });
                 const { lat, lng } = e.latlng;
                 setLatlng([lat, lng]);
+
+                // Hide existing markers
                 const markers = document.querySelectorAll(
                     ".leaflet-marker-icon"
                 );
@@ -82,7 +82,6 @@ const MapConstant = ({ setLatlng }) => {
         >
             <MapClickHandler />
             <LeafletgeoSearch />
-
             <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
