@@ -11,7 +11,7 @@ namespace AutoHub.Services
     {
         private readonly AppDbContext _dbContext;
         private readonly IMapper _mapper;
-        public ReservationService(AppDbContext dbContext, IMapper mapper,IHttpContextAccessor httpContextAccessor):base(httpContextAccessor,dbContext)
+        public ReservationService(AppDbContext dbContext, IMapper mapper,IHttpContextAccessor httpContextAccessor,CacheService cacheService):base(httpContextAccessor,dbContext, cacheService)
         {
             _mapper = mapper;
             _dbContext = dbContext;
@@ -19,7 +19,7 @@ namespace AutoHub.Services
 
         public async Task<ServiceResponse<int>> ReserveSingleSpot(ReserveDto reserveDto)
         {
-            await ClearReservations();
+            await ClearReservationsIfNeeded();
             var serviceResponse = new ServiceResponse<int>();
             var userId = GetUserId();
             var garageSpot = await _dbContext.GarageSpots
@@ -125,7 +125,7 @@ namespace AutoHub.Services
 
         public async Task<ServiceResponse<List<ReserveDto>>> GetUserReservations()
         {
-            await ClearReservations();
+            await ClearReservationsIfNeeded();
             var response = new ServiceResponse<List<ReserveDto>>();
 
             var reservations =await _dbContext.Reservations.Where(r => r.UserId == GetUserId()).Include(r=>r.SingleSpot).ToListAsync();
@@ -219,7 +219,7 @@ namespace AutoHub.Services
                                 (r.ReservationStart <= start && r.ReservationEnd >= start) ||
                                 (r.ReservationStart <= end && r.ReservationEnd >= end) ||
                                 (r.ReservationStart >= start && r.ReservationEnd <= end) ||
-                                (r.Hours.HasValue  && r.ReservationStarted.AddHours(r.Hours.Value) < start)
+                                (r.Hours.HasValue  && r.ReservationStarted.AddHours(r.Hours.Value) > start  )
                             ))
                 .ToList();
 

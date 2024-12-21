@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import style from "./reservationsmodal.module.scss";
+import toast from "react-hot-toast";
 
 const ReservationModal = ({
     onClose,
@@ -29,7 +30,12 @@ const ReservationModal = ({
 
         const localISOString = `${year}-${month}-${day}T${hh}:${minutes}:${seconds}`;
 
-        if (reservationType === "hours" && hours > 0) {
+        if (reservationType === "hours") {
+            if (parseInt(hours) <= 0 || parseInt(hours) >= 12) {
+                console.log("WTF", hours);
+                toast.error("Hours must be between 0 and 12");
+                return;
+            }
             onSubmit({
                 hours: parseInt(hours),
                 reservationStarted: localISOString,
@@ -37,9 +43,23 @@ const ReservationModal = ({
         } else if (reservationType === "date") {
             if ((reservationStart && reservationEnd) || reservationEnd) {
                 if (new Date(reservationStart) > new Date(reservationEnd)) {
-                    alert("Start date cannot be later than end date.");
+                    toast.error("Please input correct date ");
                     return;
                 }
+                if (reservationStart && reservationEnd) {
+                    const startDate = new Date(reservationStart);
+                    const endDate = new Date(reservationEnd);
+                    const oneYearLater = new Date(startDate);
+                    oneYearLater.setFullYear(startDate.getFullYear() + 1);
+
+                    if (endDate > oneYearLater) {
+                        toast.error(
+                            "Reservation period cannot exceed one year."
+                        );
+                        return;
+                    }
+                }
+
                 if (reservationStart) {
                     onSubmit({
                         reservationStart,
@@ -56,7 +76,9 @@ const ReservationModal = ({
         }
     };
 
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date(new Date().setDate(new Date().getDate() + 1))
+        .toISOString()
+        .split("T")[0];
 
     let minReservationEnd = reservationStart
         ? new Date(reservationStart)
@@ -102,6 +124,7 @@ const ReservationModal = ({
                             value={hours}
                             onChange={(e) => setHours(e.target.value)}
                             min={1}
+                            max={12}
                         />
                     </div>
                 )}

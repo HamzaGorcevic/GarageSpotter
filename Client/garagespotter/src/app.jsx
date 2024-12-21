@@ -20,6 +20,8 @@ import Footer from "./components/Footer/footer.jsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import Navbar from "./components/Navbar/navbar.jsx";
 import EmailVerification from "./components/EmailVerification/emailVerification.jsx";
+import PrivacyPolicy from "./pages/PrivacyPolicy/privacyPolicy.jsx";
+import TermsOfService from "./pages/TermsOfService/termsOfService.jsx";
 function App() {
     return (
         <GoogleOAuthProvider
@@ -108,6 +110,8 @@ function App() {
                         <Route path="/edit-profile" element={<EditProfile />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+                        <Route path="/privacy" element={<PrivacyPolicy />} />
+                        <Route path="/terms" element={<TermsOfService />} />
                         <Route
                             path="/verify-email"
                             element={<EmailVerification />}

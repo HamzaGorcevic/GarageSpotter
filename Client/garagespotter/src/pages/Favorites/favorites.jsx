@@ -3,13 +3,15 @@ import styles from "./favorites.module.scss";
 import { BASE_URL } from "../../config/config";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Loading } from "../../components/Loader/loader";
 
 const Favorites = () => {
     const { authData } = useContext(AuthContext);
     const [favoriteSpots, setFavoriteSpots] = useState([]);
-
+    const [loading, setLoading] = useState(false);
     // Function to fetch favorite spots
     const getFavoriteSpots = async () => {
+        setLoading(true);
         try {
             const response = await fetch(`${BASE_URL}/User/favoriteSpots`, {
                 method: "GET",
@@ -21,7 +23,7 @@ const Favorites = () => {
             if (!response.ok) {
                 throw new Error("Failed to fetch favorite spots");
             }
-
+            setLoading(false);
             const res = await response.json();
             console.log("Values", res.value);
             setFavoriteSpots(res?.value);
@@ -61,7 +63,7 @@ const Favorites = () => {
         }
     }, [authData]);
 
-    return (
+    return !loading ? (
         <div className={styles.container}>
             <h1 className={styles.title}>My Favorite Spots</h1>
             <div className={styles.favoritesList}>
@@ -120,6 +122,8 @@ const Favorites = () => {
                 )}
             </div>
         </div>
+    ) : (
+        <Loading />
     );
 };
 

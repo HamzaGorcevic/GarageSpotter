@@ -7,6 +7,8 @@ import ReservationModal from "../../components/Modals/ReservationModal/Reservati
 import toast from "react-hot-toast";
 import ViewGarageModal from "../../components/Modals/ViewGarageModal/viewGarageModal";
 import useExtendReservation from "../../hooks/ReservationHooks/seExtendReservation";
+import { Loading } from "../../components/Loader/loader";
+import { LucideCalendar, LucideTimer } from "lucide-react";
 const Reservations = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -15,8 +17,10 @@ const Reservations = () => {
     const [reservations, setReservations] = useState([]);
     const [selectedReservation, setSelectedReservation] = useState(null);
     const [filter, setFilter] = useState("all");
+    const [loadingWindow, setLoadingWindow] = useState(false);
 
     const getReservations = async () => {
+        setLoadingWindow(true);
         const response = await fetch(
             `${BASE_URL}/Reservation/getUserReservations`,
             {
@@ -26,6 +30,7 @@ const Reservations = () => {
                 },
             }
         );
+        setLoadingWindow(false);
         const res = await response.json();
         setReservations(res?.value || []);
     };
@@ -87,7 +92,7 @@ const Reservations = () => {
         return true;
     });
 
-    return (
+    return !loadingWindow ? (
         <div className={styles.container}>
             <h1 className={styles.title}>Your Reservations</h1>
 
@@ -106,6 +111,7 @@ const Reservations = () => {
                     }`}
                     onClick={() => setFilter("hours")}
                 >
+                    <LucideTimer />
                     Hour-based Reservations
                 </button>
                 <button
@@ -114,6 +120,7 @@ const Reservations = () => {
                     }`}
                     onClick={() => setFilter("date")}
                 >
+                    <LucideCalendar />
                     Date-based Reservations
                 </button>
             </div>
@@ -198,6 +205,8 @@ const Reservations = () => {
                 <ViewGarageModal garage={garageSpot} onClose={onClose} />
             )}
         </div>
+    ) : (
+        <Loading />
     );
 };
 

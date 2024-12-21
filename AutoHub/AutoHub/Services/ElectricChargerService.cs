@@ -13,8 +13,8 @@ using Microsoft.EntityFrameworkCore;
             private readonly IAzureBlobService _azureBlobService;
             private readonly IMapper _mapper;
             private readonly IAuthRepository _authRepository;
-            public ElectricChargerService(IMapper mapper,IHttpContextAccessor httpContextAccessor, IAuthRepository authRepository,AppDbContext dbContext,IAzureBlobService azureBlobService)
-                : base(httpContextAccessor, dbContext)
+            public ElectricChargerService(IMapper mapper,IHttpContextAccessor httpContextAccessor, IAuthRepository authRepository,AppDbContext dbContext,IAzureBlobService azureBlobService,CacheService cacheService)
+                : base(httpContextAccessor, dbContext, cacheService)
             {
                 _authRepository = authRepository;
                 userId = GetUserId();

@@ -181,8 +181,7 @@ const MapComponent = ({ garageSpots, eChargers, lat, lon }) => {
                               }}
                           >
                               <Popup>
-                                  {charger.locationName} <br />{" "}
-                                  {charger.address}
+                                  {charger.name} <br /> {charger.address}
                               </Popup>
                           </Marker>
                       ))}

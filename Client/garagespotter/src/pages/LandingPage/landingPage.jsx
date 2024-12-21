@@ -4,33 +4,64 @@ import { useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
     const searchRef = useRef();
+    const modalSearchRef = useRef();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+
     const searchCountry = () => {
         let value = searchRef.current.value;
         navigate(`/home?country=${value}`);
     };
+
+    const modalSearchCountry = () => {
+        let value = modalSearchRef.current.value;
+        setShowModal(false); // Close the modal
+        navigate(`/home?country=${value}`);
+    };
+
     const findNearbyParking = async () => {
         if (navigator.geolocation) {
             setLoading(true);
-            navigator.geolocation.getCurrentPosition(async (position) => {
-                const { latitude, longitude } = position.coords;
-                try {
-                    const response = await fetch(
-                        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
-                    );
-                    const res = await response.json();
-                    const countryName =
-                        res.address.country || "Unknown country";
-                    setLoading(false);
-                    navigate(
-                        `/home?country=${countryName}&lat=${latitude}&lon=${longitude}`
-                    );
-                } catch (error) {
-                    console.error("Error fetching countryName:", error);
-                    setError("Failed to retrieve country name");
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const { latitude, longitude } = position.coords;
+                    try {
+                        const response = await fetch(
+                            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+                        );
+
+                        if (!response.ok) {
+                            throw new Error(
+                                `Fetch failed with status: ${response.status}`
+                            );
+                        }
+
+                        const res = await response.json();
+                        const countryName =
+                            res.address?.country || "Unknown country";
+
+                        setLoading(false);
+                        navigate(
+                            `/home?country=${countryName}&lat=${latitude}&lon=${longitude}`
+                        );
+                    } catch (error) {
+                        console.error("Error fetching country name:", error);
+                        setLoading(false);
+                        setShowModal(true);
+                    }
+                },
+                (error) => {
+                    setTimeout(() => {
+                        console.error("Geolocation error:", error);
+                        setLoading(false);
+                        setShowModal(true);
+                    }, 1300);
                 }
-            });
+            );
+        } else {
+            console.error("Geolocation is not supported by this browser.");
+            setShowModal(true);
         }
     };
 
@@ -42,7 +73,10 @@ const LandingPage = () => {
                 </div>
 
                 <form
-                    onSubmit={searchCountry}
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        searchCountry();
+                    }}
                     className={styles.searchContainer}
                 >
                     <input
@@ -65,7 +99,40 @@ const LandingPage = () => {
                 </button>
             </div>
 
-            {/* New Section: How It Works */}
+            {/* Modal for Location Access */}
+            {showModal && (
+                <div className={styles.modal}>
+                    <div className={styles.modalContent}>
+                        <h3>Unable to Access Location</h3>
+                        <p>
+                            Please allow location access or search for a
+                            location manually.
+                        </p>
+                        <div className={styles.modalActions}>
+                            <input
+                                ref={modalSearchRef}
+                                type="text"
+                                placeholder="Enter country"
+                                className={styles.modalSearchBar}
+                            />
+                            <button
+                                onClick={modalSearchCountry}
+                                className={styles.modalSearchButton}
+                            >
+                                Search
+                            </button>
+                            <button
+                                onClick={() => setShowModal(false)}
+                                className={styles.modalCloseButton}
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* How It Works Section */}
             <div className={styles.howItWorks}>
                 <h2>How It Works</h2>
                 <div className={styles.steps}>
@@ -87,7 +154,6 @@ const LandingPage = () => {
                             src="https://images.prismic.io/spothero/290a7d11-ef71-4c4a-8caf-5a5bfc390deb_d837206c-d8de-4b0c-a491-2ba5b94563df_faq-pass.webp?auto=compress,format"
                             alt="Book"
                         />
-
                         <div className={styles.content}>
                             <h3>Book</h3>
                             <p>

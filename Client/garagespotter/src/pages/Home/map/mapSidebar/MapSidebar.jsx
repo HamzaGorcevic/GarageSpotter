@@ -3,6 +3,7 @@ import style from "./mapsidebar.module.scss";
 import LeftArrow from "../../../../assets/images/leftArrow.svg";
 import redCar from "../../../../assets/images/redCar.png";
 import greenCar from "../../../../assets/images/greenCar.png";
+import ECharger from "../../../../assets/images/ECharger.png";
 import { AuthContext } from "../../../../context/AuthContext";
 import ReservationModal from "../../../../components/Modals/ReservationModal/ReservationModal.jsx";
 import { BASE_URL } from "../../../../config/config.js";
@@ -20,6 +21,18 @@ import {
     Map,
     Home,
 } from "lucide-react";
+
+const CHARGER_IMAGES = {
+    "type-1":
+        "https://www.iqlaad.com/wp-content/uploads/2020/12/Adapter-T1-T2-car-side.jpg",
+    "type-2":
+        "https://www.evexpert.eu/resize/e/1200/1200/files/products/adapter-t2-t1---t1-t2/adapter-typ-1-typ-2.png",
+    chademo: "https://m.media-amazon.com/images/I/71qUQ+YPKKL.jpg",
+    "ccs-combo-1":
+        "https://m.media-amazon.com/images/I/71W57yjz6PL._AC_UF894,1000_QL80_.jpg",
+    "ccs-combo-2":
+        "https://evniculus.eu/cdn/shop/files/Untitleddesign_12.png?v=1693570974",
+};
 
 const MapSidebar = ({
     isOpen,
@@ -70,10 +83,12 @@ const MapSidebar = ({
             toast.error(res.message);
         }
     };
+
     const onGoogleMaps = (lat, lon) => {
         const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}&travelmode=driving`;
         window.open(url, "_blank");
     };
+
     const fetchGarageSpot = async () => {
         const response = await fetch(
             `${BASE_URL}/GarageSpot/getGarageSpot?garageSpotId=${garageSpotId}`,
@@ -102,24 +117,30 @@ const MapSidebar = ({
         setElectricCharger(res.value);
     };
 
-    const addToFavorites = async (spotId) => {
+    const addToFavorites = async (spotId, type = "garage") => {
         try {
-            const response = await fetch(
-                `${BASE_URL}/User/addToFavorites?garageSpotId=${spotId}`,
-                {
-                    method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${authData.token}`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
+            const endpoint =
+                type === "garage"
+                    ? `${BASE_URL}/User/addToFavorites?garageSpotId=${spotId}`
+                    : `${BASE_URL}/User/addToFavoriteChargers?chargerId=${spotId}`;
+
+            const response = await fetch(endpoint, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${authData.token}`,
+                    "Content-Type": "application/json",
+                },
+            });
 
             const res = await response.json();
             if (res.success) {
-                toast.success("Spot added to favorites!");
+                toast.success(
+                    `${
+                        type === "garage" ? "Spot" : "Charger"
+                    } added to favorites!`
+                );
             } else {
-                toast.error("Failed to add to favorites: " + res.message);
+                toast.error(`Failed to add to favorites: ${res.message}`);
             }
         } catch (error) {
             toast.error("An error occurred while adding to favorites.");
@@ -186,7 +207,7 @@ const MapSidebar = ({
                                 <button
                                     className={style.addToFavorites}
                                     onClick={() =>
-                                        addToFavorites(garageSpot.id)
+                                        addToFavorites(garageSpot.id, "garage")
                                     }
                                 >
                                     <Star style={{ color: "#FFD43B" }} />
@@ -267,51 +288,84 @@ const MapSidebar = ({
                     </>
                 ) : electricCharger ? (
                     <>
+                        <div style={{ position: "relative" }}>
+                            <div className={style.imageSlider}>
+                                <div className={style.imageContainer}>
+                                    <img
+                                        src={
+                                            CHARGER_IMAGES[
+                                                electricCharger?.chargerType
+                                            ]
+                                        }
+                                        alt="Electric Charger"
+                                        style={{
+                                            width: "100%",
+                                            height: "auto",
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
                         <h2>{electricCharger?.name}</h2>
-                        <p>
-                            <strong>
-                                <Home /> Country:
-                            </strong>{" "}
-                            {electricCharger?.countryName}
-                        </p>
-                        <p>
-                            <strong>
-                                <MapPin /> Latitude:
-                            </strong>{" "}
-                            {electricCharger?.latitude}
-                        </p>
-                        <p>
-                            <strong>
-                                <MapPin /> Longitude:
-                            </strong>{" "}
-                            {electricCharger?.longitude}
-                        </p>
-                        <p>
-                            <strong>
-                                <BatteryCharging /> Charger Type:
-                            </strong>{" "}
-                            {electricCharger?.chargerType}
-                        </p>
-                        <p>
-                            <strong>
-                                <DollarSign /> Price:
-                            </strong>{" "}
-                            ${electricCharger?.price}
-                        </p>
-                        <p>
-                            <strong>
-                                <Info /> Description:
-                            </strong>{" "}
-                            {electricCharger?.description}
-                        </p>
-                        <p>
-                            <strong>
-                                <Car /> Available Spots:
-                            </strong>{" "}
-                            {electricCharger?.availableSpots}
-                        </p>
+
+                        <div className={style.contentDescription}>
+                            <p>
+                                <strong>
+                                    <Home /> Country:
+                                </strong>{" "}
+                                {electricCharger?.countryName}
+                            </p>
+                            <p>
+                                <strong>
+                                    <MapPin /> Location:
+                                </strong>{" "}
+                                {distance} km away
+                            </p>
+                            <p>
+                                <strong>
+                                    <BatteryCharging /> Type:
+                                </strong>{" "}
+                                {electricCharger?.chargerType}
+                            </p>
+                            <p>
+                                <strong>
+                                    <DollarSign /> Price:
+                                </strong>{" "}
+                                ${electricCharger?.price}
+                            </p>
+                            <p>
+                                <strong>
+                                    <Car /> Available:
+                                </strong>{" "}
+                                {electricCharger?.availableSpots} spots
+                            </p>
+                        </div>
+
+                        <div className={style.containerForSpots}>
+                            {Array.from({
+                                length: electricCharger.availableSpots,
+                            }).map((_, index) => (
+                                <img
+                                    key={index}
+                                    src={ECharger}
+                                    alt="Available Charger"
+                                />
+                            ))}
+                        </div>
+
+                        <div className={style.description}>
+                            <p>
+                                <strong>
+                                    <Info /> Description:
+                                </strong>{" "}
+                                {electricCharger?.description}
+                            </p>
+                        </div>
+
                         <button
                             className={style.reserveButton}
+                            style={{ background: "#1a73e8" }}
                             onClick={() =>
                                 onGoogleMaps(
                                     electricCharger.latitude,
@@ -326,7 +380,6 @@ const MapSidebar = ({
                     "Wrong path"
                 )}
             </div>
-            ;
             {isModalOpen && isGarageSpot && (
                 <ReservationModal
                     onClose={() => setModalOpen(false)}

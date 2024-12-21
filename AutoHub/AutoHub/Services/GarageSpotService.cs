@@ -13,7 +13,7 @@ namespace AutoHub.Services
         private readonly IMapper _mapper;
         private readonly IAzureBlobService _azureBlobService;
         private readonly IAuthRepository _authRepository;
-        public GarageSpotService(AppDbContext dbContext,IAuthRepository authRepository,IMapper mapper,IAzureBlobService azureBlobService,IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor,dbContext)
+        public GarageSpotService(AppDbContext dbContext,IAuthRepository authRepository,IMapper mapper,IAzureBlobService azureBlobService,IHttpContextAccessor httpContextAccessor,CacheService cacheService) : base(httpContextAccessor,dbContext,cacheService)
         {
             _authRepository = authRepository;
             _dbContext = dbContext;
@@ -22,7 +22,7 @@ namespace AutoHub.Services
         }
         public async Task<ServiceResponse<List<GarageSpotDto>>> GetGarageSpotsByCountry(string country)
         {
-            await ClearReservations();
+            await ClearReservationsIfNeeded();
 
             var garagaSpots = await _dbContext.GarageSpots.Include(g => g.TotalSpots).Where(g=>g.CountryName==country && g.IsVerified).ToListAsync();
 

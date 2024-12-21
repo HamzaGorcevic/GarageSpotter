@@ -3,14 +3,16 @@ import styles from "./electricChargers.module.scss";
 import { BASE_URL } from "../../config/config";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Loading } from "../../components/Loader/loader";
 
 const MyElectricChargers = () => {
     const { authData } = useContext(AuthContext);
     const [chargers, setChargers] = useState([]);
     const navigate = useNavigate();
-
+    const [loading, setLoading] = useState(false);
     // Fetch chargers
     const getElectricChargers = async () => {
+        setLoading(true);
         try {
             const response = await fetch(
                 `${BASE_URL}/ElectricCharger/getOwnerElectricChargers`,
@@ -25,8 +27,10 @@ const MyElectricChargers = () => {
             if (response.ok) {
                 const res = await response.json();
                 setChargers(res?.value);
+                setLoading(false);
             } else {
                 console.error("Failed to fetch electric chargers");
+                setLoading(false);
             }
         } catch (error) {
             console.error("Error fetching electric chargers:", error);
@@ -65,7 +69,7 @@ const MyElectricChargers = () => {
         }
     }, [authData]);
 
-    return (
+    return !loading ? (
         <div className={styles.container}>
             <h1 className={styles.title}>My Electric Chargers</h1>
             <div className={styles.chargerList}>
@@ -108,9 +112,7 @@ const MyElectricChargers = () => {
                             </button>
                             <button
                                 className={styles.deleteBtn}
-                                onClick={() =>
-                                    handleChargerDelete(charger.id)
-                                }
+                                onClick={() => handleChargerDelete(charger.id)}
                             >
                                 Delete
                             </button>
@@ -119,6 +121,8 @@ const MyElectricChargers = () => {
                 )}
             </div>
         </div>
+    ) : (
+        <Loading />
     );
 };
 

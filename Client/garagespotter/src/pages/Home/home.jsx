@@ -5,6 +5,7 @@ import { BASE_URL } from "../../config/config";
 import { useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import getLatLngFromCountry from "../../hooks/useLocationName";
+import { Loading } from "../../components/Loader/loader";
 
 const Home = () => {
     const location = useLocation();
@@ -88,7 +89,7 @@ const Home = () => {
                     country={mapInfo.country}
                 />
             ) : (
-                <div>Loading map...</div>
+                <Loading />
             )}
         </div>
     );
