@@ -3,14 +3,16 @@ import styles from "./myGarages.module.scss";
 import { BASE_URL } from "../../config/config";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Loading } from "../../components/Loader/loader";
 
 const MyGarages = () => {
     const { authData } = useContext(AuthContext);
     const [garageSpots, setGarageSpots] = useState([]);
     const navigate = useNavigate();
-
+    const [loading, setLoading] = useState(false);
     // Fetch garage spots
     const getMyGarages = async () => {
+        setLoading(true);
         try {
             const response = await fetch(
                 `${BASE_URL}/GarageSpot/getOwnerGarageSpots`,
@@ -24,7 +26,9 @@ const MyGarages = () => {
             if (response.ok) {
                 const res = await response.json();
                 setGarageSpots(res?.value);
+                setLoading(false);
             } else {
+                setLoading(false);
                 console.error("Failed to fetch garage spots");
             }
         } catch (error) {
@@ -63,7 +67,7 @@ const MyGarages = () => {
         }
     }, [authData]);
 
-    return (
+    return !loading ? (
         <div className={styles.container}>
             <h1 className={styles.title}>My Garages</h1>
             <div className={styles.garageList}>
@@ -101,9 +105,7 @@ const MyGarages = () => {
                             </button>
                             <button
                                 className={styles.deleteBtn}
-                                onClick={() =>
-                                    handleGarageDelete(garage.id)
-                                }
+                                onClick={() => handleGarageDelete(garage.id)}
                             >
                                 Delete
                             </button>
@@ -112,6 +114,8 @@ const MyGarages = () => {
                 )}
             </div>
         </div>
+    ) : (
+        <Loading />
     );
 };
 

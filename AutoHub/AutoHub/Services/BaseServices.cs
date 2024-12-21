@@ -9,10 +9,12 @@ public class BaseService
 
 	IHttpContextAccessor _httpContextAccessor;
     public readonly AppDbContext _dbContext;
-	public BaseService(IHttpContextAccessor httpContextAccessor,AppDbContext dbContext)
+    private readonly CacheService _cacheService;
+	public BaseService(IHttpContextAccessor httpContextAccessor,AppDbContext dbContext,CacheService cacheService)
 	{
 		_httpContextAccessor = httpContextAccessor;
         _dbContext = dbContext;
+        _cacheService = cacheService;
 
 	}
 
@@ -23,55 +25,73 @@ public class BaseService
 
 		return userId != null ? int.Parse(userId) : 0;
 	}
+
+    public async Task ClearReservationsIfNeeded()
+    {
+        if (!_cacheService.ShouldCleanReservations())
+        {
+            return;
+        }
+
+        await ClearReservations();
+        _cacheService.SetLastCleanupTime();
+    }
     public async Task ClearReservations()
     {
-        var totalSpots = await _dbContext.SingleSpots.ToListAsync();
-        bool spotsUpdated = false;
-
-        foreach (var spot in totalSpots)
-        {
-            var anyRes = await _dbContext.Reservations.AnyAsync(r => r.SingleSpotId == spot.Id);
-            if (!anyRes && !spot.IsAvailable)
-            {
-                var freeGarage = await _dbContext.GarageSpots.FirstOrDefaultAsync(r => r.Id == spot.GarageSpotId);
-
-                if (freeGarage != null && !freeGarage.IsAvailable)
-                {
-                    freeGarage.IsAvailable = true;
-                    _dbContext.Entry(freeGarage).State = EntityState.Modified;
-                }
-
-                spot.IsAvailable = true;
-                _dbContext.Entry(spot).State = EntityState.Modified;
-                spotsUpdated = true;
-            }
-        }
-
-        if (spotsUpdated)
-        {
-            await _dbContext.SaveChangesAsync();
-        }
-
-        var allReservations = await _dbContext.Reservations
+        var expiredReservations = await _dbContext.Reservations
             .Include(r => r.SingleSpot)
+            .Where(r => (r.Hours.HasValue && r.ReservationStarted.AddHours(r.Hours.Value) < DateTime.UtcNow) ||
+                       (r.ReservationEnd.HasValue && r.ReservationEnd.Value < DateTime.UtcNow))
             .ToListAsync();
-
-        var expiredReservations = allReservations.Where(r => IsExpired(r)).ToList();
 
         if (expiredReservations.Any())
         {
-            foreach (var expiredReservation in expiredReservations)
+            var spotIds = expiredReservations.Select(r => r.SingleSpotId).ToList();
+
+            await _dbContext.SingleSpots
+                .Where(s => spotIds.Contains(s.Id))
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(b => b.IsAvailable, true));
+
+            var garageSpotIds = expiredReservations
+                .Select(r => r.SingleSpot?.GarageSpotId)
+                .Where(id => id.HasValue)
+                .Distinct()
+                .ToList();
+
+            if (garageSpotIds.Any())
             {
-                if (expiredReservation.SingleSpot != null)
-                {
-                    expiredReservation.SingleSpot.IsAvailable = true;
-                    _dbContext.Entry(expiredReservation.SingleSpot).State = EntityState.Modified;
-                }
+                await _dbContext.GarageSpots
+                    .Where(g => garageSpotIds.Contains(g.Id))
+                    .ExecuteUpdateAsync(g => g
+                        .SetProperty(b => b.IsAvailable, true));
             }
 
-            await _dbContext.SaveChangesAsync();
-
             _dbContext.Reservations.RemoveRange(expiredReservations);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        var spotsWithoutReservations = await _dbContext.SingleSpots
+            .Where(s => !s.IsAvailable && !_dbContext.Reservations.Any(r => r.SingleSpotId == s.Id))
+            .ToListAsync();
+
+        if (spotsWithoutReservations.Any())
+        {
+            var garageSpotIds = spotsWithoutReservations
+                .Select(s => s.GarageSpotId)
+                .Distinct()
+                .ToList();
+
+            await _dbContext.SingleSpots
+                .Where(s => spotsWithoutReservations.Select(sw => sw.Id).Contains(s.Id))
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(b => b.IsAvailable, true));
+
+            // Batch update garage spots
+            await _dbContext.GarageSpots
+                .Where(g => garageSpotIds.Contains(g.Id))
+                .ExecuteUpdateAsync(g => g
+                    .SetProperty(b => b.IsAvailable, true));
 
             await _dbContext.SaveChangesAsync();
         }

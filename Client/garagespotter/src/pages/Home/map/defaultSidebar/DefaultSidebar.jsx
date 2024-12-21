@@ -3,7 +3,17 @@ import { MapPin, DollarSign, Car, BatteryCharging } from "lucide-react";
 import style from "./defaultSidebar.module.scss";
 import noGarageImage from "../../../../assets/images/no-garages.jpg";
 import defaultChargerImage from "../../../../assets/images/defaultChargerImage.png";
-
+const CHARGER_IMAGES = {
+    "type-1":
+        "https://www.iqlaad.com/wp-content/uploads/2020/12/Adapter-T1-T2-car-side.jpg",
+    "type-2":
+        "https://www.evexpert.eu/resize/e/1200/1200/files/products/adapter-t2-t1---t1-t2/adapter-typ-1-typ-2.png",
+    chademo: "https://m.media-amazon.com/images/I/71qUQ+YPKKL.jpg",
+    "ccs-combo-1":
+        "https://m.media-amazon.com/images/I/71W57yjz6PL._AC_UF894,1000_QL80_.jpg",
+    "ccs-combo-2":
+        "https://evniculus.eu/cdn/shop/files/Untitleddesign_12.png?v=1693570974",
+};
 const DefaultSidebar = ({
     filteredGarages,
     filteredChargers,
@@ -224,7 +234,9 @@ const DefaultSidebar = ({
                             >
                                 <div className={style.imageContainer}>
                                     <img
-                                        src={defaultChargerImage}
+                                        src={
+                                            CHARGER_IMAGES[charger?.chargerType]
+                                        }
                                         alt={charger.name}
                                         className={style.garageImage}
                                     />

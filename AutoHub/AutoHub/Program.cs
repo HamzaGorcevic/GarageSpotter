@@ -39,6 +39,7 @@ namespace AutoHub
             });
             //
             builder.Services.AddMemoryCache();
+            builder.Services.AddScoped<CacheService>();
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IGarageSpotService, GarageSpotService>();
             builder.Services.AddScoped<IReservationService, ReservationService>();

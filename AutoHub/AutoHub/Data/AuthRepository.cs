@@ -22,9 +22,8 @@ namespace AutoHub.Data
         private readonly HttpClient _httpClient;
         private readonly IEmailService _emailService;
         private readonly IMemoryCache _cache; // Inject MemoryCache
-
-        public AuthRepository(AppDbContext appDbContext, IEmailService emailService, IMemoryCache cache, IConfiguration configuration, IMapper mapper, IHttpContextAccessor httpContextAccessor)
-            : base(httpContextAccessor, appDbContext)
+        public AuthRepository(AppDbContext appDbContext, IEmailService emailService, IMemoryCache cache, IConfiguration configuration, IMapper mapper, IHttpContextAccessor httpContextAccessor,CacheService cacheService)
+            : base(httpContextAccessor, appDbContext,cacheService)
         {
             _appDbContext = appDbContext;
             _configuration = configuration;
