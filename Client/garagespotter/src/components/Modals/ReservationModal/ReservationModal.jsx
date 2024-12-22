@@ -17,8 +17,9 @@ const ReservationModal = ({
         reservationData?.reservationEnd || ""
     );
     const [hours, setHours] = useState(reservationData?.hours || "");
+    const [errors, setErrors] = useState({});
+    const [touched, setTouched] = useState({});
 
-    // Custom function to get current date string in YYYY-MM-DD format
     const formatDate = (date) => {
         let currentTime = date || new Date();
         const year = currentTime.getFullYear();
@@ -31,27 +32,16 @@ const ReservationModal = ({
         return localISOString;
     };
 
-    // Custom function to get current datetime string
     const getCurrentDateTime = () => {
-        let currentTime = new Date();
-        const year = currentTime.getFullYear();
-        const month = String(currentTime.getMonth() + 1).padStart(2, "0");
-        const day = String(currentTime.getDate()).padStart(2, "0");
-        const hh = String(currentTime.getHours()).padStart(2, "0");
-        const minutes = String(currentTime.getMinutes()).padStart(2, "0");
-        const seconds = String(currentTime.getSeconds()).padStart(2, "0");
-        const localISOString = `${year}-${month}-${day}T${hh}:${minutes}:${seconds}`;
-        return localISOString;
+        return formatDate(new Date());
     };
 
-    // Get today's date at midnight for consistent comparison
     const getTodayDate = () => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         return today;
     };
 
-    // For hour-based reservations, calculate the current end time
     const getCurrentEndTime = () => {
         if (!reservationData?.reservationStarted || !reservationData?.hours) {
             return new Date();
@@ -64,125 +54,171 @@ const ReservationModal = ({
 
     const today = formatDate(getTodayDate());
 
+    const validateForm = () => {
+        const newErrors = {};
+        const todayDate = getTodayDate();
+
+        if (reservationType === "hours") {
+            const hoursNum = parseInt(hours);
+            if (!hours || isNaN(hoursNum)) {
+                newErrors.hours = "Please enter valid hours";
+            } else if (hoursNum <= 0 || hoursNum >= 12) {
+                newErrors.hours = "Hours must be between 1 and 12";
+            }
+        } else if (reservationType === "date") {
+            if (!isExtend && !reservationStart) {
+                newErrors.start = "Please select a start date";
+            }
+            if (!reservationEnd) {
+                newErrors.end = "Please select an end date";
+            }
+
+            // Check if start date is before today
+            if (reservationStart) {
+                const startDate = new Date(reservationStart);
+                startDate.setHours(0, 0, 0, 0);
+                if (startDate < todayDate) {
+                    newErrors.start = "Start date cannot be in the past";
+                }
+            }
+
+            if (reservationStart && reservationEnd) {
+                const startDate = new Date(reservationStart);
+                const endDate = new Date(reservationEnd);
+                startDate.setHours(0, 0, 0, 0);
+                endDate.setHours(0, 0, 0, 0);
+
+                const currentEnd = isExtend
+                    ? reservationData?.reservationEnd
+                        ? new Date(reservationData.reservationEnd)
+                        : getCurrentEndTime()
+                    : null;
+
+                if (isExtend && currentEnd && endDate <= currentEnd) {
+                    newErrors.end =
+                        "New end date must be after current reservation end";
+                } else if (endDate <= startDate) {
+                    newErrors.end = "End date must be after start date";
+                }
+
+                const oneYearLater = new Date(startDate);
+                oneYearLater.setFullYear(startDate.getFullYear() + 1);
+
+                if (endDate > oneYearLater) {
+                    newErrors.end = "Reservation period cannot exceed one year";
+                }
+            }
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleStartDateChange = (e) => {
         const newStartDate = e.target.value;
         const selectedDate = new Date(newStartDate);
+        const todayDate = getTodayDate();
+
         selectedDate.setHours(0, 0, 0, 0);
 
-        if (isExtend) {
-            const currentEnd = reservationData?.reservationEnd
-                ? new Date(reservationData.reservationEnd)
-                : getCurrentEndTime();
-
-            if (selectedDate < currentEnd) {
-                toast.error("Start date must be after current reservation end");
-                setReservationStart("");
-                return;
-            }
-        } else if (selectedDate < getTodayDate()) {
-            toast.error("Start date cannot be in the past");
-            setReservationStart("");
-            return;
+        // Only set error if the field has been touched and is invalid
+        if (selectedDate < todayDate) {
+            setErrors((prev) => ({
+                ...prev,
+                start: "Start date cannot be in the past",
+            }));
+        } else {
+            setErrors((prev) => {
+                const { start, ...rest } = prev;
+                return rest;
+            });
         }
 
         setReservationStart(newStartDate);
-
-        if (
-            reservationEnd &&
-            new Date(reservationEnd) <= new Date(newStartDate)
-        ) {
-            setReservationEnd("");
-            toast.error("End date must be after start date");
-        }
+        setTouched((prev) => ({ ...prev, start: true }));
     };
 
     const handleEndDateChange = (e) => {
         const newEndDate = e.target.value;
-        const startDate = new Date(reservationStart || today);
-        const endDate = new Date(newEndDate);
+        setReservationEnd(newEndDate);
+        setTouched((prev) => ({ ...prev, end: true }));
 
-        startDate.setHours(0, 0, 0, 0);
-        endDate.setHours(0, 0, 0, 0);
+        // Validate end date only if both dates are selected
+        if (reservationStart) {
+            const startDate = new Date(reservationStart);
+            const endDate = new Date(newEndDate);
+            startDate.setHours(0, 0, 0, 0);
+            endDate.setHours(0, 0, 0, 0);
 
-        if (isExtend) {
-            const currentEnd = reservationData?.reservationEnd
-                ? new Date(reservationData.reservationEnd)
-                : getCurrentEndTime();
-
-            if (endDate <= currentEnd) {
-                toast.error(
-                    "New end date must be after current reservation end"
-                );
-                setReservationEnd("");
-                return;
+            if (endDate <= startDate) {
+                setErrors((prev) => ({
+                    ...prev,
+                    end: "End date must be after start date",
+                }));
+            } else {
+                setErrors((prev) => {
+                    const { end, ...rest } = prev;
+                    return rest;
+                });
             }
         }
+    };
 
-        if (endDate <= startDate) {
-            toast.error("End date must be after start date");
-            setReservationEnd("");
-            return;
+    const handleHoursChange = (e) => {
+        const value = e.target.value;
+        const hoursNum = parseInt(value);
+
+        setHours(value);
+        setTouched((prev) => ({ ...prev, hours: true }));
+
+        // Only validate if the field has been touched
+        if (isNaN(hoursNum) || hoursNum <= 0 || hoursNum >= 12) {
+            setErrors((prev) => ({
+                ...prev,
+                hours: "Hours must be between 1 and 12",
+            }));
+        } else {
+            setErrors((prev) => {
+                const { hours, ...rest } = prev;
+                return rest;
+            });
         }
-
-        const oneYearLater = new Date(startDate);
-        oneYearLater.setFullYear(startDate.getFullYear() + 1);
-
-        if (endDate > oneYearLater) {
-            toast.error("Reservation period cannot exceed one year");
-            setReservationEnd("");
-            return;
-        }
-
-        setReservationEnd(newEndDate);
     };
 
     const handleSubmit = () => {
+        // Mark all fields as touched when submitting
+        setTouched({
+            hours: true,
+            start: true,
+            end: true,
+        });
+
+        // Validate all fields before submission
+        if (!validateForm()) {
+            toast.error("Please correct the errors before submitting");
+            return;
+        }
+
         if (reservationType === "hours") {
             const hoursNum = parseInt(hours);
-            if (hoursNum <= 0 || hoursNum >= 12) {
-                toast.error("Hours must be between 1 and 12");
-                return;
-            }
-
-            // For hour-based extension, use only the new hours value
             if (isExtend) {
                 onSubmit({
-                    hours: hoursNum, // Use only the new hours value
+                    hours: hoursNum,
                     reservationStarted: reservationData.reservationStarted,
                 });
             } else {
                 onSubmit({
                     hours: hoursNum,
-                    reservationStarted: getCurrentDateTime(), // Use custom datetime string
+                    reservationStarted: getCurrentDateTime(),
                 });
             }
         } else if (reservationType === "date") {
-            if (!reservationEnd) {
-                toast.error("Please select an end date");
-                return;
-            }
-
-            if (isExtend) {
-                const currentEnd = reservationData?.reservationEnd
-                    ? new Date(reservationData.reservationEnd)
-                    : getCurrentEndTime();
-
-                const newEnd = new Date(reservationEnd);
-
-                if (newEnd <= currentEnd) {
-                    toast.error(
-                        "New end date must be after current reservation end"
-                    );
-                    return;
-                }
-            }
-
             onSubmit({
                 ...(reservationStart && { reservationStart }),
                 reservationEnd,
                 reservationStarted: isExtend
                     ? reservationData?.reservationStarted
-                    : getCurrentDateTime(), // Use custom datetime string
+                    : getCurrentDateTime(),
                 hours: null,
             });
         }
@@ -210,6 +246,8 @@ const ReservationModal = ({
 
     useEffect(() => {
         setReservationEnd("");
+        setErrors({});
+        setTouched({});
     }, [reservationType]);
 
     return (
@@ -247,17 +285,29 @@ const ReservationModal = ({
                                 Current Hours: {reservationData.hours}
                             </div>
                         )}
-                        <label>Additional Hours</label>
-                        <input
-                            type="number"
-                            value={hours}
-                            onChange={(e) => setHours(e.target.value)}
-                            min={1}
-                            max={11}
-                            pattern="\d*"
-                            inputMode="numeric"
-                            placeholder="Enter hours to add"
-                        />
+                        <div className={style.inputWrapper}>
+                            <label>Additional Hours</label>
+                            <input
+                                type="number"
+                                value={hours}
+                                onChange={handleHoursChange}
+                                min={1}
+                                max={11}
+                                pattern="\d*"
+                                inputMode="numeric"
+                                placeholder="Enter hours to add"
+                                className={
+                                    touched.hours && errors.hours
+                                        ? style.error
+                                        : ""
+                                }
+                            />
+                        </div>
+                        {touched.hours && errors.hours && (
+                            <div className={style.errorMessage}>
+                                {errors.hours}
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -265,13 +315,25 @@ const ReservationModal = ({
                     <>
                         {!isExtend && (
                             <div className={style.inputGroup}>
-                                <label>Reservation Start</label>
-                                <input
-                                    type="date"
-                                    min={today}
-                                    value={reservationStart}
-                                    onChange={handleStartDateChange}
-                                />
+                                <div className={style.inputWrapper}>
+                                    <label>Reservation Start</label>
+                                    <input
+                                        type="date"
+                                        min={today}
+                                        value={reservationStart}
+                                        onChange={handleStartDateChange}
+                                        className={
+                                            touched.start && errors.start
+                                                ? style.error
+                                                : ""
+                                        }
+                                    />
+                                </div>
+                                {touched.start && errors.start && (
+                                    <div className={style.errorMessage}>
+                                        {errors.start}
+                                    </div>
+                                )}
                             </div>
                         )}
 
@@ -286,13 +348,25 @@ const ReservationModal = ({
                                         : getCurrentEndTime().toLocaleDateString()}
                                 </div>
                             )}
-                            <label>New End Date</label>
-                            <input
-                                type="date"
-                                min={minReservationEndStr}
-                                value={reservationEnd}
-                                onChange={handleEndDateChange}
-                            />
+                            <div className={style.inputWrapper}>
+                                <label>New End Date</label>
+                                <input
+                                    type="date"
+                                    min={minReservationEndStr}
+                                    value={reservationEnd}
+                                    onChange={handleEndDateChange}
+                                    className={
+                                        touched.end && errors.end
+                                            ? style.error
+                                            : ""
+                                    }
+                                />
+                            </div>
+                            {touched.end && errors.end && (
+                                <div className={style.errorMessage}>
+                                    {errors.end}
+                                </div>
+                            )}
                         </div>
                     </>
                 )}

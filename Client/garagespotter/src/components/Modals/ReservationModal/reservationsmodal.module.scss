@@ -104,7 +104,16 @@
         }
     }
 }
-
+.errorMessage {
+    color: #dc2626;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    min-height: 1.25rem;
+  }
+  
+  .inputWrapper {
+    margin-bottom: 0.25rem;
+  }
 /* Keyframe Animations for fade-in and slide-up effects */
 @keyframes fadeIn {
     from {
