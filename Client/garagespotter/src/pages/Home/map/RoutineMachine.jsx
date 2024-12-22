@@ -2,7 +2,7 @@ import L from "leaflet";
 import { createControlComponent } from "@react-leaflet/core";
 import "leaflet-routing-machine";
 import "./mappersidebar.css";
-import placeholderIcon from "../../../assets/images/placeholder.png";
+import placeholderIcon from "../../../assets/images/placeholder.png"; // Adjust the path as per your project structure
 
 const createRoutineMachineLayer = ({ start, end }) => {
     const customIcon = L.icon({
@@ -32,19 +32,10 @@ const createRoutineMachineLayer = ({ start, end }) => {
         },
     });
 
-    instance.on("routesfound", function (e) {
+    instance.on("routesfound", function () {
         if (instance._routes) {
             instance._clearLines();
         }
-
-        // Get the bounds of the route
-        const bounds = L.latLngBounds(e.routes[0].coordinates);
-
-        // Fit the bounds with padding to shift the route to the left
-        instance._map.fitBounds(bounds, {
-            padding: [50, 300], // [top/bottom padding, left/right padding]
-            maxZoom: 15,
-        });
     });
 
     return instance;

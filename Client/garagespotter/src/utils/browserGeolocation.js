@@ -36,6 +36,6 @@ export const getBrowserLocation = () => {
                     "Geolocation timeout - couldn't get accurate position"
                 )
             );
-        }, 50000);
+        }, 500);
     });
 };
