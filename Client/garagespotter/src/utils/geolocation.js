@@ -1,7 +1,7 @@
 import { getBrowserLocation } from "./browserGeolocation";
 
 const MAX_BROWSER_ATTEMPTS = 2;
-const BROWSER_TIMEOUT = 1000;
+const BROWSER_TIMEOUT = 10000;
 
 export const getCurrentPosition = async (acceptableAccuracy = 100) => {
     const startTime = Date.now();
