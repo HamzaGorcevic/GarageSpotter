@@ -20,11 +20,13 @@
         margin: 0;
         padding: 0;
         align-items: center;
-
+        
         li {
             margin: 0 $spacing-medium;
             position: relative;
-
+            .logoutButton{
+                width: 100%;
+            }
             a,
             button {
                 color: #fff;

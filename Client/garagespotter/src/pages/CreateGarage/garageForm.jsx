@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { BASE_URL } from "../../config/config";
 import MapConstant from "../Home/map/constants/constantMap";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { MapPin, ChevronDown, X } from "lucide-react";
 import style from "./garageForm.module.scss";
@@ -27,7 +27,7 @@ const GarageForm = () => {
         price: "",
         garageImages: [],
     });
-
+    const navigate = useNavigate();
     useEffect(() => {
         if (id && authData.token) {
             setIsUpdateMode(true);
@@ -287,6 +287,9 @@ const GarageForm = () => {
                         ? "Garage spot updated successfully"
                         : "Garage spot created successfully"
                 );
+                setTimeout(() => {
+                    navigate("/garages");
+                }, 1000);
                 if (result.value?.length > 1) {
                     updateToken(result.value);
                 }

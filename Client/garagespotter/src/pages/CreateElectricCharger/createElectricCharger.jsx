@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import styles from "./createElectricCharger.module.scss";
 import MapConstant from "../Home/map/constants/constantMap";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { MapPin, ChevronDown } from "lucide-react";
 import { BASE_URL } from "../../config/config";
@@ -33,7 +33,7 @@ const CreateElectricCharger = () => {
         price: "",
         chargerType: "",
     });
-
+    const navigate = useNavigate();
     useEffect(() => {
         if (id && authData.token) {
             setIsUpdateMode(true);
@@ -184,6 +184,10 @@ const CreateElectricCharger = () => {
                         ? "Electric charger updated successfully!"
                         : "Electric charger created successfully!"
                 );
+                setTimeout(() => {
+                    navigate("/chargers");
+                    console.log("sta ti je");
+                }, 1000);
                 if (result.value?.length > 1) {
                     updateToken(result.value);
                 }

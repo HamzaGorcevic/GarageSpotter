@@ -116,6 +116,7 @@ function App() {
                             path="/verify-email"
                             element={<EmailVerification />}
                         />
+
                         <Route
                             path="/access-denied"
                             element={<AccessDenied />}
