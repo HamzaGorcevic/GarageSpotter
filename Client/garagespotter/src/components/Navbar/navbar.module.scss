@@ -94,12 +94,12 @@
 
             li {
                 margin: 0;
+                list-style-type: none;
                 
                 a,
                 button {
                     padding: $spacing-small $spacing-medium;
                     display: block;
-                    width: 100%;
                     text-align: left;
 
                     &:hover {

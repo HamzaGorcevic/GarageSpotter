@@ -18,6 +18,32 @@ const ReservationModal = ({
     );
     const [hours, setHours] = useState(reservationData?.hours || "");
 
+    // Custom function to get current date string in YYYY-MM-DD format
+    const formatDate = (date) => {
+        let currentTime = date || new Date();
+        const year = currentTime.getFullYear();
+        const month = String(currentTime.getMonth() + 1).padStart(2, "0");
+        const day = String(currentTime.getDate()).padStart(2, "0");
+        const hh = String(currentTime.getHours()).padStart(2, "0");
+        const minutes = String(currentTime.getMinutes()).padStart(2, "0");
+        const seconds = String(currentTime.getSeconds()).padStart(2, "0");
+        const localISOString = `${year}-${month}-${day}T${hh}:${minutes}:${seconds}`;
+        return localISOString;
+    };
+
+    // Custom function to get current datetime string
+    const getCurrentDateTime = () => {
+        let currentTime = new Date();
+        const year = currentTime.getFullYear();
+        const month = String(currentTime.getMonth() + 1).padStart(2, "0");
+        const day = String(currentTime.getDate()).padStart(2, "0");
+        const hh = String(currentTime.getHours()).padStart(2, "0");
+        const minutes = String(currentTime.getMinutes()).padStart(2, "0");
+        const seconds = String(currentTime.getSeconds()).padStart(2, "0");
+        const localISOString = `${year}-${month}-${day}T${hh}:${minutes}:${seconds}`;
+        return localISOString;
+    };
+
     // Get today's date at midnight for consistent comparison
     const getTodayDate = () => {
         const today = new Date();
@@ -25,14 +51,35 @@ const ReservationModal = ({
         return today;
     };
 
-    const today = getTodayDate().toISOString().split("T")[0];
+    // For hour-based reservations, calculate the current end time
+    const getCurrentEndTime = () => {
+        if (!reservationData?.reservationStarted || !reservationData?.hours) {
+            return new Date();
+        }
+        const startTime = new Date(reservationData.reservationStarted);
+        return new Date(
+            startTime.getTime() + reservationData.hours * 60 * 60 * 1000
+        );
+    };
+
+    const today = formatDate(getTodayDate());
 
     const handleStartDateChange = (e) => {
         const newStartDate = e.target.value;
         const selectedDate = new Date(newStartDate);
         selectedDate.setHours(0, 0, 0, 0);
 
-        if (selectedDate < getTodayDate()) {
+        if (isExtend) {
+            const currentEnd = reservationData?.reservationEnd
+                ? new Date(reservationData.reservationEnd)
+                : getCurrentEndTime();
+
+            if (selectedDate < currentEnd) {
+                toast.error("Start date must be after current reservation end");
+                setReservationStart("");
+                return;
+            }
+        } else if (selectedDate < getTodayDate()) {
             toast.error("Start date cannot be in the past");
             setReservationStart("");
             return;
@@ -40,7 +87,6 @@ const ReservationModal = ({
 
         setReservationStart(newStartDate);
 
-        // Clear end date if it's before or equal to the new start date
         if (
             reservationEnd &&
             new Date(reservationEnd) <= new Date(newStartDate)
@@ -57,6 +103,20 @@ const ReservationModal = ({
 
         startDate.setHours(0, 0, 0, 0);
         endDate.setHours(0, 0, 0, 0);
+
+        if (isExtend) {
+            const currentEnd = reservationData?.reservationEnd
+                ? new Date(reservationData.reservationEnd)
+                : getCurrentEndTime();
+
+            if (endDate <= currentEnd) {
+                toast.error(
+                    "New end date must be after current reservation end"
+                );
+                setReservationEnd("");
+                return;
+            }
+        }
 
         if (endDate <= startDate) {
             toast.error("End date must be after start date");
@@ -77,57 +137,76 @@ const ReservationModal = ({
     };
 
     const handleSubmit = () => {
-        const currentTime = new Date();
-        const localISOString = currentTime.toISOString().split(".")[0];
-
         if (reservationType === "hours") {
             const hoursNum = parseInt(hours);
             if (hoursNum <= 0 || hoursNum >= 12) {
                 toast.error("Hours must be between 1 and 12");
                 return;
             }
-            onSubmit({
-                hours: hoursNum,
-                reservationStarted: localISOString,
-            });
+
+            // For hour-based extension, use only the new hours value
+            if (isExtend) {
+                onSubmit({
+                    hours: hoursNum, // Use only the new hours value
+                    reservationStarted: reservationData.reservationStarted,
+                });
+            } else {
+                onSubmit({
+                    hours: hoursNum,
+                    reservationStarted: getCurrentDateTime(), // Use custom datetime string
+                });
+            }
         } else if (reservationType === "date") {
             if (!reservationEnd) {
                 toast.error("Please select an end date");
                 return;
             }
 
-            const startDate = new Date(reservationStart || today);
-            const endDate = new Date(reservationEnd);
-            startDate.setHours(0, 0, 0, 0);
-            endDate.setHours(0, 0, 0, 0);
+            if (isExtend) {
+                const currentEnd = reservationData?.reservationEnd
+                    ? new Date(reservationData.reservationEnd)
+                    : getCurrentEndTime();
 
-            if (startDate < getTodayDate()) {
-                toast.error("Start date cannot be in the past");
-                return;
-            }
+                const newEnd = new Date(reservationEnd);
 
-            if (endDate <= startDate) {
-                toast.error("End date must be after start date");
-                return;
+                if (newEnd <= currentEnd) {
+                    toast.error(
+                        "New end date must be after current reservation end"
+                    );
+                    return;
+                }
             }
 
             onSubmit({
                 ...(reservationStart && { reservationStart }),
                 reservationEnd,
-                reservationStarted: localISOString,
+                reservationStarted: isExtend
+                    ? reservationData?.reservationStarted
+                    : getCurrentDateTime(), // Use custom datetime string
+                hours: null,
             });
         }
     };
 
-    const minReservationEnd = reservationStart
-        ? new Date(
-              new Date(reservationStart).setDate(
-                  new Date(reservationStart).getDate() + 1
+    const getMinReservationEnd = () => {
+        if (isExtend) {
+            if (reservationData?.reservationEnd) {
+                return new Date(reservationData.reservationEnd);
+            } else if (reservationData?.hours) {
+                const currentEnd = getCurrentEndTime();
+                return new Date(currentEnd.setDate(currentEnd.getDate() + 1));
+            }
+        }
+        return reservationStart
+            ? new Date(
+                  new Date(reservationStart).setDate(
+                      new Date(reservationStart).getDate() + 1
+                  )
               )
-          )
-        : new Date(new Date(today).setDate(new Date(today).getDate() + 1));
+            : new Date(new Date(today).setDate(new Date(today).getDate() + 1));
+    };
 
-    const minReservationEndStr = minReservationEnd.toISOString().split("T")[0];
+    const minReservationEndStr = formatDate(getMinReservationEnd());
 
     useEffect(() => {
         setReservationEnd("");
@@ -136,7 +215,7 @@ const ReservationModal = ({
     return (
         <div className={style.modalOverlay}>
             <div className={style.modalContent}>
-                <h2>Reserve a Spot</h2>
+                <h2>{isExtend ? "Extend Reservation" : "Reserve a Spot"}</h2>
 
                 <div className={style.toggleGroup}>
                     <label>
@@ -157,15 +236,19 @@ const ReservationModal = ({
                             checked={reservationType === "date"}
                             onChange={() => setReservationType("date")}
                         />
-                        {isExtend ? "Extend by end-date" : "Reserve by Date"}
+                        {isExtend ? "Extend by End Date" : "Reserve by Date"}
                     </label>
                 </div>
 
                 {reservationType === "hours" && (
                     <div className={style.inputGroup}>
-                        <label></label>
+                        {isExtend && reservationData?.hours && (
+                            <div className={style.currentInfo}>
+                                Current Hours: {reservationData.hours}
+                            </div>
+                        )}
+                        <label>Additional Hours</label>
                         <input
-                            placeholder="Hours"
                             type="number"
                             value={hours}
                             onChange={(e) => setHours(e.target.value)}
@@ -173,6 +256,7 @@ const ReservationModal = ({
                             max={11}
                             pattern="\d*"
                             inputMode="numeric"
+                            placeholder="Enter hours to add"
                         />
                     </div>
                 )}
@@ -187,29 +271,27 @@ const ReservationModal = ({
                                     min={today}
                                     value={reservationStart}
                                     onChange={handleStartDateChange}
-                                    onInvalid={(e) => {
-                                        e.preventDefault();
-                                        toast.error(
-                                            "Please select a valid start date"
-                                        );
-                                    }}
                                 />
                             </div>
                         )}
 
                         <div className={style.inputGroup}>
-                            <label>Reservation End</label>
+                            {isExtend && (
+                                <div className={style.currentInfo}>
+                                    Current End:{" "}
+                                    {reservationData?.reservationEnd
+                                        ? new Date(
+                                              reservationData.reservationEnd
+                                          ).toLocaleDateString()
+                                        : getCurrentEndTime().toLocaleDateString()}
+                                </div>
+                            )}
+                            <label>New End Date</label>
                             <input
                                 type="date"
                                 min={minReservationEndStr}
                                 value={reservationEnd}
                                 onChange={handleEndDateChange}
-                                onInvalid={(e) => {
-                                    e.preventDefault();
-                                    toast.error(
-                                        "Please select a valid end date"
-                                    );
-                                }}
                             />
                         </div>
                     </>
@@ -217,7 +299,11 @@ const ReservationModal = ({
 
                 <div className={style.buttonGroup}>
                     <button onClick={handleSubmit} disabled={loading}>
-                        {loading ? "Loading..." : "Confirm Reservation"}
+                        {loading
+                            ? "Loading..."
+                            : isExtend
+                            ? "Confirm Extension"
+                            : "Confirm Reservation"}
                     </button>
                     <button onClick={onClose} disabled={loading}>
                         Cancel

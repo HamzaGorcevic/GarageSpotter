@@ -32,6 +32,7 @@ const Reservations = () => {
         );
         setLoadingWindow(false);
         const res = await response.json();
+        console.log(res.value);
         setReservations(res?.value || []);
     };
     const { extendReservation, loading } =
@@ -155,12 +156,14 @@ const Reservations = () => {
                                     ).toLocaleString()}
                                 </p>
                             )}
-                            {reservation.hours && reservation.hours !== 0 && (
-                                <p>
-                                    <strong>Duration:</strong>{" "}
-                                    {reservation.hours} hour(s)
-                                </p>
-                            )}
+                            {reservation.hours &&
+                                reservation.hours !== 0 &&
+                                !reservation.reservationEnd && (
+                                    <p>
+                                        <strong>Duration:</strong>{" "}
+                                        {reservation.hours} hour(s)
+                                    </p>
+                                )}
                             <GarageReservationTimer
                                 reservationStarted={
                                     reservation.reservationStarted
