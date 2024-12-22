@@ -31,7 +31,6 @@ export const AuthProvider = ({ children }) => {
             email: decodedToken?.email,
             passwordVerification: decodedToken?.passwordVerification,
         };
-        console.log(modifiedUser, "dec", decodeToken);
         localStorage.setItem("user", JSON.stringify(modifiedUser));
         setAuthData({ token, user: modifiedUser });
         checkTokenExpiration(token, decodedToken?.exp);
@@ -76,7 +75,6 @@ export const AuthProvider = ({ children }) => {
             email: updatedUser.email,
             passwordVerification: updatedUser.passwordVerification,
         };
-        console.log(modifiedUser);
         localStorage.setItem("user", JSON.stringify(modifiedUser));
         setAuthData({ user: modifiedUser, token: authData.token });
     };

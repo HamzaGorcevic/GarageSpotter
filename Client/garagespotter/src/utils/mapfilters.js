@@ -1,6 +1,5 @@
 import { getDistanceToSpot } from "./distanceUtils";
 export const filterSpots = (spots = [], filters = {}, userPosition) => {
-    console.log(spots);
     const {
         searchTerm = "",
         distanceFilter = null,
