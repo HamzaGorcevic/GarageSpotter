@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import styles from "./landingPage.module.scss";
 import { useNavigate } from "react-router-dom";
+import { getCurrentPosition } from "../../utils/geolocation";
 
 const LandingPage = () => {
     const searchRef = useRef();
@@ -8,60 +9,57 @@ const LandingPage = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const searchCountry = () => {
-        let value = searchRef.current.value;
-        navigate(`/home?country=${value}`);
+        const value = searchRef.current.value?.trim();
+        if (value) {
+            navigate(`/home?country=${encodeURIComponent(value)}`);
+        }
     };
 
     const modalSearchCountry = () => {
-        let value = modalSearchRef.current.value;
-        setShowModal(false); // Close the modal
-        navigate(`/home?country=${value}`);
+        const value = modalSearchRef.current.value?.trim();
+        if (value) {
+            setShowModal(false);
+            navigate(`/home?country=${encodeURIComponent(value)}`);
+        }
     };
 
     const findNearbyParking = async () => {
-        if (navigator.geolocation) {
-            setLoading(true);
-            navigator.geolocation.getCurrentPosition(
-                async (position) => {
-                    const { latitude, longitude } = position.coords;
-                    try {
-                        const response = await fetch(
-                            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
-                        );
+        setLoading(true);
+        setErrorMessage("");
 
-                        if (!response.ok) {
-                            throw new Error(
-                                `Fetch failed with status: ${response.status}`
-                            );
-                        }
-
-                        const res = await response.json();
-                        const countryName =
-                            res.address?.country || "Unknown country";
-
-                        setLoading(false);
-                        navigate(
-                            `/home?country=${countryName}&lat=${latitude}&lon=${longitude}`
-                        );
-                    } catch (error) {
-                        console.error("Error fetching country name:", error);
-                        setLoading(false);
-                        setShowModal(true);
-                    }
-                },
-                (error) => {
-                    setTimeout(() => {
-                        console.error("Geolocation error:", error);
-                        setLoading(false);
-                        setShowModal(true);
-                    }, 1300);
-                }
+        try {
+            // Get precise location
+            const position = await getCurrentPosition();
+            console.log(position);
+            // Reverse geocoding with better error handling
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?lat=${position.lat}&lon=${position.lng}&format=json&zoom=18&addressdetails=1`
             );
-        } else {
-            console.error("Geolocation is not supported by this browser.");
+
+            if (!response.ok) {
+                throw new Error("Failed to get location details");
+            }
+
+            const data = await response.json();
+
+            if (!data.address?.country) {
+                throw new Error("Could not determine your country");
+            }
+
+            navigate(
+                `/home?country=${encodeURIComponent(
+                    data.address.country
+                )}&userLat=${position.lat}&userLng=${position.lng}`
+            );
+        } catch (error) {
+            console.error("Location error:", error);
+            setErrorMessage(error.message);
             setShowModal(true);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -93,20 +91,23 @@ const LandingPage = () => {
                 <button
                     onClick={findNearbyParking}
                     className={styles.nearbyButton}
+                    disabled={loading}
                 >
-                    {loading ? <div className={styles.loader}></div> : null}
-                    Find Parking Near Me
+                    {loading ? (
+                        <div className={styles.loader}></div>
+                    ) : (
+                        "Find Parking Near Me"
+                    )}
                 </button>
             </div>
 
-            {/* Modal for Location Access */}
             {showModal && (
                 <div className={styles.modal}>
                     <div className={styles.modalContent}>
-                        <h3>Unable to Access Location</h3>
+                        <h3>Location Access Issue</h3>
                         <p>
-                            Please allow location access or search for a
-                            location manually.
+                            {errorMessage ||
+                                "Please allow location access or search manually."}
                         </p>
                         <div className={styles.modalActions}>
                             <input
@@ -122,7 +123,10 @@ const LandingPage = () => {
                                 Search
                             </button>
                             <button
-                                onClick={() => setShowModal(false)}
+                                onClick={() => {
+                                    setShowModal(false);
+                                    setErrorMessage("");
+                                }}
                                 className={styles.modalCloseButton}
                             >
                                 Close
@@ -132,7 +136,6 @@ const LandingPage = () => {
                 </div>
             )}
 
-            {/* How It Works Section */}
             <div className={styles.howItWorks}>
                 <h2>How It Works</h2>
                 <div className={styles.steps}>

@@ -267,42 +267,58 @@ namespace AutoHub.Services
 
 
 
-        public async Task<ServiceResponse<int>> UpdateGarageSpot([FromForm] IFormFile verificationDocument, [FromForm] List<IFormFile> garageImages, [FromForm] CreateGarageSpotDto updatedSpot,int garageSpotId)
+        public async Task<ServiceResponse<int>> UpdateGarageSpot(
+            [FromForm] List<IFormFile> garageImages,
+            [FromForm] List<string> existingImages,
+            [FromForm] CreateGarageSpotDto updatedSpot,
+    int garageSpotId)
         {
             var response = new ServiceResponse<int>();
 
             var garagespot = await _dbContext.GarageSpots.FirstOrDefaultAsync(g => g.Id == garageSpotId);
-
-
             if (garagespot == null)
             {
                 response.Success = false;
-                response.Message = "Not found";
-                response.Value = 0;
+                response.Message = "Garage spot not found";
                 return response;
             }
-            if (verificationDocument != null)
+
+            try
             {
-                garagespot.VerificationDocument = await _azureBlobService.UploadFileAsync(verificationDocument, "garage-verifications");
+                var uploadedImages = new List<string>();
+                if (garageImages != null && garageImages.Any())
+                {
+                    uploadedImages = await _azureBlobService.UploadMultipleFilesAsync(garageImages, "garage-images");
+                }
+
+                garagespot.GarageImages = (existingImages ?? new List<string>())
+                    .Concat(uploadedImages)
+                    .ToList();
+
+                // Update other properties
+                garagespot.Longitude = updatedSpot.Longitude;
+                garagespot.Latitude = updatedSpot.Latitude;
+                garagespot.LocationName = updatedSpot.LocationName;
+                garagespot.Price = updatedSpot.Price;
+                garagespot.VerificationDocument = updatedSpot.VerificationDocument;
+                garagespot.CountryName = updatedSpot.CountryName;
+
+                await _dbContext.SaveChangesAsync();
+
+                response.Success = true;
+                response.Message = "Garage spot updated successfully";
+                response.Value = garagespot.Id;
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions
+                response.Success = false;
+                response.Message = $"Error updating garage spot: {ex.Message}";
             }
 
-            if (garageImages != null && garageImages.Count > 0)
-            {
-                garagespot.GarageImages = await _azureBlobService.UploadMultipleFilesAsync(garageImages, "garage-images");
-            }
-            garagespot.Longitude = updatedSpot.Longitude;
-            garagespot.Latitude = updatedSpot.Latitude;
-            garagespot.LocationName = updatedSpot.LocationName;
-            garagespot.Price = updatedSpot.Price;
-            garagespot.VerificationDocument = updatedSpot.CountryName;
-            garagespot.CountryName = updatedSpot.CountryName;
-
-            await _dbContext.SaveChangesAsync();
-            response.Success = true;
-            response.Message = "Succesfully updated garage";
-            response.Value = garagespot.Id;
             return response;
         }
+
         public async Task<ServiceResponse<bool>> DeleteGarageSpot(int spotId)
         {
             var response = new ServiceResponse<bool>();

@@ -1,8 +1,9 @@
 import React from "react";
+import styles from "./privacypolicy.module.scss";
 
 const PrivacyPolicy = () => {
     return (
-        <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
+        <div className={styles.privacyPolicy}>
             <h1>Privacy Policy</h1>
             <p>
                 This Privacy Policy explains how we collect, use, and protect
@@ -29,14 +30,12 @@ const PrivacyPolicy = () => {
             </ul>
 
             <h2>2. How We Use Your Information</h2>
-            <p>
-                We use your information to:
-                <ul>
-                    <li>Provide and improve our application services.</li>
-                    <li>Respond to your inquiries and support requests.</li>
-                    <li>Ensure security and prevent fraudulent activities.</li>
-                </ul>
-            </p>
+            <p>We use your information to:</p>
+            <ul>
+                <li>Provide and improve our application services.</li>
+                <li>Respond to your inquiries and support requests.</li>
+                <li>Ensure security and prevent fraudulent activities.</li>
+            </ul>
 
             <h2>3. Sharing Your Information</h2>
             <p>
@@ -61,7 +60,10 @@ const PrivacyPolicy = () => {
             <p>
                 If you have any questions or concerns about this Privacy Policy,
                 please contact us at{" "}
-                <a href="mailto:info@example.com">info@example.com</a>.
+                <a href="mailto:hamzagorcevic100@gmail.com">
+                    hamzagorcevic100@gmail.com
+                </a>
+                .
             </p>
         </div>
     );

@@ -53,9 +53,9 @@ namespace AutoHub.Controllers
 
         [HttpPut("updateElectricCharger")]
         [Authorize(Roles = "Owner")]
-        public async Task<ServiceResponse<int>> UpdateElectricCharger([FromForm] IFormFile verificationDocument, [FromForm] CreateElectricCharagerDto electricCharger, int electricChargerId)
+        public async Task<ServiceResponse<int>> UpdateElectricCharger([FromForm] CreateElectricCharagerDto electricCharger, int electricChargerId)
         {
-            return await _electricChargerService.UpdateElectricCharger(verificationDocument, electricCharger, electricChargerId);
+            return await _electricChargerService.UpdateElectricCharger( electricCharger, electricChargerId);
         }
 
         [HttpDelete("deleteElectricCharger")]
