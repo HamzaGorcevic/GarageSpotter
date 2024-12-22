@@ -122,12 +122,22 @@ const CreateElectricCharger = () => {
             }
         });
 
-        if (formData.availableSpots && Number(formData.availableSpots) < 1) {
-            errors.availableSpots = "Must have at least 1 available spot";
+        if (Number(formData.availableSpots)) {
+            if (formData.availableSpots < 1) {
+                errors.availableSpots = "Must have at least 1 available spot";
+            }
+            if (formData.availableSpots > 20) {
+                errors.availableSpots =
+                    "Must have less than 20 spots, since we are in beta phase";
+            }
         }
-
-        if (formData.price && Number(formData.price) < 0) {
-            errors.price = "Price cannot be negative";
+        if (Number(formData.price)) {
+            if (formData.price < 0) {
+                errors.price = "Price cannot be negative";
+            }
+            if (formData.price > 1000) {
+                errors.price = "Price cannot be higher than 1000";
+            }
         }
 
         setError(errors);
@@ -266,7 +276,8 @@ const CreateElectricCharger = () => {
                         name="price"
                         value={formData.price}
                         onChange={handleChange}
-                        min="0"
+                        min="1"
+                        max="1000"
                         placeholder="Enter price per charge"
                     />
                     {error.price && (
@@ -283,6 +294,7 @@ const CreateElectricCharger = () => {
                         value={formData.availableSpots}
                         onChange={handleChange}
                         min="1"
+                        max="20"
                         placeholder="Number of charging spots"
                     />
                     {error.availableSpots && (

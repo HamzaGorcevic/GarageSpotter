@@ -3,7 +3,6 @@ import styles from "./imagesModal.module.scss";
 
 const ImagesModal = ({ images, setShowImagesModal }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
-    console.log(images);
     if (!images || images.length === 0) {
         return <div>No images to display</div>;
     }
@@ -17,12 +16,11 @@ const ImagesModal = ({ images, setShowImagesModal }) => {
             (prevIndex) => (prevIndex - 1 + images.length) % images.length
         );
     };
-    window.addEventListener("keydown",(e)=>{
-        console.log(e,"clicked");
-        if(e.key == "Escape"){
-            setShowImagesModal(false)
+    window.addEventListener("keydown", (e) => {
+        if (e.key == "Escape") {
+            setShowImagesModal(false);
         }
-    })
+    });
 
     return (
         <div className={styles.modal}>

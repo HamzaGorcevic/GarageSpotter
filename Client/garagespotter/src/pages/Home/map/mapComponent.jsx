@@ -92,7 +92,7 @@ const MapComponent = ({
         <div className={style.mapContainer}>
             <MapContainer
                 center={[mapCenter.lat, mapCenter.lng]}
-                zoom={7}
+                zoom={8}
                 style={{ height: "100vh", width: "100%" }}
             >
                 <TileLayer

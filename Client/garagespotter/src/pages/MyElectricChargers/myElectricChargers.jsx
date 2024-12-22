@@ -54,7 +54,6 @@ const MyElectricChargers = () => {
                 setChargers((prev) =>
                     prev.filter((charger) => charger.id !== chargerId)
                 );
-                console.log("Electric charger deleted successfully");
             } else {
                 console.error("Failed to delete electric charger");
             }

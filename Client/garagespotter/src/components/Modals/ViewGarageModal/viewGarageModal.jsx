@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import styles from "./viewGarageModal.module.scss";
 
 const ViewGarageModal = ({ garage, onClose }) => {
-    console.log(garage);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const closeModal = (e) => {

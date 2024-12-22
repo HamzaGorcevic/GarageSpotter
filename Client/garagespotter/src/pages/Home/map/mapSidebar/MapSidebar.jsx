@@ -21,6 +21,7 @@ import {
     Map,
     Home,
 } from "lucide-react";
+import useFavorites from "../../../../hooks/useFavorites.js";
 
 const CHARGER_IMAGES = {
     "type-1":
@@ -46,6 +47,7 @@ const MapSidebar = ({
     const [garageSpot, setGarageSpot] = useState(null);
     const [electricCharger, setElectricCharger] = useState(null);
     const [loading, setLoading] = useState(false);
+    const { favoriteSpots, refreshFavorites } = useFavorites(authData.token);
     const sliderRef = useRef(null);
 
     const handleSliderMovement = (direction) => {
@@ -117,12 +119,9 @@ const MapSidebar = ({
         setElectricCharger(res.value);
     };
 
-    const addToFavorites = async (spotId, type = "garage") => {
+    const addToFavorites = async (spotId) => {
         try {
-            const endpoint =
-                type === "garage"
-                    ? `${BASE_URL}/User/addToFavorites?garageSpotId=${spotId}`
-                    : `${BASE_URL}/User/addToFavoriteChargers?chargerId=${spotId}`;
+            const endpoint = `${BASE_URL}/User/addToFavorites?garageSpotId=${spotId}`;
 
             const response = await fetch(endpoint, {
                 method: "POST",
@@ -134,11 +133,8 @@ const MapSidebar = ({
 
             const res = await response.json();
             if (res.success) {
-                toast.success(
-                    `${
-                        type === "garage" ? "Spot" : "Charger"
-                    } added to favorites!`
-                );
+                toast.success("Successfuly added to favorites!");
+                refreshFavorites();
             } else {
                 toast.error(`Failed to add to favorites: ${res.message}`);
             }
@@ -147,7 +143,9 @@ const MapSidebar = ({
             console.error("Error:", error);
         }
     };
-
+    const isSpotInFavorites = (spotId) => {
+        return favoriteSpots.some((spot) => spot.id === spotId);
+    };
     useEffect(() => {
         if (garageSpotId >= 0) {
             if (isGarageSpot) {
@@ -204,14 +202,31 @@ const MapSidebar = ({
                                         <FontAwesomeIcon icon={faArrowRight} />
                                     </button>
                                 </div>
-                                <button
-                                    className={style.addToFavorites}
-                                    onClick={() =>
-                                        addToFavorites(garageSpot.id, "garage")
-                                    }
-                                >
-                                    <Star style={{ color: "#FFD43B" }} />
-                                </button>
+
+                                {isSpotInFavorites(garageSpot.id) ? (
+                                    <button
+                                        className={style.addToFavorites}
+                                        onClick={() => {
+                                            window.location.href = "/favorites";
+                                        }}
+                                    >
+                                        <Star
+                                            style={{
+                                                color: "#FFD43B",
+                                                fill: "#FFD43B",
+                                            }}
+                                        />
+                                    </button>
+                                ) : (
+                                    <button
+                                        className={style.addToFavorites}
+                                        onClick={() =>
+                                            addToFavorites(garageSpot.id)
+                                        }
+                                    >
+                                        <Star style={{ color: "#FFD43B" }} />
+                                    </button>
+                                )}
                             </div>
                         )}
                         <h2>{garageSpot?.locationName}</h2>
