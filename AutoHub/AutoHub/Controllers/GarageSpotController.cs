@@ -49,9 +49,9 @@ namespace AutoHub.Controllers
         [HttpPut("updateGarageSpot")]
         [Authorize(Roles = "User,Owner")]
 
-        public async Task<ServiceResponse<int>> UpdateGarageSpot([FromForm] IFormFile verificationDocument, [FromForm] List<IFormFile> garageImages, [FromForm] CreateGarageSpotDto updatedSpot,int garageSpotId)
+        public async Task<ServiceResponse<int>> UpdateGarageSpot([FromForm] List<IFormFile> garageImages, [FromForm] List<string> existingImages,[FromForm] CreateGarageSpotDto updatedSpot,int garageSpotId)
         {
-            return await _garageSpotService.UpdateGarageSpot( verificationDocument, garageImages,updatedSpot,garageSpotId);
+            return await _garageSpotService.UpdateGarageSpot( garageImages,existingImages,updatedSpot,garageSpotId);
         }
         
         [HttpPost("creategaragespot")]

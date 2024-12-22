@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-import style from "./garageForm.module.scss";
 import { AuthContext } from "../../context/AuthContext";
 import { BASE_URL } from "../../config/config";
 import MapConstant from "../Home/map/constants/constantMap";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { MapPin, ChevronDown } from "lucide-react";
+import { MapPin, ChevronDown, X } from "lucide-react";
+import style from "./garageForm.module.scss";
 
 const GarageForm = () => {
     const [latlng, setLatlng] = useState([43.23132, 21.21321]);
@@ -16,6 +16,7 @@ const GarageForm = () => {
     const [isUpdateMode, setIsUpdateMode] = useState(false);
     const [loading, setLoading] = useState(false);
     const [formErrors, setFormErrors] = useState({});
+    const [existingImages, setExistingImages] = useState([]);
     const [formData, setFormData] = useState({
         locationName: "",
         latitude: latlng[0],
@@ -47,6 +48,7 @@ const GarageForm = () => {
             if (response.ok) {
                 let data = await response.json();
                 data = data.value;
+                setExistingImages(data.garageImages || []);
                 setFormData({
                     locationName: data.locationName,
                     latitude: data.latitude,
@@ -55,7 +57,7 @@ const GarageForm = () => {
                     verificationDocument: data.verificationDocument,
                     numberOfSpots: data.totalSpots?.length,
                     price: data.price,
-                    garageImages: data.garageImages,
+                    garageImages: [],
                 });
             } else {
                 setError("Failed to fetch garage spot details.");
@@ -94,10 +96,14 @@ const GarageForm = () => {
 
     const handleFileChange = (e) => {
         const { name, files } = e.target;
-        setFormData((prevState) => ({
-            ...prevState,
-            [name]: files[0],
-        }));
+        if (name === "garageImages") {
+            handleMultipleFileChange(e);
+        } else {
+            setFormData((prevState) => ({
+                ...prevState,
+                [name]: files[0],
+            }));
+        }
     };
 
     const handleMultipleFileChange = (e) => {
@@ -108,7 +114,12 @@ const GarageForm = () => {
             validImageTypes.includes(file.type)
         );
 
-        if (filteredFiles.length + formData.garageImages.length > 7) {
+        if (
+            filteredFiles.length +
+                formData.garageImages.length +
+                existingImages.length >
+            7
+        ) {
             toast.error("You can only upload a maximum of 7 images.");
             setAreFilesValid(false);
             return;
@@ -119,6 +130,17 @@ const GarageForm = () => {
         setFormData((prevState) => ({
             ...prevState,
             garageImages: [...prevState.garageImages, ...filteredFiles],
+        }));
+    };
+
+    const removeExistingImage = (index) => {
+        setExistingImages((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    const removeNewImage = (index) => {
+        setFormData((prev) => ({
+            ...prev,
+            garageImages: prev.garageImages.filter((_, i) => i !== index),
         }));
     };
 
@@ -158,8 +180,14 @@ const GarageForm = () => {
             formDataToSend.append("numberOfSpots", formData.numberOfSpots);
             formDataToSend.append("price", formData.price);
 
+            // Append existing image URLs
+            existingImages.forEach((imageUrl) => {
+                formDataToSend.append("existingImages", imageUrl);
+            });
+
+            // Append new image files
             formData.garageImages.forEach((image) => {
-                formDataToSend.append(`garageImages`, image);
+                formDataToSend.append("garageImages", image);
             });
 
             const url = isUpdateMode
@@ -325,16 +353,73 @@ const GarageForm = () => {
 
                 <div className={style.formGroup}>
                     <label>Garage Images (Max 7):</label>
+
+                    {/* Display existing images */}
+                    {existingImages.length > 0 && (
+                        <div className={style.imageGrid}>
+                            {existingImages.map((imageUrl, index) => (
+                                <div
+                                    key={`existing-${index}`}
+                                    className={style.imageContainer}
+                                >
+                                    <img
+                                        src={imageUrl}
+                                        alt={`Garage ${index + 1}`}
+                                        className={style.previewImage}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            removeExistingImage(index)
+                                        }
+                                        className={style.removeButton}
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {formData.garageImages.length > 0 && (
+                        <div className={style.imageGrid}>
+                            {formData.garageImages.map((file, index) => (
+                                <div
+                                    key={`new-${index}`}
+                                    className={style.imageContainer}
+                                >
+                                    <img
+                                        src={URL.createObjectURL(file)}
+                                        alt={`New garage ${index + 1}`}
+                                        className={style.previewImage}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => removeNewImage(index)}
+                                        className={style.removeButton}
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
                     <input
                         type="file"
                         name="garageImages"
                         multiple
                         accept="image/png, image/jpg, image/jpeg"
-                        onChange={handleMultipleFileChange}
+                        onChange={handleFileChange}
+                        className={style.fileInput}
                     />
                     {formErrors.validFiles && (
                         <p className={style.error}>{formErrors.validFiles}</p>
                     )}
+                    <p className={style.imageCount}>
+                        {existingImages.length + formData.garageImages.length}/7
+                        images
+                    </p>
                 </div>
 
                 <button
@@ -353,6 +438,8 @@ const GarageForm = () => {
                         "Create Garage"
                     )}
                 </button>
+
+                {error && <p className={style.error}>{error}</p>}
             </form>
         </div>
     );

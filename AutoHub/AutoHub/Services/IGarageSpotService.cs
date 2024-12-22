@@ -15,6 +15,6 @@ namespace AutoHub.Services
         Task<ServiceResponse<string>> CreateGarageSpot([FromForm] IFormFile verificationDocument, [FromForm] List<IFormFile> garageImages, [FromForm] CreateGarageSpotDto newSpot);
         Task<ServiceResponse<List<GarageSpotDto>>> GetOwnerGarageSpots();
         Task<ServiceResponse<bool>> DeleteGarageSpot(int spotId);
-        Task<ServiceResponse<int>> UpdateGarageSpot([FromForm] IFormFile verificationDocument, [FromForm] List<IFormFile> garageImages, [FromForm] CreateGarageSpotDto updatedSpot,int garageSpotId);
+        Task<ServiceResponse<int>> UpdateGarageSpot( [FromForm] List<IFormFile> garageImages, [FromForm] List<string> existingImages,[FromForm] CreateGarageSpotDto updatedSpot,int garageSpotId);
     }
 }

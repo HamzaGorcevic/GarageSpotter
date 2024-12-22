@@ -115,10 +115,9 @@ using Microsoft.EntityFrameworkCore;
 
                 return response;
             }
-            public async Task<ServiceResponse<int>> UpdateElectricCharger([FromForm] IFormFile verificationDocument,[FromForm] CreateElectricCharagerDto electricChargerDto, int electricChargerId)
+            public async Task<ServiceResponse<int>> UpdateElectricCharger([FromForm] CreateElectricCharagerDto electricChargerDto, int electricChargerId)
             {
                 var response = new ServiceResponse<int>();
-                string verificationDocumentPath = "";
 
                 try
                 {
@@ -126,19 +125,14 @@ using Microsoft.EntityFrameworkCore;
                     if (charger == null)
                     {
                         response.Success = false;   
-                        response.Message = "Electric charger not found.";
+                        response.Message = "Electric charger not found.";   
                         return response;
                     }
 
-                    charger = _mapper.Map<ElectricCharger>(electricChargerDto);
+                    _mapper.Map(electricChargerDto,charger);
+                    _dbContext.Entry(charger).State = EntityState.Modified;
 
-                    if (verificationDocument != null)
-                    {
-                        verificationDocumentPath = await _azureBlobService.UploadFileAsync(verificationDocument, "charger-verifications");
-                        charger.VerificationDocument = verificationDocumentPath;
-                    }
-
-                    await _dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync();
 
                     response.Value = charger.Id;
                     response.Success = true;

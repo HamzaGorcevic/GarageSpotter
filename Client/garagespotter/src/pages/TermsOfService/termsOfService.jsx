@@ -2,7 +2,13 @@ import React from "react";
 
 const TermsOfService = () => {
     return (
-        <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
+        <div
+            style={{
+                padding: "50px",
+                fontFamily: "Arial, sans-serif",
+                color: "#333",
+            }}
+        >
             <h1>Terms of Service</h1>
             <p>
                 By using this application, you agree to the following terms and
@@ -61,7 +67,11 @@ const TermsOfService = () => {
             <h2>7. Contact Us</h2>
             <p>
                 If you have any questions about these Terms of Service, contact
-                us at <a href="mailto:info@example.com">info@example.com</a>.
+                us at{" "}
+                <a href="mailto:hamzagorcevic100@gmail.com">
+                    hamzagorcevic100@gmail.com
+                </a>
+                .
             </p>
         </div>
     );

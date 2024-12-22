@@ -1,3 +1,5 @@
+import toast from "react-hot-toast";
+
 const getLatLngFromCountry = async (countryName) => {
     try {
         const response = await fetch(
@@ -25,6 +27,8 @@ const getLatLngFromCountry = async (countryName) => {
             name: standardizedCountryName,
         };
     } catch (error) {
+        toast.error("You are searching for country witch doesnt exist");
+        window.location.pathname = "/";
         console.error("Error fetching lat/lng:", error);
         return { lat: null, lon: null, name: countryName }; // Fallback to original name
     }
