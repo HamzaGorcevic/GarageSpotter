@@ -1,4 +1,4 @@
-# Ignore all logs
+# Node.js
 logs
 *.log
 npm-debug.log*
@@ -6,16 +6,16 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-
-# Ignore node modules (for JavaScript/Node.js packages)
 node_modules
 dist
 dist-ssr
 *.local
 
-# Ignore all temporary files for editors and IDEs
-.vs/
+# Editor directories and files
 .vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
 !.vscode/extensions.json
 .idea
 .DS_Store
@@ -25,31 +25,69 @@ dist-ssr
 *.sln
 *.sw?
 
-# Ignore environment files
-/AutoHub/.env
+# .NET Core
+AutoHub/AutoHub/[Bb]in/
+AutoHub/AutoHub/[Oo]bj/
+AutoHub/AutoHub/[Ll]ogs/
+AutoHub/AutoHub/*.user
 
-# Ignore obj and bin directories (common in .NET projects)
-AutoHub/obj/
-AutoHub/bin/
+# Ensure necessary configuration files are included
+!AutoHub/AutoHub/appsettings.Development.json
+!AutoHub/AutoHub/appsettings.Production.json
+!AutoHub/AutoHub/appsettings.json
 
-# Ignore build output for .NET projects
-AutoHub/obj/
-AutoHub/bin/
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
 
-# Ignore any compiled files for .NET
-*.dll
-*.exe
-*.pdb
-*.cache
-*.vsix
+# Visual Studio files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
 
-# Ignore package manager files that are not needed for the repo
-/AutoHub/package-lock.json
-/AutoHub/yarn.lock
-/AutoHub/pnpm-lock.yaml
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
 
-# Ignore ASP.NET Core development certificates
-/.aspnet/https/
+# NuGet Packages
+*.nupkg
+*.snupkg
+!**/[Pp]ackages/build/
 
-# Ignore ASP.NET Core temporary files
-/AutoHub/Properties/
+# Local development settings
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
+
+# SQL Server files
+*.mdf
+*.ldf
+*.ndf
+
+# Azure
+*.publishsettings
+PublishScripts/
+
+*.tmp
+*.temp
+
+Thumbs.db
