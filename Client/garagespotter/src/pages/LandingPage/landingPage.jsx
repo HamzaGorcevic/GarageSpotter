@@ -33,7 +33,6 @@ const LandingPage = () => {
         try {
             // Get precise location
             const position = await getCurrentPosition();
-            og(position);
             // Reverse geocoding with better error handling
             const response = await fetch(
                 `https://nominatim.openstreetmap.org/reverse?lat=${position.lat}&lon=${position.lng}&format=json&zoom=18&addressdetails=1`
