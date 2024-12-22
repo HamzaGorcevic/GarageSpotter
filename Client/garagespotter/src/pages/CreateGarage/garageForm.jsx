@@ -99,37 +99,72 @@ const GarageForm = () => {
         if (name === "garageImages") {
             handleMultipleFileChange(e);
         } else {
-            setFormData((prevState) => ({
-                ...prevState,
-                [name]: files[0],
-            }));
+            const file = files[0];
+            if (file) {
+                if (name === "verificationDocument") {
+                    const validTypes = [
+                        "image/jpeg",
+                        "image/png",
+                        "image/jpg",
+                        "application/pdf",
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // for .docx files
+                        "application/msword", // for .doc files
+                    ];
+                    if (!validTypes.includes(file.type)) {
+                        setFormErrors((prev) => ({
+                            ...prev,
+                            verificationDocument:
+                                "Please upload a valid image (JPG, PNG) or PDF file",
+                        }));
+                        return;
+                    }
+                }
+                setFormData((prev) => ({ ...prev, [name]: file }));
+                setFormErrors((prev) => ({ ...prev, [name]: null }));
+            }
         }
     };
 
     const handleMultipleFileChange = (e) => {
-        const validImageTypes = ["image/jpeg", "image/png", "image/jpg"];
+        const validImageTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/jpg",
+            "image/webp",
+        ];
         const selectedFiles = Array.from(e.target.files);
-
-        const filteredFiles = selectedFiles.filter((file) =>
-            validImageTypes.includes(file.type)
+        const invalidFiles = selectedFiles.filter(
+            (file) => !validImageTypes.includes(file.type)
         );
 
+        if (invalidFiles.length > 0) {
+            setFormErrors((prev) => ({
+                ...prev,
+                garageImages: "Only JPG and PNG images are allowed",
+            }));
+            setAreFilesValid(false);
+            return;
+        }
+
         if (
-            filteredFiles.length +
+            selectedFiles.length +
                 formData.garageImages.length +
                 existingImages.length >
             7
         ) {
-            toast.error("You can only upload a maximum of 7 images.");
+            setFormErrors((prev) => ({
+                ...prev,
+                garageImages: "You can only upload a maximum of 7 images",
+            }));
             setAreFilesValid(false);
             return;
         }
 
         setAreFilesValid(true);
-
-        setFormData((prevState) => ({
-            ...prevState,
-            garageImages: [...prevState.garageImages, ...filteredFiles],
+        setFormErrors((prev) => ({ ...prev, garageImages: null }));
+        setFormData((prev) => ({
+            ...prev,
+            garageImages: [...prev.garageImages, ...selectedFiles],
         }));
     };
 
@@ -146,18 +181,57 @@ const GarageForm = () => {
 
     const validateForm = () => {
         const errors = {};
-        if (!formData.locationName) {
+
+        // Location name validation
+        if (!formData.locationName.trim()) {
             errors.locationName = "Location name is required";
+        } else if (formData.locationName.length < 3) {
+            errors.locationName =
+                "Location name must be at least 3 characters long";
+        } else if (formData.locationName.length > 50) {
+            errors.locationName =
+                "Location name must be less than 50 characters";
         }
-        if (formData.numberOfSpots < 1) {
+
+        // Number of spots validation
+        const spots = Number(formData.numberOfSpots);
+        if (!formData.numberOfSpots) {
+            errors.numberOfSpots = "Number of spots is required";
+        } else if (isNaN(spots) || !Number.isInteger(spots)) {
+            errors.numberOfSpots = "Number of spots must be a whole number";
+        } else if (spots < 1) {
             errors.numberOfSpots = "Number of spots must be at least 1";
+        } else if (spots > 20) {
+            errors.numberOfSpots = "Number of spots cannot exceed 100";
         }
-        if (formData.price < 1) {
-            errors.price = "Price must be at least 1";
+
+        // Price validation
+        const price = Number(formData.price);
+        if (!formData.price) {
+            errors.price = "Price is required";
+        } else if (isNaN(price) || price < 0) {
+            errors.price = "Price must be a positive number";
+        } else if (price > 1000) {
+            errors.price = "Price cannot exceed 1000";
         }
+
+        // Verification document validation
+        if (!isUpdateMode && !formData.verificationDocument) {
+            errors.verificationDocument = "Verification document is required";
+        }
+
+        // Image validation
         if (!areFilesValid) {
-            errors.validFiles = "Files for images must be png or jpg format";
+            errors.garageImages =
+                "Please ensure all images are in valid format (JPG or PNG)";
         }
+
+        const totalImages =
+            existingImages.length + formData.garageImages.length;
+        if (!isUpdateMode && totalImages === 0) {
+            errors.garageImages = "At least one garage image is required";
+        }
+
         setFormErrors(errors);
         return Object.keys(errors).length === 0;
     };
@@ -165,27 +239,29 @@ const GarageForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validateForm()) {
+            toast.error("Please correct all errors before submitting");
             return;
         }
         try {
             const formDataToSend = new FormData();
-            formDataToSend.append("locationName", formData.locationName);
+            formDataToSend.append("locationName", formData.locationName.trim());
             formDataToSend.append("latitude", formData.latitude);
             formDataToSend.append("longitude", formData.longitude);
             formDataToSend.append("countryName", formData.countryName);
-            formDataToSend.append(
-                "verificationDocument",
-                formData.verificationDocument
-            );
             formDataToSend.append("numberOfSpots", formData.numberOfSpots);
             formDataToSend.append("price", formData.price);
 
-            // Append existing image URLs
+            if (formData.verificationDocument) {
+                formDataToSend.append(
+                    "verificationDocument",
+                    formData.verificationDocument
+                );
+            }
+
             existingImages.forEach((imageUrl) => {
                 formDataToSend.append("existingImages", imageUrl);
             });
 
-            // Append new image files
             formData.garageImages.forEach((image) => {
                 formDataToSend.append("garageImages", image);
             });
@@ -194,49 +270,41 @@ const GarageForm = () => {
                 ? `${BASE_URL}/GarageSpot/updateGarageSpot/?garageSpotId=${id}`
                 : `${BASE_URL}/GarageSpot/creategaragespot`;
 
-            const method = isUpdateMode ? "PUT" : "POST";
             setLoading(true);
             const response = await fetch(url, {
-                method: method,
+                method: isUpdateMode ? "PUT" : "POST",
                 headers: {
                     Authorization: `Bearer ${authData.token}`,
                 },
                 body: formDataToSend,
             });
-            const res = await response.json();
-            if (res.success) {
+
+            const result = await response.json();
+
+            if (result.success) {
                 toast.success(
                     isUpdateMode
                         ? "Garage spot updated successfully"
                         : "Garage spot created successfully"
                 );
-                if (res.value.length > 1) {
-                    updateToken(res.value);
+                if (result.value?.length > 1) {
+                    updateToken(result.value);
                 }
             } else {
-                const errorResponse = await response.text();
-                const errorMessage = isUpdateMode
-                    ? "Failed to update garage spot: " + errorResponse
-                    : "Failed to create garage spot: " + errorResponse;
-                toast.error(errorMessage);
-                setError(errorMessage);
+                throw new Error(result.message || "Operation failed");
             }
         } catch (error) {
-            setError("Error: " + error.message);
+            toast.error(error.message || "Failed to process request");
+            setError(error.message || "An unexpected error occurred");
         } finally {
             setLoading(false);
         }
     };
 
     const handleChange = (e) => {
-        const targetKey = e.target.name;
-        setFormData({ ...formData, [targetKey]: e.target.value });
-        if (formErrors[targetKey]) {
-            setFormErrors((prevErrors) => ({
-                ...prevErrors,
-                [targetKey]: null,
-            }));
-        }
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+        setFormErrors((prev) => ({ ...prev, [name]: null }));
     };
 
     const scrollDown = () => {
@@ -300,10 +368,11 @@ const GarageForm = () => {
                             formErrors.locationName ? style.errorInput : ""
                         }
                         placeholder="Enter a name for this location"
-                        required
                     />
                     {formErrors.locationName && (
-                        <p className={style.error}>{formErrors.locationName}</p>
+                        <p className={style.errorMessage}>
+                            {formErrors.locationName}
+                        </p>
                     )}
                 </div>
 
@@ -318,9 +387,11 @@ const GarageForm = () => {
                             formErrors.numberOfSpots ? style.errorInput : ""
                         }
                         placeholder="How many parking spots?"
+                        min="1"
+                        max="20"
                     />
                     {formErrors.numberOfSpots && (
-                        <p className={style.error}>
+                        <p className={style.errorMessage}>
                             {formErrors.numberOfSpots}
                         </p>
                     )}
@@ -335,9 +406,11 @@ const GarageForm = () => {
                         onChange={handleChange}
                         className={formErrors.price ? style.errorInput : ""}
                         placeholder="Daily rate"
+                        min="0"
+                        max="1000"
                     />
                     {formErrors.price && (
-                        <p className={style.error}>{formErrors.price}</p>
+                        <p className={style.errorMessage}>{formErrors.price}</p>
                     )}
                 </div>
 
@@ -347,14 +420,22 @@ const GarageForm = () => {
                         type="file"
                         name="verificationDocument"
                         onChange={handleFileChange}
-                        accept="image/*,.pdf"
+                        accept="image/*,.pdf,.docx"
+                        className={
+                            formErrors.verificationDocument
+                                ? style.errorInput
+                                : ""
+                        }
                     />
+                    {formErrors.verificationDocument && (
+                        <p className={style.errorMessage}>
+                            {formErrors.verificationDocument}
+                        </p>
+                    )}
                 </div>
 
                 <div className={style.formGroup}>
                     <label>Garage Images (Max 7):</label>
-
-                    {/* Display existing images */}
                     {existingImages.length > 0 && (
                         <div className={style.imageGrid}>
                             {existingImages.map((imageUrl, index) => (
@@ -411,10 +492,14 @@ const GarageForm = () => {
                         multiple
                         accept="image/png, image/jpg, image/jpeg"
                         onChange={handleFileChange}
-                        className={style.fileInput}
+                        className={`${style.fileInput} ${
+                            formErrors.garageImages ? style.errorInput : ""
+                        }`}
                     />
-                    {formErrors.validFiles && (
-                        <p className={style.error}>{formErrors.validFiles}</p>
+                    {formErrors.garageImages && (
+                        <p className={style.errorMessage}>
+                            {formErrors.garageImages}
+                        </p>
                     )}
                     <p className={style.imageCount}>
                         {existingImages.length + formData.garageImages.length}/7

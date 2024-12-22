@@ -52,7 +52,6 @@ const MyGarages = () => {
                 setGarageSpots((prev) =>
                     prev.filter((garage) => garage.id !== spotId)
                 );
-                console.log("Garage spot deleted successfully");
             } else {
                 console.error("Failed to delete garage spot");
             }

@@ -20,7 +20,6 @@ const UsersList = () => {
                 },
             });
             const data = await response.json();
-            console.log(authData);
             setUsers(
                 data?.value.filter(
                     (user) => user.email != authData?.user.email

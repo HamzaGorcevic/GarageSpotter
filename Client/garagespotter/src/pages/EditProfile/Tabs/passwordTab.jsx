@@ -33,7 +33,6 @@ const PasswordTab = () => {
         }
 
         try {
-            console.log(authData.token);
             const res = await changePassword(passwordForm, authData.token);
             if (res.success) {
                 toast.success("Password changed successfully!");
