@@ -1,4 +1,4 @@
-# Logs
+# Ignore all logs
 logs
 *.log
 npm-debug.log*
@@ -7,12 +7,13 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Ignore node modules (for JavaScript/Node.js packages)
 node_modules
 dist
 dist-ssr
 *.local
 
-# Editor directories and files
+# Ignore all temporary files for editors and IDEs
 .vs/
 .vscode/*
 !.vscode/extensions.json
@@ -23,4 +24,32 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Ignore environment files
 /AutoHub/.env
+
+# Ignore obj and bin directories (common in .NET projects)
+AutoHub/obj/
+AutoHub/bin/
+
+# Ignore build output for .NET projects
+AutoHub/obj/
+AutoHub/bin/
+
+# Ignore any compiled files for .NET
+*.dll
+*.exe
+*.pdb
+*.cache
+*.vsix
+
+# Ignore package manager files that are not needed for the repo
+/AutoHub/package-lock.json
+/AutoHub/yarn.lock
+/AutoHub/pnpm-lock.yaml
+
+# Ignore ASP.NET Core development certificates
+/.aspnet/https/
+
+# Ignore ASP.NET Core temporary files
+/AutoHub/Properties/
