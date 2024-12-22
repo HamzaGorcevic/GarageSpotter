@@ -22,7 +22,8 @@ namespace AutoHub
 
             builder.Configuration["Token"] = Environment.GetEnvironmentVariable("TOKEN");
             builder.Configuration["AzureBlobStorage:ConnectionString"] = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING");
-            builder.Configuration["ConnectionStrings:DefaultConnection"] = Environment.GetEnvironmentVariable("DATABASE"); 
+            builder.Configuration["ConnectionStrings:DefaultConnection"] = Environment.GetEnvironmentVariable("DATABASE");
+            builder.Configuration["Email:Password"] = Environment.GetEnvironmentVariable("gspassword");
             // Add services to the container.
 
             builder.Services.AddControllers();
