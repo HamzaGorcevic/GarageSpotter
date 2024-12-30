@@ -53,7 +53,7 @@ namespace AutoHub
                 options.AddPolicy("AllowOrigins",
                     builder =>
                     {
-                        builder.WithOrigins("http://localhost:5173", "http://192.168.0.105:5173", "https://garagespotterclient.onrender.com", "https://authentic-unity-production.up.railway.app", "https://authentic-unity.railway.internal")
+                        builder.WithOrigins("http://localhost:5173", "http://192.168.0.105:5173", "https://garagespotterclient.onrender.com", "https://garagespotter-production.up.railway.app", "garagespotter-6f9840c8.railway.internal")
                             .AllowAnyHeader()
                             .AllowAnyMethod()
                             .AllowCredentials();
