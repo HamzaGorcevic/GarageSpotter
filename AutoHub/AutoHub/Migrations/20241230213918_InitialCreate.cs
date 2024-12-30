@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AutoHub.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialState : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -24,7 +24,11 @@ namespace AutoHub.Migrations
                     PasswordHash = table.Column<byte[]>(type: "bytea", nullable: true),
                     PasswordSalt = table.Column<byte[]>(type: "bytea", nullable: true),
                     Role = table.Column<int>(type: "integer", nullable: false),
-                    GoogleId = table.Column<string>(type: "text", nullable: true)
+                    GoogleId = table.Column<string>(type: "text", nullable: true),
+                    VerificationTokenExpiry = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    PasswordVerification = table.Column<bool>(type: "boolean", nullable: false),
+                    VerificationToken = table.Column<string>(type: "text", nullable: true),
+                    IsEmailVerified = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
