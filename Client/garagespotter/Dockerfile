@@ -5,13 +5,13 @@ FROM node:18-slim
 WORKDIR /app
 
 # Copy only package.json and package-lock.json to leverage Docker cache for dependencies
-COPY Client/garagespotter/package.json Client/garagespotter/package-lock.json ./
+COPY ./package.json /package-lock.json ./
 
 # Install project dependencies
 RUN npm install
 
 # Copy the entire project into the working directory
-COPY Client/garagespotter/ .
+COPY ./ .
 
 # Build the production-ready static files
 RUN npm run build
