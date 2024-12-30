@@ -53,7 +53,7 @@ namespace AutoHub
                 options.AddPolicy("AllowOrigins",
                     builder =>
                     {
-                        builder.WithOrigins("http://localhost:5173", "http://192.168.0.105:5173", "https://garagespotterclient.onrender.com")
+                        builder.WithOrigins("http://localhost:5173", "http://192.168.0.105:5173", "https://garagespotterclient.onrender.com", "https://authentic-unity-production.up.railway.app", "https://authentic-unity.railway.internal")
                             .AllowAnyHeader()
                             .AllowAnyMethod()
                             .AllowCredentials();
@@ -130,7 +130,7 @@ namespace AutoHub
                 {
                     googleOptions.ClientId = "338263297768-ch4slvrh0pjnrsb3enbg0ifasdnmhmun.apps.googleusercontent.com";
                     googleOptions.ClientSecret = "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T";
-                    googleOptions.CallbackPath = "/auth/google/callback"; 
+                    googleOptions.CallbackPath = "/auth/google/callback";
                 });
 
 
