@@ -8,58 +8,122 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
-    z-index: $z-index-navbar;
+    z-index: $z-index-navbar + 10;
 }
 
 .modalContent {
     position: relative;
-    max-width: 90%;
-    max-height: 90%;
+    width: 90%;  // Changed from max-width to width
+    height: 90vh; // Changed from max-height to height
     display: flex;
     flex-direction: column;
     align-items: center;
+    border-radius: $border-radius;
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: $spacing-medium;
+}
+
+.imageContainer {
+    position: relative;
+    width: 100%;
+    height: 100%; // Changed from 80vh to 100%
+    display: flex; // Added
+    justify-content: center; // Added
+    align-items: center; // Added
+    overflow: hidden;
 }
 
 .image {
+    position: absolute;
     max-width: 100%;
-    max-height: 80vh;
-    border-radius: 8px;
+    max-height: 100%;
+    width: auto; // Changed from 100%
+    height: auto; // Changed from 100%
+    object-fit: contain;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity $transition-default;
+
+    &.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
 }
 
-.prevButton,
-.nextButton {
+.navButton {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: none;
+    background-color: rgba($primary-color, 0.3);
     border: none;
-    color: #ffffff;
-    font-size: 2rem;
+    color: $text-color-light;
+    font-size: $font-size-large;
     cursor: pointer;
     user-select: none;
+    padding: $spacing-small;
+    border-radius: $border-radius;
+    transition: background-color $transition-default,
+                transform $transition-default;
+    z-index: 2; // Added to ensure buttons are above images
+
+    &:hover {
+        background-color: rgba($primary-color, 0.5);
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba($primary-color, 0.5);
+    }
 }
 
 .prevButton {
-    left: 10px;
+    left: $spacing-medium;
 }
 
 .nextButton {
-    right: 10px;
+    right: $spacing-medium;
 }
 
 .closeButton {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
+    top: $spacing-small;
+    right: $spacing-small;
+    background: rgba($error-color, 0.3);
     border: none;
-    font-size: 2rem;
-    color: #ffffff;
+    font-size: $font-size-large;
+    color: $text-color-light;
     cursor: pointer;
+    padding: 0 $spacing-small;
+    border-radius: $border-radius;
+    transition: background-color $transition-default;
+    z-index: 2; // Added to ensure button is above images
+
+    &:hover {
+        background-color: rgba($error-color, 0.5);
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba($error-color, 0.5);
+    }
 }
 
 .imageCounter {
-    margin-top: 10px;
-    color: #ffffff;
+    margin-top: $spacing-medium;
+    color: $text-color-light;
+    font-family: $font-family;
+    font-size: $font-size-base;
+    position: absolute; // Added
+    bottom: $spacing-medium; // Added
+    z-index: 2; // Added
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }

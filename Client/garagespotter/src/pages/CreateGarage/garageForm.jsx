@@ -401,7 +401,7 @@ const GarageForm = () => {
                 </div>
 
                 <div className={style.formGroup}>
-                    <label>Price per Day:</label>
+                    <label>Price per Hour:</label>
                     <input
                         type="number"
                         name="price"
