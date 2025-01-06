@@ -140,3 +140,4 @@ C:\Users\gorce\GarageSpotter\AutoHub\autohub\obj\Debug\net9.0\AutoHub.genruntime
 C:\Users\gorce\GarageSpotter\AutoHub\autohub\obj\Debug\net9.0\ref\AutoHub.dll
 C:\Users\gorce\GarageSpotter\AutoHub\AutoHub\bin\Debug\net9.0\Microsoft.AspNetCore.Authentication.Google.dll
 C:\Users\gorce\GarageSpotter\AutoHub\AutoHub\bin\Debug\net9.0\Newtonsoft.Json.dll
+C:\Users\gorce\GarageSpotter\AutoHub\AutoHub\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt

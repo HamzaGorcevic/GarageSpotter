@@ -3,8 +3,8 @@ import styles from "../admin.module.scss";
 import toast from "react-hot-toast";
 import { AuthContext } from "../../../context/AuthContext";
 import { BASE_URL } from "../../../config/config";
-import { DocumentDetailsModal } from "../../../components/Modals/DocumentDetailsModal/documentDetailsModal";
 import ImagesModal from "../../../components/Modals/ImagesModal/imagesModal";
+import DocumentDetailsModal from "../../../components/Modals/DocumentDetailsModal/documentDetailsModal";
 
 const GarageList = () => {
     const { authData } = useContext(AuthContext);

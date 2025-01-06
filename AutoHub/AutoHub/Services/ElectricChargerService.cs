@@ -131,7 +131,7 @@ using Microsoft.EntityFrameworkCore;
 
                     _mapper.Map(electricChargerDto,charger);
                     _dbContext.Entry(charger).State = EntityState.Modified;
-
+                charger.IsVerified = false;
                 await _dbContext.SaveChangesAsync();
 
                     response.Value = charger.Id;

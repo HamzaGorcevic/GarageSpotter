@@ -2,8 +2,8 @@ import React, { useState, useEffect, useContext } from "react";
 import toast from "react-hot-toast";
 import { AuthContext } from "../../../context/AuthContext";
 import { BASE_URL } from "../../../config/config";
-import { DocumentDetailsModal } from "../../../components/Modals/DocumentDetailsModal/documentDetailsModal";
 import styles from "../admin.module.scss";
+import DocumentDetailsModal from "../../../components/Modals/DocumentDetailsModal/documentDetailsModal";
 const ChargerList = () => {
     const { authData } = useContext(AuthContext);
     const [chargers, setChargers] = useState([]);

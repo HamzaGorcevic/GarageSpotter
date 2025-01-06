@@ -302,7 +302,7 @@ namespace AutoHub.Services
                 garagespot.Price = updatedSpot.Price;
                 garagespot.VerificationDocument = updatedSpot.VerificationDocument;
                 garagespot.CountryName = updatedSpot.CountryName;
-
+                garagespot.IsVerified = false;
                 await _dbContext.SaveChangesAsync();
 
                 response.Success = true;
