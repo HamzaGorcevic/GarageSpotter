@@ -59,9 +59,6 @@ npm run dev
 
 The system is built on a client-server architecture with a focus on scalability and maintainability. The React client communicates with the .NET backend API to manage data and handle business logic.
 
-## 📷 Screenshots
-
-[Add screenshots of your app here to showcase the UI]
 
 ## 💡 Future Enhancements
 
