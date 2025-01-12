@@ -38,12 +38,12 @@ GarageSpotter is a web application designed to make it easy for users to find, r
 
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/GarageSpotter.git
+git clone https://github.com/HamzaGorcevic/GarageSpotter.git
 cd GarageSpotter
 ```
 
 ### Backend Setup
-1. Open the `zephyr2.Server.csproj` in Visual Studio
+1. Open the `AutoHub.Server.csproj` in Visual Studio
 2. Configure the database connection in `appsettings.json`
 3. Run the project using `dotnet run`
 
@@ -52,7 +52,7 @@ cd GarageSpotter
 ```bash
 cd client
 npm install
-npm start
+npm run dev
 ```
 
 ## 🗺️ Architecture Overview
