@@ -28,6 +28,54 @@ const GarageForm = () => {
         garageImages: [],
     });
     const navigate = useNavigate();
+
+    const compressImage = async (file) => {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    const MAX_WIDTH = 1200;
+                    const MAX_HEIGHT = 1200;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    canvas.toBlob(
+                        (blob) => {
+                            resolve(
+                                new File([blob], file.name, {
+                                    type: "image/jpeg",
+                                    lastModified: Date.now(),
+                                })
+                            );
+                        },
+                        "image/jpeg",
+                        0.7 // compression quality
+                    );
+                };
+            };
+        });
+    };
     useEffect(() => {
         if (id && authData.token) {
             setIsUpdateMode(true);
@@ -125,7 +173,7 @@ const GarageForm = () => {
         }
     };
 
-    const handleMultipleFileChange = (e) => {
+    const handleMultipleFileChange = async (e) => {
         const validImageTypes = [
             "image/jpeg",
             "image/png",
@@ -162,9 +210,12 @@ const GarageForm = () => {
 
         setAreFilesValid(true);
         setFormErrors((prev) => ({ ...prev, garageImages: null }));
+        const compressedFiles = await Promise.all(
+            selectedFiles.map((file) => compressImage(file))
+        );
         setFormData((prev) => ({
             ...prev,
-            garageImages: [...prev.garageImages, ...selectedFiles],
+            garageImages: [...prev.garageImages, ...compressedFiles],
         }));
     };
 
@@ -243,6 +294,7 @@ const GarageForm = () => {
             return;
         }
         try {
+            setLoading(true);
             const formDataToSend = new FormData();
             formDataToSend.append("locationName", formData.locationName.trim());
             formDataToSend.append("latitude", formData.latitude);
@@ -261,7 +313,6 @@ const GarageForm = () => {
             existingImages.forEach((imageUrl) => {
                 formDataToSend.append("existingImages", imageUrl);
             });
-
             formData.garageImages.forEach((image) => {
                 formDataToSend.append("garageImages", image);
             });
@@ -270,7 +321,6 @@ const GarageForm = () => {
                 ? `${BASE_URL}/GarageSpot/updateGarageSpot/?garageSpotId=${id}`
                 : `${BASE_URL}/GarageSpot/creategaragespot`;
 
-            setLoading(true);
             const response = await fetch(url, {
                 method: isUpdateMode ? "PUT" : "POST",
                 headers: {
@@ -316,7 +366,6 @@ const GarageForm = () => {
             behavior: "smooth",
         });
     };
-
     return (
         <div className={style.registerContainer}>
             <h1 className={style.title}>
