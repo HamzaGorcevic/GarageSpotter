@@ -1,14 +1,17 @@
 import React, { useState, useContext } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
+import { Eye, EyeOff } from "lucide-react";
 import styles from "./login.module.scss";
 import { BASE_URL } from "../../config/config";
 import { AuthContext } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 import useLogin from "../../hooks/useLogin";
 import GoogleSvg from "../../assets/google.svg";
+
 const Login = () => {
     const { login } = useContext(AuthContext);
     const [form, setForm] = useState({ email: "", password: "" });
+    const [showPassword, setShowPassword] = useState(false);
     const { loginUser, loading } = useLogin(login);
 
     const handleChange = (e) => {
@@ -18,6 +21,10 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         loginUser({ ...form, isGoogleLogin: false });
+    };
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
     };
 
     const googleLogin = useGoogleLogin({
@@ -71,14 +78,31 @@ const Login = () => {
                 </div>
                 <div className={styles.formGroup}>
                     <label htmlFor="password">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        value={form.password}
-                        onChange={handleChange}
-                        required
-                    />
+                    <div className={styles.passwordInputWrapper}>
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            id="password"
+                            name="password"
+                            value={form.password}
+                            onChange={handleChange}
+                            required
+                            className={styles.passwordInput}
+                        />
+                        <button
+                            type="button"
+                            onClick={togglePasswordVisibility}
+                            className={styles.passwordToggle}
+                            aria-label={
+                                showPassword ? "Hide password" : "Show password"
+                            }
+                        >
+                            {showPassword ? (
+                                <EyeOff size={20} />
+                            ) : (
+                                <Eye size={20} />
+                            )}
+                        </button>
+                    </div>
                 </div>
                 <button
                     type="submit"
