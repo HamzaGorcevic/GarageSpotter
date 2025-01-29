@@ -6,6 +6,27 @@ import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { MapPin, ChevronDown, X } from "lucide-react";
 import style from "./garageForm.module.scss";
+import { gql } from "@apollo/client";
+import { apolloClient } from "../../config/apolloClient";
+
+const UPDATE_GARAGE = gql`
+    mutation updateGarageSpot($input: UpdateGarageInput!) {
+        updateGarage(input: $input) {
+            value
+            message
+            success
+        }
+    }
+`;
+const CREATE_GARAGE = gql`
+    mutation createGarageSpot($input: CreateGarageInput!) {
+        createGarage(input: $input) {
+            value
+            message
+            success
+        }
+    }
+`;
 
 const GarageForm = () => {
     const [latlng, setLatlng] = useState([43.23132, 21.21321]);
@@ -317,38 +338,54 @@ const GarageForm = () => {
                 formDataToSend.append("garageImages", image);
             });
 
-            const url = isUpdateMode
-                ? `${BASE_URL}/GarageSpot/updateGarageSpot/?garageSpotId=${id}`
-                : `${BASE_URL}/GarageSpot/creategaragespot`;
+            // const url = isUpdateMode
+            //     ? `${BASE_URL}/GarageSpot/updateGarageSpot/?garageSpotId=${id}`
+            //     : `${BASE_URL}/GarageSpot/creategaragespot`;
 
-            const response = await fetch(url, {
-                method: isUpdateMode ? "PUT" : "POST",
-                headers: {
-                    Authorization: `Bearer ${authData.token}`,
+            // const response = await fetch(url, {
+            //     method: isUpdateMode ? "PUT" : "POST",
+            //     headers: {
+            //         Authorization: `Bearer ${authData.token}`,
+            //     },
+            //     body: formDataToSend,
+            // });
+            setLoading(true);
+            const mutation = isUpdateMode ? UPDATE_GARAGE : CREATE_GARAGE;
+
+            // Map files to Upload scalars
+            const variables = {
+                input: {
+                    ...(isUpdateMode && { id: parseInt(id) }),
+                    locationName: formData.locationName.trim(),
+                    latitude: parseFloat(formData.latitude),
+                    longitude: parseFloat(formData.longitude),
+                    countryName: formData.countryName,
+                    numberOfSpots: parseInt(formData.numberOfSpots),
+                    price: parseFloat(formData.price),
+                    ...(isUpdateMode && { existingImages: existingImages }),
+                    // Pass the files directly
+                    garageImages: formData.garageImages || [],
                 },
-                body: formDataToSend,
+            };
+
+            const { data } = await apolloClient.mutate({
+                mutation,
+                variables,
             });
 
-            const result = await response.json();
-
+            const result = data[isUpdateMode ? "updateGarage" : "createGarage"];
             if (result.success) {
                 toast.success(
-                    isUpdateMode
-                        ? "Garage spot updated successfully"
-                        : "Garage spot created successfully"
+                    result.message ||
+                        (isUpdateMode ? "Garage updated!" : "Garage created!")
                 );
-                setTimeout(() => {
-                    navigate("/garages");
-                }, 1000);
-                if (result.value?.length > 1) {
-                    updateToken(result.value);
-                }
+                navigate("/garages");
             } else {
                 throw new Error(result.message || "Operation failed");
             }
         } catch (error) {
-            toast.error(error.message || "Failed to process request");
-            setError(error.message || "An unexpected error occurred");
+            toast.error(error.message);
+            console.error("Submission error:", error);
         } finally {
             setLoading(false);
         }
@@ -466,25 +503,27 @@ const GarageForm = () => {
                     )}
                 </div>
 
-                <div className={style.formGroup}>
-                    <label>Verification Document:</label>
-                    <input
-                        type="file"
-                        name="verificationDocument"
-                        onChange={handleFileChange}
-                        accept="image/*,.pdf,.docx"
-                        className={
-                            formErrors.verificationDocument
-                                ? style.errorInput
-                                : ""
-                        }
-                    />
-                    {formErrors.verificationDocument && (
-                        <p className={style.errorMessage}>
-                            {formErrors.verificationDocument}
-                        </p>
-                    )}
-                </div>
+                {!isUpdateMode && (
+                    <div className={style.formGroup}>
+                        <label>Verification Document:</label>
+                        <input
+                            type="file"
+                            name="verificationDocument"
+                            onChange={handleFileChange}
+                            accept="image/*,.pdf,.docx"
+                            className={
+                                formErrors.verificationDocument
+                                    ? style.errorInput
+                                    : ""
+                            }
+                        />
+                        {formErrors.verificationDocument && (
+                            <p className={style.errorMessage}>
+                                {formErrors.verificationDocument}
+                            </p>
+                        )}
+                    </div>
+                )}
 
                 <div className={style.formGroup}>
                     <label>Garage Images (Max 7):</label>

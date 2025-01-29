@@ -54,6 +54,18 @@
               "target": "Package",
               "version": "[12.22.2, )"
             },
+            "HotChocolate.AspNetCore": {
+              "target": "Package",
+              "version": "[14.3.0, )"
+            },
+            "HotChocolate.Data.EntityFramework": {
+              "target": "Package",
+              "version": "[14.3.0, )"
+            },
+            "HotChocolate.Types": {
+              "target": "Package",
+              "version": "[14.3.0, )"
+            },
             "Microsoft.AspNetCore.Authentication.Google": {
               "target": "Package",
               "version": "[9.0.0, )"
@@ -108,7 +120,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.102/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

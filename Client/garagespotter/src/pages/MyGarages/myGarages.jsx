@@ -1,59 +1,79 @@
 import React, { useState, useEffect, useContext } from "react";
-import styles from "./myGarages.module.scss";
-import { BASE_URL } from "../../config/config";
+import { gql } from "@apollo/client";
+import { apolloClient } from "../../config/apolloClient";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Loading } from "../../components/Loader/loader";
+import styles from "./myGarages.module.scss";
+
+const DELETE_GARAGE_MUTATION = gql`
+    mutation DeleteGarage($input: DeleteGarageSpotInput!) {
+        deleteGarage(input: $input) {
+            value
+            message
+            success
+        }
+    }
+`;
+
+const GET_GARAGES = gql`
+    query GetGarages {
+        garageSpots {
+            id
+            locationName
+            countryName
+            isAvailable
+            price
+            latitude
+            longitude
+            isVerified
+            verificationDocument
+            garageImages
+            totalSpots {
+                id
+            }
+        }
+    }
+`;
 
 const MyGarages = () => {
     const { authData } = useContext(AuthContext);
     const [garageSpots, setGarageSpots] = useState([]);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
-    // Fetch garage spots
+
     const getMyGarages = async () => {
         setLoading(true);
         try {
-            const response = await fetch(
-                `${BASE_URL}/GarageSpot/getOwnerGarageSpots`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${authData.token}`,
-                    },
-                }
-            );
-            if (response.ok) {
-                const res = await response.json();
-                setGarageSpots(res?.value);
-                setLoading(false);
-            } else {
-                setLoading(false);
-                console.error("Failed to fetch garage spots");
-            }
+            const { data } = await apolloClient.query({
+                query: GET_GARAGES,
+                fetchPolicy: "network-only",
+            });
+            setGarageSpots(data.garageSpots);
         } catch (error) {
             console.error("Error fetching garage spots:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleGarageDelete = async (spotId) => {
         try {
-            const response = await fetch(
-                `${BASE_URL}/GarageSpot/deleteGarageSpot?spotId=${spotId}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${authData.token}`,
+            const { data } = await apolloClient.mutate({
+                mutation: DELETE_GARAGE_MUTATION,
+                variables: {
+                    input: {
+                        spotId: spotId,
                     },
-                }
-            );
+                },
+            });
 
-            if (response.ok) {
+            if (data.deleteGarage.success) {
                 setGarageSpots((prev) =>
                     prev.filter((garage) => garage.id !== spotId)
                 );
             } else {
-                console.error("Failed to delete garage spot");
+                console.error(data.deleteGarage.message);
             }
         } catch (error) {
             console.error("Error deleting garage spot:", error);
@@ -83,7 +103,6 @@ const MyGarages = () => {
                             <p>
                                 <strong>Price:</strong> ${garage.price}
                             </p>
-
                             <p>
                                 <strong>Is verified:</strong>{" "}
                                 {garage.isVerified ? "Yes" : "Pending ..."}

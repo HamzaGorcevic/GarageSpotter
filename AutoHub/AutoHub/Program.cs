@@ -8,7 +8,11 @@ using Microsoft.OpenApi.Models;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Authentication.Google;
+using AutoHub.GraphQl.Mutations;
+using AutoHub.GraphQL.Types;
+using HotChocolate.Authorization;
+     
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace AutoHub
 {
@@ -24,6 +28,8 @@ namespace AutoHub
             builder.Configuration["AzureBlobStorage:ConnectionString"] = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING");
             builder.Configuration["ConnectionStrings:DefaultConnection"] = Environment.GetEnvironmentVariable("DATABASE");
             builder.Configuration["Email:Password"] = Environment.GetEnvironmentVariable("gspassword");
+            builder.Configuration["Google:ClientId"] = Environment.GetEnvironmentVariable("googleClientId");
+            builder.Configuration["Google:ClientSecret"] = Environment.GetEnvironmentVariable("googleClientSecret");
             // Add services to the container.
 
             builder.Services.AddControllers();
@@ -128,16 +134,27 @@ namespace AutoHub
                 })
                 .AddGoogle(googleOptions =>
                 {
-                    googleOptions.ClientId = "338263297768-ch4slvrh0pjnrsb3enbg0ifasdnmhmun.apps.googleusercontent.com";
-                    googleOptions.ClientSecret = "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T";
+                    googleOptions.ClientId = Environment.GetEnvironmentVariable("googleClientId");
+                    googleOptions.ClientSecret = Environment.GetEnvironmentVariable("googleClientSecret");
                     googleOptions.CallbackPath = "/auth/google/callback";
                 });
 
+            // graphql
+
+            // Add these to your services
+            builder.Services
+                .AddGraphQLServer()
+                .AddType<UploadType>()
+                .AddMutationType<Mutation>()
+                .AddQueryType<Query>()
+                .AddProjections()
+                .AddFiltering()
+                .AddSorting();
 
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            // Configure the HTTP request pipeline
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -145,12 +162,12 @@ namespace AutoHub
             }
 
             app.UseHttpsRedirection();
+            app.UseCors("AllowOrigins");
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseCors("AllowOrigins");
-
 
             app.MapControllers();
+            app.MapGraphQL(); // GraphQL endpoint
 
             app.Run();
         }
