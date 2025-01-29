@@ -27,7 +27,7 @@ public class AzureBlobService : IAzureBlobService
         var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
         await containerClient.CreateIfNotExistsAsync(PublicAccessType.None);
 
-        var blobClient = containerClient.GetBlobClient(Guid.NewGuid().ToString() + Path.GetExtension(file.FileName));
+        var blobClient = containerClient.GetBlobClient(Guid.NewGuid().ToString() + System.IO.Path.GetExtension(file.FileName));
 
         await using (var stream = file.OpenReadStream())
         {

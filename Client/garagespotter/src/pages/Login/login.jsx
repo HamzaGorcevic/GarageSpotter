@@ -12,7 +12,7 @@ const Login = () => {
     const { login } = useContext(AuthContext);
     const [form, setForm] = useState({ email: "", password: "" });
     const [showPassword, setShowPassword] = useState(false);
-    const { loginUser, loading } = useLogin(login);
+    const { loginUser, googleLogin, loading } = useLogin(login);
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -26,40 +26,6 @@ const Login = () => {
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
-
-    const googleLogin = useGoogleLogin({
-        onSuccess: async (response) => {
-            try {
-                const res = await fetch(`${BASE_URL}/Auth/login`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        email: "",
-                        password: "",
-                        isGoogleLogin: true,
-                        googleToken: response.access_token,
-                    }),
-                });
-
-                const data = await res.json();
-
-                if (data.success) {
-                    login(data.value);
-                    toast.success("Successfully logged in with Google!");
-                } else {
-                    toast.error(data.message || "Failed to login with Google");
-                }
-            } catch (error) {
-                toast.error("An error occurred during Google login");
-                console.error(error);
-            }
-        },
-        onError: () => {
-            toast.error("Google login failed");
-        },
-    });
 
     return (
         <div className={styles.loginContainer}>

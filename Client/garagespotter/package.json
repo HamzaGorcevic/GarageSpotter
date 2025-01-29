@@ -11,12 +11,17 @@
         "start": "vite preview"
     },
     "dependencies": {
+        "@apollo/client": "^3.12.8",
         "@fortawesome/fontawesome-svg-core": "^6.6.0",
         "@fortawesome/free-solid-svg-icons": "^6.6.0",
         "@fortawesome/react-fontawesome": "^0.2.2",
         "@react-oauth/google": "^0.12.1",
+        "@types/apollo-upload-client": "^18.0.0",
+        "apollo-upload-client": "^17.0.0",
         "cross-env": "^7.0.3",
         "geolib": "^3.3.4",
+        "graphql": "^16.10.0",
+        "graphql-upload": "^17.0.0",
         "jwt-decode": "^4.0.0",
         "leaflet": "^1.9.4",
         "leaflet-geosearch": "^4.0.0",
