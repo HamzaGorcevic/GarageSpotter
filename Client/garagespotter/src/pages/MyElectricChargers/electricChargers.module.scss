@@ -1,68 +1,249 @@
+// Base Styles
+*{
+    box-sizing: border-box;
+
+}
 .container {
     background-color: $background-color;
     padding: $spacing-large;
-    font-family: $font-family;
-    color: $text-color;
     min-height: 100vh;
+    width: 100%;
+}
+
+.contentWrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: $spacing-large;
+
+    @media (max-width: 768px) {
+        padding: $spacing-medium;
+    }
 }
 
 .title {
-    font-size: $font-size-large;
-    margin-bottom: $spacing-large;
+    font-size: 2rem;
+    color: $text-color;
     text-align: center;
+    margin-bottom: $spacing-large;
+    font-family: $font-family;
+
+    @media (max-width: 768px) {
+        font-size: 1.5rem;
+        margin-bottom: $spacing-medium;
+    }
+}
+
+.searchContainer {
+    display: flex;
+    gap: $spacing-medium;
+    margin-bottom: $spacing-large;
+    flex-wrap: wrap;
+
+    @media (max-width: 640px) {
+        flex-direction: column;
+        gap: $spacing-small;
+    }
+}
+
+.searchWrapper {
+    position: relative;
+    flex: 1;
+    min-width: 250px;
+
+    @media (max-width: 640px) {
+        min-width: 100%;
+    }
+}
+
+.searchIcon {
+    position: absolute;
+    left: $spacing-medium;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $muted-text-color;
+    z-index: 1;
+}
+
+.searchInput {
+    width: 100%;
+    padding: $spacing-medium;
+    padding-left: 40px;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    font-size: $font-size-base;
+    background-color: white;
+    color: $text-color;
+    box-shadow: $box-shadow-light;
+    transition: all $transition-default;
+
+    &:focus {
+        outline: none;
+        box-shadow: $hover-shadow;
+        border-color: $primary-color;
+    }
 }
 
 .chargerList {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-medium;
-}
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: $spacing-large;
+    margin-top: $spacing-large;
 
-.noChargers {
-    color: $muted-text-color;
-    text-align: center;
-    font-size: $font-size-base;
+    @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+        gap: $spacing-medium;
+    }
 }
 
 .chargerCard {
-    background-color: #fff;
-    border: 1px solid $border-color;
+    background-color: white;
     border-radius: $border-radius;
-    padding: $spacing-medium;
+    padding: $spacing-large;
     box-shadow: $box-shadow;
-    transition: box-shadow $transition-default;
+    transition: all $transition-default;
+    border: 1px solid $border-color;
+
+    @media (max-width: 480px) {
+        padding: $spacing-medium;
+    }
 
     &:hover {
         box-shadow: $hover-shadow;
+        transform: translateY(-2px);
     }
 
-    h2 {
-        font-size: $font-size-large;
-        margin-bottom: $spacing-small;
-        color: $primary-color;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.chargerHeader {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-medium;
+    margin-bottom: $spacing-medium;
+
+    @media (max-width: 480px) {
+        flex-direction: column;
+        align-items: flex-start;
     }
+}
+
+.chargerNumber {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: $primary-color;
+    color: $text-color-light;
+    border-radius: 50%;
+    font-weight: bold;
+    flex-shrink: 0;
+
+    @media (max-width: 480px) {
+        margin-bottom: $spacing-small;
+    }
+}
+
+.chargerInfo {
+    flex: 1;
+
+    @media (max-width: 480px) {
+        width: 100%;
+    }
+}
+
+.locationName {
+    font-size: $font-size-large;
+    color: $text-color;
+    margin-bottom: $spacing-small;
+    font-weight: bold;
+
+    @media (max-width: 480px) {
+        font-size: $font-size-base;
+    }
+}
+
+.verificationStatus {
+    color: $muted-text-color;
+    font-size: $font-size-small;
+    margin-top: $spacing-small;
+    display: flex;
+    align-items: center;
+    gap: $spacing-small;
+
+    &::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: $secondary-color;
+    }
+}
+
+.chargerDetails {
+    margin: $spacing-medium 0;
+    color: $text-color;
 
     p {
         margin: $spacing-small 0;
-        font-size: $font-size-base;
+        line-height: 1.5;
+        display: flex;
+        flex-wrap: wrap;
+        gap: $spacing-small;
+
+        strong {
+            color: $muted-text-color;
+            min-width: 120px;
+
+            @media (max-width: 480px) {
+                min-width: 100px;
+            }
+        }
+    }
+}
+
+.buttonContainer {
+    display: flex;
+    gap: $spacing-small;
+    margin-top: $spacing-medium;
+
+    @media (max-width: 480px) {
+        flex-direction: column;
+        gap: $spacing-medium;
     }
 
-    .editButton {
-        background-color: $primary-color;
-        color: #fff;
-        padding: $spacing-small $spacing-medium;
-        border: none;
-        border-radius: $border-radius;
-        cursor: pointer;
-        transition: background-color $transition-default;
+    button {
+        flex: 1;
 
-        &:hover {
-            background-color: darken($primary-color, 10%);
+        @media (max-width: 480px) {
+            width: 100%;
         }
+    }
+}
 
-        &:focus {
-            outline: none;
-            box-shadow: $hover-shadow;
-        }
+.noChargers {
+    text-align: center;
+    color: $muted-text-color;
+    padding: $spacing-large;
+    background-color: white;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow-light;
+    margin-top: $spacing-large;
+
+    @media (max-width: 480px) {
+        padding: $spacing-medium;
+    }
+}
+
+// Keyframes for animations
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
