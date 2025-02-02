@@ -1,8 +1,11 @@
 using AutoHub.Models;
 using AutoHub.Services;
+using Microsoft.AspNetCore.Authorization;
 
 public class Query
 {
+    [Authorize(Roles = "Owner")]
+    [GraphQLName("getOwnerGarages")]
     public async Task<List<GarageSpotDto>> GetOwnerGarages(
         [Service] IGarageSpotService garageSpotService)
     {

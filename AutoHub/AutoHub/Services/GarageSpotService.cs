@@ -330,7 +330,7 @@ namespace AutoHub.Services
                 response.Message = "Garage spot not found.";
                 return response;
             }
-
+            Console.WriteLine(GetUserId());
             if (garageSpot.OwnerId != GetUserId())
             {
                 response.Success = false;

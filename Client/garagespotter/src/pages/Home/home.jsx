@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-import styles from "./home.module.scss";
-import MapComponent from "./map/mapComponent";
-import { BASE_URL } from "../../config/config";
 import { useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { getCountryCoordinates } from "../../utils/countryCoords";
 import { Loading } from "../../components/Loader/loader";
+import MapComponent from "./map/mapComponent";
+import styles from "./home.module.scss";
+import { BASE_URL } from "../../config/config";
 
 const Home = () => {
     const location = useLocation();
@@ -20,34 +20,92 @@ const Home = () => {
         userLng: null,
     });
 
+    // Function to save map info to local storage
+    const saveMapInfoToLocal = (info) => {
+        localStorage.setItem("mapInfo", JSON.stringify(info));
+        console.log("Saved to local storage:", info);
+    };
+
+    // Function to load map info from local storage
+    const loadMapInfoFromLocal = () => {
+        const storedInfo = localStorage.getItem("mapInfo");
+        if (storedInfo) {
+            const parsedInfo = JSON.parse(storedInfo);
+            console.log("Loaded from local storage:", parsedInfo);
+            return parsedInfo;
+        }
+        return null;
+    };
+
     useEffect(() => {
         const resolveLocation = async () => {
             const query = new URLSearchParams(location.search);
-            const queryCountry = query.get("country") || "Serbia";
+            const queryCountry = query.get("country");
             const userLat = query.get("userLat");
             const userLng = query.get("userLng");
 
             try {
-                const countryLocation = await getCountryCoordinates(
-                    queryCountry
-                );
-                setMapInfo({
-                    lat: countryLocation.lat,
-                    lon: countryLocation.lon,
-                    country: countryLocation.name || queryCountry,
-                    userLat: userLat || null,
-                    userLng: userLng || null,
-                });
+                // Check if new values are provided in the query parameters
+                if (queryCountry || userLat || userLng) {
+                    console.log("New query parameters detected:", {
+                        queryCountry,
+                        userLat,
+                        userLng,
+                    });
+
+                    const countryToUse = queryCountry || "Serbia";
+                    const countryLocation = await getCountryCoordinates(
+                        countryToUse
+                    );
+
+                    const updatedMapInfo = {
+                        lat: countryLocation.lat,
+                        lon: countryLocation.lon,
+                        country: countryLocation.name || countryToUse,
+                        userLat: userLat || null,
+                        userLng: userLng || null,
+                    };
+
+                    setMapInfo(updatedMapInfo);
+                    saveMapInfoToLocal(updatedMapInfo); // Save new data to local storage
+                } else {
+                    // Try to load from local storage
+                    const storedMapInfo = loadMapInfoFromLocal();
+                    if (storedMapInfo) {
+                        console.log("Using local storage data.");
+                        setMapInfo(storedMapInfo);
+                    } else {
+                        // Only use default if there's no stored data
+                        console.log("No local storage data. Using defaults.");
+                        const defaultMapInfo = {
+                            lat: "44.787197",
+                            lon: "20.457273",
+                            country: "Serbia",
+                            userLat: null,
+                            userLng: null,
+                        };
+                        setMapInfo(defaultMapInfo);
+                        saveMapInfoToLocal(defaultMapInfo);
+                    }
+                }
             } catch (error) {
                 console.error("Error resolving location:", error);
-                // Fallback to default coordinates if country lookup fails
-                setMapInfo({
-                    lat: "44.787197", // Default coordinates (Serbia)
-                    lon: "20.457273",
-                    country: queryCountry,
-                    userLat: userLat || null,
-                    userLng: userLng || null,
-                });
+                // Use stored data as fallback if available
+                const storedMapInfo = loadMapInfoFromLocal();
+                if (storedMapInfo) {
+                    setMapInfo(storedMapInfo);
+                } else {
+                    // Only use default as last resort
+                    const defaultMapInfo = {
+                        lat: "44.787197",
+                        lon: "20.457273",
+                        country: "Serbia",
+                        userLat: null,
+                        userLng: null,
+                    };
+                    setMapInfo(defaultMapInfo);
+                    saveMapInfoToLocal(defaultMapInfo);
+                }
             }
         };
 
@@ -55,6 +113,7 @@ const Home = () => {
     }, [location]);
 
     useEffect(() => {
+        // Fetch garage spots and electric chargers when mapInfo updates
         if (!mapInfo.lat || !mapInfo.lon) return;
 
         const fetchGarageSpots = async () => {

@@ -1,35 +1,127 @@
 .landingPage {
     text-align: center;
-    color: white;
-    min-height: 90vh;
-    background: linear-gradient(135deg, $primary-color 0%, #5a9ff0 100%);
+    color: $text-color-light;
+    min-height: 100vh;
+    background: linear-gradient(135deg, $primary-color 0%, darken($primary-color, 15%) 100%);
+    font-family: $font-family;
+
+    .locationPrompt {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: $z-index-modal + 1;
+        animation: fadeIn 0.3s ease;
+
+        .promptContent {
+            background-color: white;
+            padding: 2rem;
+            border-radius: $border-radius;
+            box-shadow: $hover-shadow;
+            max-width: 400px;
+            width: 90%;
+            animation: slideUp 0.3s ease;
+
+            h3 {
+                color: $text-color;
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin-bottom: 1rem;
+            }
+
+            p {
+                color: $muted-text-color;
+                margin-bottom: 1.5rem;
+                line-height: 1.6;
+            }
+
+            .promptActions {
+                display: flex;
+                gap: 1rem;
+                justify-content: center;
+
+                button {
+                    padding: $spacing-medium $spacing-large;
+                    border-radius: $border-radius;
+                    font-weight: 600;
+                    transition: all $transition-default;
+                    flex: 1;
+                    cursor: pointer;
+
+                    &.acceptButton {
+                        background-color: $primary-color;
+                        color: white;
+                        border: none;
+
+                        &:hover {
+                            background-color: darken($primary-color, 10%);
+                            transform: translateY(-1px);
+                        }
+                    }
+
+                    &.denyButton {
+                        background-color: $background-color;
+                        color: $text-color;
+                        border: none;
+
+                        &:hover {
+                            background-color: darken($background-color, 5%);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     .mainWindow {
-        padding: 100px 0 30px 0;
-        height: 80vh;
-        .header {
-            font-size: 32px;
-            margin-bottom: 20px;
+        padding: 120px 20px 60px;
+        min-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 0%, transparent 60%);
+            pointer-events: none;
         }
 
-        .tabs {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-
-            button {
-                background-color: transparent;
-                color: white;
-                border: none;
-                font-size: 16px;
-                margin: 0 10px;
-                cursor: pointer;
-                padding-bottom: 5px;
-                transition: border-bottom 0.3s ease;
-
-                &.active {
-                    border-bottom: 2px solid white;
+        .header {
+            margin-bottom: 40px;
+            
+            h1 {
+                font-size: 3.5rem;
+                font-weight: bold;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                margin-bottom: 20px;
+                
+                @media (max-width: 768px) {
+                    font-size: 2.5rem;
                 }
+            }
+
+            .locationStatus {
+                font-size: $font-size-base;
+                color: rgba(255, 255, 255, 0.9);
+                background-color: rgba(0, 0, 0, 0.2);
+                padding: 0.5rem 1rem;
+                border-radius: 2rem;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-top: 1rem;
+                backdrop-filter: blur(4px);
+                animation: fadeIn 0.3s ease;
             }
         }
 
@@ -37,218 +129,333 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 20px;
             width: 100%;
-
+            max-width: 600px;
+            margin: 0 auto 30px;
+            position: relative;
+            
             .searchBar {
-                width: 50%;
-                padding: $spacing-medium;
-                border: none;
+                width: 100%;
+                padding: $spacing-medium $spacing-large;
+                border: 2px solid rgba(255,255,255,0.2);
                 border-radius: $border-radius;
-                font-size: 17px;
+                font-size: $font-size-large;
+                background: rgba(255,255,255,0.95);
                 box-shadow: $hover-shadow;
+                transition: all $transition-default;
+                
+                &:focus {
+                    outline: none;
+                    border-color: $accent-color;
+                    box-shadow: 0 0 0 4px rgba($accent-color, 0.3);
+                }
             }
 
             .searchButton {
-                background-color: $accent-color;
+                position: absolute;
+                right: 8px;
+                top: 50%;
+                transform: translateY(-50%);
+                background-color: $primary-color;
                 border: none;
-                padding: $spacing-medium;
-                margin-left: 10px;
+                padding: $spacing-medium $spacing-large;
                 color: white;
                 border-radius: $border-radius;
+                font-weight: 600;
                 cursor: pointer;
-                font-size: 16px;
-                box-shadow: $hover-shadow;
-                transition: background-color 0.3s ease;
+                transition: all $transition-default;
 
                 &:hover {
-                    background-color: darken($accent-color, 10%);
+                    background-color: darken($primary-color, 10%);
                 }
             }
         }
 
         .nearbyButton {
             background-color: transparent;
-            border: 2px solid white;
+            border: 2px solid rgba(255,255,255,0.8);
             color: white;
-            padding: $spacing-medium;
+            padding: $spacing-medium $spacing-large;
             border-radius: $border-radius;
+            font-size: $font-size-base;
+            font-weight: 600;
             display: flex;
-            margin: auto;
-            gap: 5px;
+            align-items: center;
+            gap: 10px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all $transition-default;
+            backdrop-filter: blur(5px);
 
             &:hover {
-                background-color: rgba(255, 255, 255, 0.2);
-            }
-            .loader {
-                border: 3px solid rgba(255, 255, 255, 0.2);
-                border-top: 3px solid white;
-                border-radius: 50%;
-                width: 15px;
-                height: 15px;
-                animation: spin 1s linear infinite;
+                background-color: rgba(255,255,255,0.15);
+                transform: translateY(-2px);
+                box-shadow: $hover-shadow;
             }
 
-            @keyframes spin {
-                0% {
-                    transform: rotate(0deg);
+            &:disabled {
+                opacity: 0.7;
+                cursor: not-allowed;
+                
+                &:hover {
+                    transform: none;
+                    background-color: transparent;
                 }
-                100% {
-                    transform: rotate(360deg);
-                }
+            }
+
+            .loader {
+                border: 3px solid rgba(255,255,255,0.3);
+                border-top: 3px solid white;
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                animation: spin 1s linear infinite;
+            }
+        }
+
+        .selectLocationButton {
+            margin-top: 1rem;
+            background-color: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: $spacing-medium $spacing-large;
+            border-radius: $border-radius;
+            font-size: $font-size-base;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all $transition-default;
+            backdrop-filter: blur(5px);
+
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.25);
+                transform: translateY(-2px);
+                box-shadow: $hover-shadow;
             }
         }
     }
+
     .howItWorks {
         background-color: $background-color;
-        text-align: center;
-        margin-top: 40px;
-        width: 100%;
-        min-height: 80vh;
-        padding-top: 50px;
-
+        padding: 80px 20px;
+        
         h2 {
-            font-size: 2rem;
-            margin-bottom: 50px;
-            color: black;
+            font-size: 2.5rem;
+            color: $text-color;
+            margin-bottom: 60px;
+            font-weight: bold;
         }
 
         .steps {
             display: flex;
-            justify-content: space-evenly;
-            color: black;
+            justify-content: center;
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
 
             .step {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                width: 25%;
-                text-align: center;
+                flex: 1;
+                background: white;
+                border-radius: $border-radius;
+                padding: 30px;
+                box-shadow: $box-shadow;
+                transition: transform $transition-default;
+
+                &:hover {
+                    transform: translateY(-10px);
+                    box-shadow: $hover-shadow;
+                }
+
                 img {
-                    width: 80px;
+                    width: 100px;
                     height: auto;
-                    margin-bottom: 15px;
+                    margin-bottom: 20px;
+                    transition: transform $transition-default;
+
+                    &:hover {
+                        transform: scale(1.1);
+                    }
                 }
 
-                h3 {
-                    font-size: 1.5rem;
-                    margin-bottom: 10px;
-                }
+                .content {
+                    h3 {
+                        color: $text-color;
+                        font-size: 1.5rem;
+                        margin-bottom: 15px;
+                        font-weight: 600;
+                    }
 
-                p {
-                    font-size: 1.2rem;
-                    color: #555;
+                    p {
+                        color: $muted-text-color;
+                        font-size: $font-size-base;
+                        line-height: 1.6;
+                    }
                 }
             }
         }
     }
 
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .mainWindow {
-            .searchButton {
-                display: none;
-            }
-            .searchBar {
-                width: 80% !important;
-            }
-        }
-        .howItWorks .steps {
-            flex-direction: column;
-            align-items: center;
+    .modal {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(5px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        z-index: $z-index-modal;
+        animation: fadeIn 0.3s ease;
 
-            .step {
-                width: 100%;
-                margin-bottom: 20px;
+        .modalContent {
+            background-color: white;
+            padding: 2rem;
+            border-radius: $border-radius;
+            box-shadow: $hover-shadow;
+            max-width: 600px;
+            width: 90%;
+            animation: slideUp 0.3s ease;
+
+            h3 {
+                color: $text-color;
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin-bottom: 1rem;
+            }
+
+            .errorMessage {
+                color: #ef4444;
+                margin-bottom: 1rem;
+                font-size: $font-size-base;
+                animation: shake 0.5s ease;
+            }
+
+            .mapContainer {
+                margin: 20px 0;
+                border-radius: $border-radius;
+                overflow: hidden;
+                box-shadow: $box-shadow;
+
+                .mapInstruction {
+                    margin-top: 10px;
+                    color: $muted-text-color;
+                    font-size: $font-size-small;
+                    text-align: center;
+                }
+            }
+
+            .modalActions {
                 display: flex;
-                flex-direction: row;
-                gap: 20px;
-                .content {
-                    text-align: start;
+                gap: 1rem;
+                margin-top: 1.5rem;
+
+                button {
+                    flex: 1;
+                    padding: $spacing-medium;
+                    border-radius: $border-radius;
+                    font-weight: 600;
+                    transition: all $transition-default;
+                    cursor: pointer;
+
+                    &.modalConfirmButton {
+                        background-color: $primary-color;
+                        color: white;
+                        border: none;
+
+                        &:hover:not(:disabled) {
+                            background-color: darken($primary-color, 10%);
+                            transform: translateY(-1px);
+                        }
+
+                        &:disabled {
+                            opacity: 0.7;
+                            cursor: not-allowed;
+                        }
+                    }
+
+                    &.modalCloseButton {
+                        background-color: $background-color;
+                        color: $text-color;
+                        border: none;
+
+                        &:hover {
+                            background-color: darken($background-color, 5%);
+                        }
+                    }
                 }
             }
         }
     }
 }
-.modal {
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    z-index: 50;
-  }
-  
-  .modalContent {
-    background-color: white;
-    padding: 1.5rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 28rem;
-    width: 100%;
-  
-    h3 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: #111827;
-      margin-bottom: 1rem;
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-  
-    p {
-      color: #4b5563;
-      margin-bottom: 1.5rem;
-    }
-  }
-  
-  .modalActions {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .modalSearchBar {
-    width: 90%;
-    padding: 0.5rem 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    
-    &:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-    }
-  }
-  
-  .modalSearchButton {
-    padding: 0.5rem 1rem;
-    background-color: #3b82f6;
-    color: white;
-    border-radius: 0.5rem;
-    transition: background-color 0.2s;
-    
-    &:hover {
-      background-color: #2563eb;
-    }
-  }
-  
-  .modalCloseButton {
-    padding: 0.5rem 1rem;
-    background-color: #e5e7eb;
-    color: #374151;
-    border-radius: 0.5rem;
-    transition: background-color 0.2s;
-    
-    &:hover {
-      background-color: #d1d5db;
-    }
-  }
-  
-  @keyframes spin {
     to {
-      transform: rotate(360deg);
+        opacity: 1;
+        transform: translateY(0);
     }
-  }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+    .landingPage {
+        .mainWindow {
+            padding: 80px 20px 40px;
+
+            // .searchContainer {
+            //     width: 90%;
+                
+            //     .searchButton {
+            //         position: relative;
+            //         right: auto;
+            //         transform: none;
+            //         height: 100%;
+            //     }
+            // }
+        }
+
+        .howItWorks {
+            .steps {
+                flex-direction: column;
+                padding: 0 20px;
+
+                .step {
+                    width: 100%;
+                    margin-bottom: 30px;
+                    text-align: center;
+
+                    img {
+                        width: 80px;
+                    }
+                }
+            }
+        }
+
+        .locationPrompt, .modal {
+            .promptContent, .modalContent {
+                width: 95%;
+                padding: 1.5rem;
+
+                .promptActions, .modalActions {
+                    flex-direction: column;
+                }
+            }
+        }
+    }
+}

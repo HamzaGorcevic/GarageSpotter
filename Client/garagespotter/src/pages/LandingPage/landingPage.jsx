@@ -1,52 +1,128 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import styles from "./landingPage.module.scss";
 import { useNavigate } from "react-router-dom";
 import { getCurrentPosition } from "../../utils/geolocation";
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import MapConstant from "../Home/map/constants/constantMap";
+
+// Custom marker component for react-leaflet
+const LocationMarker = ({ position, setPosition }) => {
+    useMapEvents({
+        click(e) {
+            setPosition([e.latlng.lat, e.latlng.lng]);
+        },
+    });
+    return position ? <Marker position={position} /> : null;
+};
 
 const LandingPage = () => {
     const searchRef = useRef();
-    const modalSearchRef = useRef();
     const navigate = useNavigate();
+
+    // State variables
     const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [selectedPosition, setSelectedPosition] = useState(null);
+    const [locationStatus, setLocationStatus] = useState("pending"); // 'pending', 'granted', 'denied'
+    const [showLocationPrompt, setShowLocationPrompt] = useState(true);
 
-    const searchCountry = () => {
-        const value = searchRef.current.value?.trim();
-        if (value) {
-            navigate(`/home?country=${encodeURIComponent(value)}`);
+    // Ask for location permission when component mounts
+    useEffect(() => {
+        if ("geolocation" in navigator) {
+            navigator.permissions
+                .query({ name: "geolocation" })
+                .then((result) => {
+                    setLocationStatus(result.state);
+                    if (result.state === "granted") {
+                        setShowLocationPrompt(false);
+                        // Get initial position
+                        getCurrentPosition()
+                            .then((position) => {
+                                setSelectedPosition([
+                                    position.lat,
+                                    position.lng,
+                                ]);
+                            })
+                            .catch(console.error);
+                    }
+                });
+        } else {
+            setLocationStatus("denied");
+            setShowLocationPrompt(false);
         }
-    };
+    }, []);
 
-    const modalSearchCountry = () => {
-        const value = modalSearchRef.current.value?.trim();
-        if (value) {
-            setShowModal(false);
-            navigate(`/home?country=${encodeURIComponent(value)}`);
-        }
-    };
-
-    const findNearbyParking = async () => {
+    // Function to handle location permission request
+    const handleLocationPermission = async () => {
+        setShowLocationPrompt(false);
         setLoading(true);
-        setErrorMessage("");
-
         try {
-            // Get precise location
             const position = await getCurrentPosition();
-            // Reverse geocoding with better error handling
+            setSelectedPosition([position.lat, position.lng]);
+            setLocationStatus("granted");
+        } catch (error) {
+            console.error("Location error:", error);
+            setLocationStatus("denied");
+            setShowModal(true);
+            setErrorMessage(
+                "Please select your starting point on the map for better results."
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Function to handle country search
+    const searchCountry = async (e) => {
+        e.preventDefault();
+        const value = searchRef.current.value?.trim();
+
+        if (!value) {
+            setErrorMessage("Please enter a country name.");
+            return;
+        }
+
+        if (!selectedPosition) {
+            setErrorMessage(
+                "Please select your starting point for better results."
+            );
+            setShowModal(true);
+            return;
+        }
+
+        // Proceed with the search
+        navigate(
+            `/home?country=${encodeURIComponent(value)}&userLat=${
+                selectedPosition[0]
+            }&userLng=${selectedPosition[1]}`
+        );
+    };
+
+    // Function to find nearby parking
+    const findNearbyParking = async () => {
+        if (locationStatus !== "granted") {
+            setErrorMessage(
+                "Please allow location access or select your starting point manually."
+            );
+            setShowModal(true);
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const position = await getCurrentPosition();
             const response = await fetch(
                 `https://nominatim.openstreetmap.org/reverse?lat=${position.lat}&lon=${position.lng}&format=json&zoom=18&addressdetails=1`
             );
 
-            if (!response.ok) {
-                throw new Error("Failed to get location details");
-            }
+            if (!response.ok) throw new Error("Failed to get location details");
 
             const data = await response.json();
-
-            if (!data.address?.country) {
+            if (!data.address?.country)
                 throw new Error("Could not determine your country");
-            }
 
             navigate(
                 `/home?country=${encodeURIComponent(
@@ -55,7 +131,9 @@ const LandingPage = () => {
             );
         } catch (error) {
             console.error("Location error:", error);
-            setErrorMessage(error.message);
+            setErrorMessage(
+                "Could not determine your location. Please select manually."
+            );
             setShowModal(true);
         } finally {
             setLoading(false);
@@ -64,29 +142,60 @@ const LandingPage = () => {
 
     return (
         <div className={styles.landingPage}>
+            {/* Location Permission Prompt */}
+            {showLocationPrompt && (
+                <div className={styles.locationPrompt}>
+                    <div className={styles.promptContent}>
+                        <h3>Enable Location Services</h3>
+                        <p>
+                            Allow access to your location for better parking
+                            recommendations near you.
+                        </p>
+                        <div className={styles.promptActions}>
+                            <button
+                                onClick={handleLocationPermission}
+                                className={styles.acceptButton}
+                            >
+                                Allow Location Access
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setShowLocationPrompt(false);
+                                    setShowModal(true);
+                                }}
+                                className={styles.denyButton}
+                            >
+                                Select Manually
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Main Window */}
             <div className={styles.mainWindow}>
                 <div className={styles.header}>
                     <h1>Reserve Parking Now & Save</h1>
+                    {selectedPosition && (
+                        <p className={styles.locationStatus}>
+                            Starting point selected ✓
+                        </p>
+                    )}
                 </div>
-
                 <form
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        searchCountry();
-                    }}
+                    onSubmit={searchCountry}
                     className={styles.searchContainer}
                 >
                     <input
                         ref={searchRef}
                         type="text"
-                        placeholder="Country"
+                        placeholder="Enter country name"
                         className={styles.searchBar}
                     />
                     <button className={styles.searchButton} type="submit">
                         Search
                     </button>
                 </form>
-
                 <button
                     onClick={findNearbyParking}
                     className={styles.nearbyButton}
@@ -98,28 +207,67 @@ const LandingPage = () => {
                         "Find Parking Near Me"
                     )}
                 </button>
+                {!selectedPosition && (
+                    <button
+                        onClick={() => setShowModal(true)}
+                        className={styles.selectLocationButton}
+                    >
+                        Select Starting Point
+                    </button>
+                )}
             </div>
 
+            {/* Modal for Manual Location Selection */}
             {showModal && (
                 <div className={styles.modal}>
                     <div className={styles.modalContent}>
-                        <h3>Location Access Issue</h3>
-                        <p>
-                            {errorMessage ||
-                                "Please allow location access or search manually."}
-                        </p>
-                        <div className={styles.modalActions}>
-                            <input
-                                ref={modalSearchRef}
-                                type="text"
-                                placeholder="Enter country"
-                                className={styles.modalSearchBar}
-                            />
-                            <button
-                                onClick={modalSearchCountry}
-                                className={styles.modalSearchButton}
+                        <h3>Select Your Starting Point</h3>
+                        {errorMessage && (
+                            <p className={styles.errorMessage}>
+                                {errorMessage}
+                            </p>
+                        )}
+                        <div className={styles.mapContainer}>
+                            <MapContainer
+                                center={selectedPosition || [51.505, -0.09]}
+                                zoom={13}
+                                style={{
+                                    height: "300px",
+                                    width: "100%",
+                                    marginBottom: "20px",
+                                }}
                             >
-                                Search
+                                <TileLayer
+                                    url={
+                                        MapConstant.tileLayer ||
+                                        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                    }
+                                    attribution={MapConstant.attribution}
+                                />
+                                <LocationMarker
+                                    position={selectedPosition}
+                                    setPosition={setSelectedPosition}
+                                />
+                            </MapContainer>
+                            <p className={styles.mapInstruction}>
+                                Click on the map to select your starting point
+                            </p>
+                        </div>
+                        <div className={styles.modalActions}>
+                            <button
+                                onClick={() => {
+                                    if (selectedPosition) {
+                                        setShowModal(false);
+                                        setErrorMessage("");
+                                    } else {
+                                        setErrorMessage(
+                                            "Please select a starting point on the map"
+                                        );
+                                    }
+                                }}
+                                className={styles.modalConfirmButton}
+                            >
+                                Confirm Location
                             </button>
                             <button
                                 onClick={() => {
@@ -128,13 +276,14 @@ const LandingPage = () => {
                                 }}
                                 className={styles.modalCloseButton}
                             >
-                                Close
+                                Cancel
                             </button>
                         </div>
                     </div>
                 </div>
             )}
 
+            {/* How It Works Section */}
             <div className={styles.howItWorks}>
                 <h2>How It Works</h2>
                 <div className={styles.steps}>

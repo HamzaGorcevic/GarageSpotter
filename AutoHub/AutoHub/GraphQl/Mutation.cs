@@ -3,14 +3,14 @@ using AutoHub.Services;
 using HotChocolate;
 using HotChocolate.Types;
 using AutoHub.Models;
-using HotChocolate.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using AutoHub.Helpers;
 
 namespace AutoHub.GraphQl.Mutations
 {
     public class Mutation
     {
-        //[Authorize(Roles = new[] { "Owner"})]
+        [Authorize(Roles = "Owner")]
         public async Task<ServiceResponse<string>> CreateGarage(
             [Service] IGarageSpotService service,
             CreateGarageInput input)
@@ -34,7 +34,7 @@ namespace AutoHub.GraphQl.Mutations
             return result;
         }
 
-        //[Authorize(Roles = new[] { "Owner"})]
+        [Authorize(Roles = "Owner")]
         public async Task<ServiceResponse<int>> UpdateGarage(
             [Service] IGarageSpotService service,   
             UpdateGarageInput input)
@@ -62,7 +62,7 @@ namespace AutoHub.GraphQl.Mutations
         }
 
 
-        //[Authorize(Roles = new[] {"Owner","Admin"})]
+        [Authorize(Roles = "Owner,Admin")]
         public async Task<ServiceResponse<bool>> DeleteGarage(
             [Service] IGarageSpotService service,
             DeleteGarageSpotInput input)
