@@ -40,6 +40,13 @@ const MyElectricChargers = () => {
     };
 
     const handleChargerDelete = async (chargerId) => {
+        if (
+            !window.confirm(
+                "Are you sure you want to delete this charger station?"
+            )
+        ) {
+            return;
+        }
         try {
             const response = await fetch(
                 `${BASE_URL}/ElectricCharger/deleteElectricCharger?chargerId=${chargerId}`,
