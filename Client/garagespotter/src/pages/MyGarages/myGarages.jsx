@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Loading } from "../../components/Loader/loader";
 import { Search } from "lucide-react";
 import styles from "./myGarages.module.scss";
+import toast from "react-hot-toast";
 
 const DELETE_GARAGE_MUTATION = gql`
     mutation DeleteGarage($input: DeleteGarageSpotInput!) {
@@ -18,8 +19,8 @@ const DELETE_GARAGE_MUTATION = gql`
 `;
 
 const GET_GARAGES = gql`
-    query GetGarages {
-        garageSpots {
+    query GetOwnerGarages {
+        getOwnerGarages {
             id
             locationName
             countryName
@@ -51,7 +52,7 @@ const MyGarages = () => {
                 query: GET_GARAGES,
                 fetchPolicy: "network-only",
             });
-            setGarageSpots(data.garageSpots);
+            setGarageSpots(data.getOwnerGarages);
         } catch (error) {
             console.error("Error fetching garage spots:", error);
         } finally {
@@ -73,7 +74,9 @@ const MyGarages = () => {
                     },
                 },
             });
+            console.log(data);
             if (data.deleteGarage.success) {
+                toast.success("Succesfully deleted garage");
                 setGarageSpots((prev) =>
                     prev.filter((garage) => garage.id !== spotId)
                 );
