@@ -4,6 +4,7 @@ import { apolloClient } from "../../config/apolloClient";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Loading } from "../../components/Loader/loader";
+import { Search } from "lucide-react";
 import styles from "./myGarages.module.scss";
 
 const DELETE_GARAGE_MUTATION = gql`
@@ -35,12 +36,13 @@ const GET_GARAGES = gql`
         }
     }
 `;
-
 const MyGarages = () => {
     const { authData } = useContext(AuthContext);
     const [garageSpots, setGarageSpots] = useState([]);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [sortOrder, setSortOrder] = useState("asc");
 
     const getMyGarages = async () => {
         setLoading(true);
@@ -58,6 +60,10 @@ const MyGarages = () => {
     };
 
     const handleGarageDelete = async (spotId) => {
+        if (!window.confirm("Are you sure you want to delete this garage?")) {
+            return;
+        }
+
         try {
             const { data } = await apolloClient.mutate({
                 mutation: DELETE_GARAGE_MUTATION,
@@ -67,7 +73,6 @@ const MyGarages = () => {
                     },
                 },
             });
-
             if (data.deleteGarage.success) {
                 setGarageSpots((prev) =>
                     prev.filter((garage) => garage.id !== spotId)
@@ -86,54 +91,119 @@ const MyGarages = () => {
         }
     }, [authData]);
 
-    return !loading ? (
+    const filteredGarages = garageSpots
+        .filter(
+            (garage) =>
+                garage.locationName
+                    ?.toLowerCase()
+                    .includes(searchTerm.toLowerCase()) ||
+                garage.countryName
+                    ?.toLowerCase()
+                    .includes(searchTerm.toLowerCase())
+        )
+        .sort((a, b) => {
+            if (sortOrder === "asc") {
+                return a.price - b.price;
+            }
+            return b.price - a.price;
+        });
+
+    if (loading) return <Loading />;
+
+    return (
         <div className={styles.container}>
-            <h1 className={styles.title}>My Garages</h1>
-            <div className={styles.garageList}>
-                {!garageSpots || garageSpots?.length === 0 ? (
+            <div className={styles.contentWrapper}>
+                <h1 className={styles.title}>My Garages</h1>
+
+                <div className={styles.searchContainer}>
+                    <div className={styles.searchWrapper}>
+                        <Search className={styles.searchIcon} size={20} />
+                        <input
+                            type="text"
+                            placeholder="Search garages..."
+                            className={styles.searchInput}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <button
+                        onClick={() =>
+                            setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                        }
+                        className={styles.addBtn}
+                    >
+                        Price:{" "}
+                        {sortOrder === "asc" ? "Low to High" : "High to Low"}
+                    </button>
+                </div>
+
+                {filteredGarages.length === 0 ? (
                     <p className={styles.noGarages}>
                         No garage spots available.
                     </p>
                 ) : (
-                    garageSpots?.map((garage) => (
-                        <div className={styles.garageCard} key={garage.id}>
-                            <h2 className={styles.locationName}>
-                                {garage.locationName}, {garage.countryName}
-                            </h2>
-                            <p>
-                                <strong>Price:</strong> ${garage.price}
-                            </p>
-                            <p>
-                                <strong>Is verified:</strong>{" "}
-                                {garage.isVerified ? "Yes" : "Pending ..."}
-                            </p>
-                            <p>
-                                <strong>Total Spots:</strong>{" "}
-                                {garage.totalSpots.length}
-                            </p>
-                            <p>
-                                <strong>Latitude:</strong> {garage.latitude},{" "}
-                                <strong>Longitude:</strong> {garage.longitude}
-                            </p>
-                            <button
-                                className={styles.addBtn}
-                                onClick={() => navigate(`/update/${garage.id}`)}
-                            >
-                                Edit
-                            </button>
-                            <button
-                                className={styles.deleteBtn}
-                                onClick={() => handleGarageDelete(garage.id)}
-                            >
-                                Delete
-                            </button>
-                        </div>
-                    ))
+                    <div className={styles.garageList}>
+                        {filteredGarages.map((garage, index) => (
+                            <div key={garage.id} className={styles.garageCard}>
+                                <div className={styles.garageHeader}>
+                                    <div className={styles.garageNumber}>
+                                        {index + 1}
+                                    </div>
+                                    <div className={styles.garageInfo}>
+                                        <h2 className={styles.locationName}>
+                                            {garage.locationName},{" "}
+                                            {garage.countryName}
+                                        </h2>
+                                        <p
+                                            className={
+                                                styles.verificationStatus
+                                            }
+                                        >
+                                            {garage.isVerified
+                                                ? "✓ Verified"
+                                                : "Pending verification"}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className={styles.garageDetails}>
+                                    <p>
+                                        <strong>Price:</strong> ${garage.price}
+                                    </p>
+                                    <p>
+                                        <strong>Total Spots:</strong>{" "}
+                                        {garage.totalSpots.length}
+                                    </p>
+                                    <p>
+                                        <strong>Location:</strong>{" "}
+                                        {garage.latitude}, {garage.longitude}
+                                    </p>
+                                </div>
+
+                                <div className={styles.buttonContainer}>
+                                    <button
+                                        className={styles.addBtn}
+                                        onClick={() =>
+                                            navigate(`/update/${garage.id}`)
+                                        }
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        className={styles.deleteBtn}
+                                        onClick={() =>
+                                            handleGarageDelete(garage.id)
+                                        }
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 )}
             </div>
         </div>
-    ) : (
-        <Loading />
     );
 };
 
