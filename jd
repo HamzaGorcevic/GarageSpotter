@@ -1,0 +1,102 @@
+[33m11031dc[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{0}: filter-branch: rewrite
+[33mde3e0c5[m[33m ([m[mrefs/original/refs/remotes/origin/main[m[33m, [m[mrefs/original/refs/heads/main[m[33m)[m HEAD@{1}: filter-branch: rewrite
+[33mee3f34b[m HEAD@{2}: reset: moving to HEAD
+[33mee3f34b[m HEAD@{3}: commit: polishing desing
+[33m7bde0ae[m HEAD@{4}: commit: logic for user location fixed
+[33m0dec985[m HEAD@{5}: commit: garage spots
+[33m9f84881[m HEAD@{6}: commit: desing changes
+[33mbcf0734[m HEAD@{7}: commit: graphql
+[33m7f0659d[m HEAD@{8}: commit: toggle password
+[33m434f37f[m HEAD@{9}: pull origin main --force: Merge made by the 'ort' strategy.
+[33m82a9fc5[m HEAD@{10}: reset: moving to HEAD
+[33m82a9fc5[m HEAD@{11}: commit: reduced image size
+[33m2f0fd45[m HEAD@{12}: commit: path fixed
+[33m42c25f3[m HEAD@{13}: commit: readme
+[33m9ac7b81[m HEAD@{14}: commit: smaller polishing
+[33m89a38a1[m HEAD@{15}: commit: backend path
+[33m3e3b115[m HEAD@{16}: commit: mail
+[33mf0ff00c[m HEAD@{17}: commit: connection to diffrent domain name
+[33m737b999[m HEAD@{18}: commit: comunication
+[33m25d3a97[m HEAD@{19}: commit: removed docker
+[33m14862df[m HEAD@{20}: commit: fixed paths
+[33m92e3191[m HEAD@{21}: commit: docker for frontend
+[33m933580c[m HEAD@{22}: reset: moving to 933580c
+[33ma2623df[m HEAD@{23}: reset: moving to a2623df
+[33m69d33e4[m HEAD@{24}: commit: old docker image
+[33mcc4a9b6[m HEAD@{25}: commit: reverted docker
+[33m1385614[m HEAD@{26}: commit: configuration for railway
+[33mc3edc94[m HEAD@{27}: reset: moving to HEAD
+[33mc3edc94[m HEAD@{28}: commit: test
+[33m4d1c9b8[m HEAD@{29}: commit: docker with .net 9
+[33ma013712[m HEAD@{30}: commit: docker with .net 9
+[33mc762db3[m HEAD@{31}: commit: docker with .net 9
+[33m3824b8f[m HEAD@{32}: commit: m
+[33m71e21c8[m HEAD@{33}: commit: nixpack.tmls
+[33m8943659[m HEAD@{34}: commit: nixpacks
+[33mecd8bf0[m HEAD@{35}: commit: o
+[33m1c73b1f[m HEAD@{36}: commit: docker
+[33m08641e9[m HEAD@{37}: commit: changed working dir
+[33m63b006f[m HEAD@{38}: commit: changed working dir
+[33m71a98e1[m HEAD@{39}: commit: updated docker
+[33mb02f844[m HEAD@{40}: commit: reverted
+[33ma2623df[m HEAD@{41}: commit: railway
+[33m933580c[m HEAD@{42}: commit: fix after dzemil tested
+[33m109ff0a[m HEAD@{43}: commit: fix:landing page
+[33mc79548f[m HEAD@{44}: commit: reservation mpdal
+[33m14c6cf7[m HEAD@{45}: commit: clear local nuget
+[33mfc58634[m HEAD@{46}: commit: debuging docker
+[33mca05fdf[m HEAD@{47}: commit: path
+[33m6d9b5e8[m HEAD@{48}: commit: appsettings
+[33m11644e0[m HEAD@{49}: commit: render conf
+[33m24d40a6[m HEAD@{50}: commit: Remove bin and obj directories from version control
+[33m472192a[m HEAD@{51}: commit: favorites
+[33mb1367a4[m HEAD@{52}: commit: usless try to improve location accuracy
+[33m971f19d[m HEAD@{53}: commit: has to be longer
+[33m53fc856[m HEAD@{54}: commit: reduced time
+[33mb465cff[m HEAD@{55}: commit: accurate location
+[33mf722240[m HEAD@{56}: commit: complete
+[33maa7cd82[m HEAD@{57}: commit: local client language error fixed
+[33mea4df68[m HEAD@{58}: commit: force en contru name
+[33m89b1efa[m HEAD@{59}: commit: final changes
+[33m8d25bea[m HEAD@{60}: commit: path
+[33m21669f0[m HEAD@{61}: commit: email verification
+[33m9372dd0[m HEAD@{62}: commit: navbar
+[33m4da3567[m HEAD@{63}: commit: register
+[33mdbf2483[m HEAD@{64}: commit: should work
+[33m0ed7dbf[m HEAD@{65}: commit: nullable isGoogle
+[33meeef35e[m HEAD@{66}: commit: navbar capitalize letter file
+[33m22d735c[m HEAD@{67}: commit: docker image updates
+[33mf579838[m HEAD@{68}: commit: google login and register auth
+[33m3ea6d0d[m HEAD@{69}: reset: moving to HEAD
+[33m3ea6d0d[m HEAD@{70}: commit: styling
+[33me67fe9e[m HEAD@{71}: commit: design changes
+[33maff284c[m HEAD@{72}: commit: style changes
+[33m7ff145c[m HEAD@{73}: commit: fixed:redirection issues
+[33mfadc78d[m HEAD@{74}: commit: path to backend
+[33m8667021[m HEAD@{75}: commit: user restrictions
+[33ma23cdd9[m HEAD@{76}: commit: removed local conection
+[33m0d82cca[m HEAD@{77}: commit: update user role
+[33m8e5e21d[m HEAD@{78}: commit: token in authdata
+[33m2e160f8[m HEAD@{79}: commit: serve routes
+[33mf66e16e[m HEAD@{80}: commit: saving user
+[33m8e59620[m HEAD@{81}: commit: appsettings
+[33mb0857f2[m HEAD@{82}: commit: changed path
+[33m9dba0c2[m HEAD@{83}: commit: allowing cors
+[33m6c6c301[m HEAD@{84}: pull origin main: Fast-forward
+[33mcfa5f8f[m HEAD@{85}: commit: deployed base
+[33m1b78fdb[m HEAD@{86}: commit: case sensitivity
+[33m47e8df1[m HEAD@{87}: commit: import home.jsx
+[33mdc12e3b[m HEAD@{88}: commit: switched to postgress sql
+[33m2480311[m HEAD@{89}: commit: delete options
+[33ma83997a[m HEAD@{90}: commit: styling favorite and fixed extend reservation logix
+[33m4041b38[m HEAD@{91}: commit: facroties
+[33m8b05c12[m HEAD@{92}: commit: changes
+[33m13c947b[m HEAD@{93}: commit: showing chargers
+[33m6a48576[m HEAD@{94}: commit: Electric chargers
+[33m67aeb6f[m HEAD@{95}: commit: error notification and change password
+[33m96b2dc3[m HEAD@{96}: commit: error notification and change password
+[33m8bf14dd[m HEAD@{97}: commit: reservation by dates and logic for reservations in between
+[33m215d7ee[m HEAD@{98}: commit: docker file
+[33m8b72441[m HEAD@{99}: commit: https redirections
+[33mb623e59[m HEAD@{100}: commit: exposed 8080 port
+[33mb864385[m HEAD@{101}: commit: .gitignore is now working
