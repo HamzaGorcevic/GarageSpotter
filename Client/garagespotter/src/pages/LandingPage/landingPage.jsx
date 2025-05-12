@@ -12,23 +12,17 @@ import {
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import MapConstant from "../Home/map/constants/constantMap";
-import BluePin from "../../assets/images/blueicon.png";
 import { GeoSearchControl, OpenStreetMapProvider } from "leaflet-geosearch";
+import { blueIcon } from "../../assets/icons/mapicons";
+
 // Custom marker component for react-leaflet
 const LocationMarker = ({ position, setPosition }) => {
-    const customIcon = L.icon({
-        iconUrl: BluePin,
-        iconSize: [32, 35],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -32],
-    });
-
     useMapEvents({
         click(e) {
             setPosition({ lat: e.latlng.lat, lng: e.latlng.lng });
         },
     });
-    return position ? <Marker position={position} icon={customIcon} /> : null;
+    return position ? <Marker position={position} icon={blueIcon} /> : null;
 };
 
 const LandingPage = () => {
