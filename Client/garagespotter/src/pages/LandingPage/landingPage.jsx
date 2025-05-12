@@ -107,8 +107,8 @@ const LandingPage = () => {
         // Proceed with the search
         navigate(
             `/home?country=${encodeURIComponent(value)}&userLat=${
-                selectedPosition[0]
-            }&userLng=${selectedPosition[1]}`
+                selectedPosition.lat
+            }&userLng=${selectedPosition.lng}`
         );
     };
 
