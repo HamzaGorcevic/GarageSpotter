@@ -22,6 +22,8 @@ import Navbar from "./components/Navbar/navbar.jsx";
 import EmailVerification from "./components/EmailVerification/emailVerification.jsx";
 import PrivacyPolicy from "./pages/PrivacyPolicy/privacyPolicy.jsx";
 import TermsOfService from "./pages/TermsOfService/termsOfService.jsx";
+import ResetPassword from "./pages/ResetPassword/resetPassword.jsx";
+import ResetPasswordForm from "./pages/ResetPassword/resetPasswordForm.jsx";
 function App() {
     return (
         <GoogleOAuthProvider
@@ -109,12 +111,18 @@ function App() {
 
                         <Route path="/edit-profile" element={<EditProfile />} />
                         <Route path="/login" element={<Login />} />
+                        <Route path="/reset" element={<ResetPassword />} />
+
                         <Route path="/register" element={<Register />} />
                         <Route path="/privacy" element={<PrivacyPolicy />} />
                         <Route path="/terms" element={<TermsOfService />} />
                         <Route
                             path="/verify-email"
                             element={<EmailVerification />}
+                        />
+                        <Route
+                            path="/reset-password"
+                            element={<ResetPasswordForm />}
                         />
 
                         <Route

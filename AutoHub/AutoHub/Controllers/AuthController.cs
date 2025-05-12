@@ -41,7 +41,24 @@ namespace AutoHub.Controllers
                 return BadRequest(response);
             return Ok(response);
         }
+        [HttpGet("reset-password-request")]
+        public async Task<ActionResult<ServiceResponse<string>>> ResetPasswordRequest(string email)
+        {
+            var respone = await _authRepository.ResetPasswordRequest(email);
 
-        
+            if (!respone.Success)
+                return BadRequest(respone);
+            return Ok(respone);
+        }
+        [HttpPost("reset-password")]
+        public async Task<ActionResult<ServiceResponse<string>>> ResetPassword(ResetPasswordDto resetPasswordDto)
+        {
+            var respone = await _authRepository.ResetPassword(resetPasswordDto);
+            if (!respone.Success)
+                return BadRequest(respone);
+            return Ok(respone);
+        }
+
+
     }
 }

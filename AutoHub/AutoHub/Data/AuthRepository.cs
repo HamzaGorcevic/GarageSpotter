@@ -3,12 +3,14 @@ using AutoHub.Models;
 using AutoHub.Models.Enums;
 using AutoHub.Services;
 using AutoMapper;
+using Azure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using System.Text;
 
@@ -348,7 +350,57 @@ namespace AutoHub.Data
             response.Message = "User deleted successfully";
             return response;
         }
+        public async Task<ServiceResponse<string>> ResetPasswordRequest(string email)
+        {
+            var response = new ServiceResponse<string>();
+            var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
 
+            if (user == null)
+            {
+                response.Success = false;
+                response.Message = "User not found";
+                return response;
+            }
+            var verificationToken = Guid.NewGuid().ToString();
+            var tokenExpiry = DateTime.UtcNow.AddHours(24);
+
+            // Store token temporarily (in-memory or cache)
+            _cache.Set(verificationToken, new VerificationData
+            {
+                Name = user.Name,
+                Email = user.Email,
+                Token = verificationToken,
+                TokenExpiry = tokenExpiry
+            });
+
+            var verificationLink = $"{_configuration["AppUrl"]}/reset-password?token={verificationToken}";
+            await _emailService.SendResetPasswordEmailAsync(email, verificationLink);
+            response.Success = true;
+            response.Message = "Message sent successfully!";
+            return response;
+
+        }
+        public async Task<ServiceResponse<string>> ResetPassword(ResetPasswordDto resetPasswordDto)
+        {
+            var response = new ServiceResponse<string>();
+            if (!_cache.TryGetValue(resetPasswordDto.Token, out VerificationData verificationData))
+            {
+                response.Success = false;
+                response.Message = "Invalid or expired verification token";
+                return response;
+            }
+            CreateHashPassword(resetPasswordDto.NewPassword, out byte[] passwordHash, out byte[] passwordSalt);
+            var user = await _appDbContext.Users.FirstOrDefaultAsync(user => user.Email == verificationData.Email);
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+            user.PasswordVerification = true;
+            await _appDbContext.SaveChangesAsync();
+            string returnToken = CreateToken(user.Name, user.Role, user.Id, user.Email, user.PasswordVerification);
+            response.Success = true;
+            response.Message = "Successfully reseted password";
+            response.Value = returnToken;
+            return response;
+        }
         private bool VerifyHashPassword(string password, byte[] passwordHash, byte[] passwordSalt)
         {
             if (password == null || passwordHash == null || passwordSalt == null)

@@ -2,19 +2,33 @@ import React, { useRef, useState, useEffect } from "react";
 import styles from "./landingPage.module.scss";
 import { useNavigate } from "react-router-dom";
 import { getCurrentPosition } from "../../utils/geolocation";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import {
+    MapContainer,
+    TileLayer,
+    Marker,
+    useMapEvents,
+    useMap,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import MapConstant from "../Home/map/constants/constantMap";
-
+import BluePin from "../../assets/images/blueicon.png";
+import { GeoSearchControl, OpenStreetMapProvider } from "leaflet-geosearch";
 // Custom marker component for react-leaflet
 const LocationMarker = ({ position, setPosition }) => {
+    const customIcon = L.icon({
+        iconUrl: BluePin,
+        iconSize: [32, 35],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32],
+    });
+
     useMapEvents({
         click(e) {
-            setPosition([e.latlng.lat, e.latlng.lng]);
+            setPosition({ lat: e.latlng.lat, lng: e.latlng.lng });
         },
     });
-    return position ? <Marker position={position} /> : null;
+    return position ? <Marker position={position} icon={customIcon} /> : null;
 };
 
 const LandingPage = () => {
@@ -41,10 +55,7 @@ const LandingPage = () => {
                         // Get initial position
                         getCurrentPosition()
                             .then((position) => {
-                                setSelectedPosition([
-                                    position.lat,
-                                    position.lng,
-                                ]);
+                                setSelectedPosition(position);
                             })
                             .catch(console.error);
                     }
@@ -61,7 +72,7 @@ const LandingPage = () => {
         setLoading(true);
         try {
             const position = await getCurrentPosition();
-            setSelectedPosition([position.lat, position.lng]);
+            setSelectedPosition(position);
             setLocationStatus("granted");
         } catch (error) {
             console.error("Location error:", error);
@@ -103,17 +114,14 @@ const LandingPage = () => {
 
     // Function to find nearby parking
     const findNearbyParking = async () => {
-        if (locationStatus !== "granted") {
-            setErrorMessage(
-                "Please allow location access or select your starting point manually."
-            );
-            setShowModal(true);
-            return;
-        }
-
-        setLoading(true);
         try {
-            const position = await getCurrentPosition();
+            let position;
+            try {
+                position = await getCurrentPosition();
+            } catch (error) {
+                position = selectedPosition;
+                console.log(selectedPosition, "selected points");
+            }
             const response = await fetch(
                 `https://nominatim.openstreetmap.org/reverse?lat=${position.lat}&lon=${position.lng}&format=json&zoom=18&addressdetails=1`
             );
@@ -139,6 +147,23 @@ const LandingPage = () => {
             setLoading(false);
         }
     };
+    function LeafletgeoSearch() {
+        const map = useMap();
+        useEffect(() => {
+            const provider = new OpenStreetMapProvider();
+
+            const searchControl = new GeoSearchControl({
+                provider,
+                style: "bar",
+                showMarker: false,
+            });
+
+            map.addControl(searchControl);
+            return () => map.removeControl(searchControl);
+        }, []);
+
+        return null;
+    }
 
     return (
         <div className={styles.landingPage}>
@@ -204,7 +229,7 @@ const LandingPage = () => {
                     {loading ? (
                         <div className={styles.loader}></div>
                     ) : (
-                        "Find Parking Near Me"
+                        "Find Parking Near My Point"
                     )}
                 </button>
                 {!selectedPosition && (
@@ -229,7 +254,7 @@ const LandingPage = () => {
                         )}
                         <div className={styles.mapContainer}>
                             <MapContainer
-                                center={selectedPosition || [51.505, -0.09]}
+                                center={selectedPosition || [21.505, 40.09]}
                                 zoom={13}
                                 style={{
                                     height: "300px",
@@ -237,6 +262,8 @@ const LandingPage = () => {
                                     marginBottom: "20px",
                                 }}
                             >
+                                <LeafletgeoSearch />
+
                                 <TileLayer
                                     url={
                                         MapConstant.tileLayer ||

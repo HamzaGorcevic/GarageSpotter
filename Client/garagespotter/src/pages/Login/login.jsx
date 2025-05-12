@@ -101,6 +101,9 @@ const Login = () => {
                         If you don't have an account register here
                     </a>
                 </p>
+                <p>
+                    <a href="/reset">Forgot your password?</a>
+                </p>
             </form>
         </div>
     );
