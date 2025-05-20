@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\gorce\\GarageSpotter\\AutoHub\\AutoHub\\AutoHub.csproj": {}
+    "C:\\Users\\gorce\\GarageSpotter\\AutoHub\\AutoHub\\Autohub.csproj": {}
   },
   "projects": {
-    "C:\\Users\\gorce\\GarageSpotter\\AutoHub\\AutoHub\\AutoHub.csproj": {
+    "C:\\Users\\gorce\\GarageSpotter\\AutoHub\\AutoHub\\Autohub.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\gorce\\GarageSpotter\\AutoHub\\AutoHub\\AutoHub.csproj",
-        "projectName": "AutoHub",
-        "projectPath": "C:\\Users\\gorce\\GarageSpotter\\AutoHub\\AutoHub\\AutoHub.csproj",
+        "projectUniqueName": "C:\\Users\\gorce\\GarageSpotter\\AutoHub\\AutoHub\\Autohub.csproj",
+        "projectName": "Autohub",
+        "projectPath": "C:\\Users\\gorce\\GarageSpotter\\AutoHub\\AutoHub\\Autohub.csproj",
         "packagesPath": "C:\\Users\\gorce\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\gorce\\GarageSpotter\\AutoHub\\AutoHub\\obj\\",
         "projectStyle": "PackageReference",
@@ -74,11 +74,19 @@
               "target": "Package",
               "version": "[8.0.10, )"
             },
+            "Microsoft.AspNetCore.Mvc": {
+              "target": "Package",
+              "version": "[2.3.0, )"
+            },
             "Microsoft.EntityFrameworkCore.Design": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
               "version": "[9.0.0, )"
+            },
+            "Moq": {
+              "target": "Package",
+              "version": "[4.20.72, )"
             },
             "Newtonsoft.Json": {
               "target": "Package",
@@ -99,6 +107,10 @@
             "automapper": {
               "target": "Package",
               "version": "[13.0.1, )"
+            },
+            "xunit": {
+              "target": "Package",
+              "version": "[2.9.3, )"
             }
           },
           "imports": [
